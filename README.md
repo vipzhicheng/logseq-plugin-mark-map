@@ -1,18 +1,21 @@
-# Webpack Typescript Starter
+# Logseq Markmap Plugin
 
-A simple webpack typescript starter for frontend developers
+## Installation and Usage
 
-## Usage
-
-```shell
-npm i -g @semo/cli
-semo run --force --with project-templates -- create --template=webpack-typescript-starter <YOUR_PROJECT_NAME>
-cd <YOUR_PROJECT_NAME>
+```
 npm install
-    npm start
+npm run build
 ```
 
-Semo help you clone, rm .git, and git init a new one at the same time.
+load unpack plugin from `dist` directory
+
+## Stack
+
+* Typescript
+* Tailwind
+* Markmap
+
 
 ## Licence
+
 MIT

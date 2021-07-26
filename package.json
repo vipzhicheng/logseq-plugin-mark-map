@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "main": "index.html",
+  "description": "Logseq markmap plugin",
   "logseq": {
     "icon": "./icon.png"
   },
