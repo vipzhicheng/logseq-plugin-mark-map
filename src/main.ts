@@ -34,17 +34,6 @@ async function main() {
     `,
   });
 
-  // Esc close model
-  document.addEventListener(
-    'keydown',
-    function (e) {
-      if (e.keyCode === 27) {
-        logseq.hideMainUI();
-      }
-    },
-    false
-  );
-
   // iterate blocks
   const walkTransformBlocks = (blocks: any, depth = 0) => {
     return blocks.map((it: any) => {
@@ -70,6 +59,20 @@ async function main() {
   };
 
   let mm: Markmap;
+
+  document.addEventListener(
+    'keydown',
+    async function (e) {
+      if (e.keyCode === 27) { // Esc
+        logseq.hideMainUI();
+      }
+
+      if (e.keyCode === 32) { // Space
+        await mm?.fit();
+      }
+    },
+    false
+  );
 
   logseq.on('ui:visible:changed', async ({ visible }) => {
     if (!visible) {
