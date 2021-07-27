@@ -1,5 +1,5 @@
 {
-  "name": "logseq-mark-map",
+  "name": "logseq-plugin-mark-map",
   "version": "0.0.1",
   "license": "MIT",
   "main": "index.html",
