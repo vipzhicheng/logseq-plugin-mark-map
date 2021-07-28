@@ -3,6 +3,7 @@ import { Transformer } from 'markmap-lib';
 import * as markmap from 'markmap-view';
 import { Markmap } from 'markmap-view';
 import { Toolbar } from 'markmap-toolbar';
+import { INode } from 'markmap-common';
 
 const transformer = new Transformer();
 
@@ -60,20 +61,6 @@ async function main() {
 
   let mm: Markmap;
 
-  document.addEventListener(
-    'keydown',
-    async function (e) {
-      if (e.keyCode === 27) { // Esc
-        logseq.hideMainUI();
-      }
-
-      if (e.keyCode === 32) { // Space
-        await mm?.fit();
-      }
-    },
-    false
-  );
-
   logseq.on('ui:visible:changed', async ({ visible }) => {
     if (!visible) {
       return;
@@ -86,13 +73,96 @@ async function main() {
     // Build markdown
     const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks).join('\n');
 
-    const { root, features } = transformer.transform(md);
+    let { root, features } = transformer.transform(md);
     const { styles, scripts } = transformer.getUsedAssets(features);
-
     const { Markmap, loadCSS, loadJS } = markmap;
 
     if (styles) loadCSS(styles);
     if (scripts) loadJS(scripts, { getMarkmap: () => markmap });
+
+    // 隐藏所有子节点
+    const hideAll = (target: INode) => {
+      target.p = {
+        ...target.p,
+        f: true,
+      };
+
+      target.c?.forEach(t => {
+        hideAll(t);
+      });
+    };
+
+    // 显示所有子节点
+    const showAll = (target: INode) => {
+      target.p = {
+        ...target.p,
+        f: false,
+      };
+
+      target.c?.forEach(t => {
+        showAll(t);
+      });
+    };
+
+    // 展开指定级别
+    const expandLevel = (target: INode, level = 1) => {
+      if (level <= 0) {
+        return;
+      }
+      level--;
+
+      target.p = {
+        ...target.p,
+        f: false,
+      };
+
+      target.c?.forEach(t => {
+        expandLevel(t, level);
+      });
+    };
+
+    // Shortcuts
+    document.addEventListener(
+      'keydown',
+      async function (e) {
+        if (e.keyCode === 27) { // Esc
+          logseq.hideMainUI();
+        }
+
+        if (e.keyCode === 32) { // Space
+          await mm?.fit();
+        }
+
+        if (e.keyCode === 48) { // press 0
+          hideAll(root);
+          mm.setData(root);
+        }
+
+        if (e.keyCode === 57) { // press 9
+          showAll(root);
+          mm.setData(root);
+        }
+
+        if (e.keyCode === 49) { // press 1
+          hideAll(root);
+          expandLevel(root, 1);
+          mm.setData(root);
+        }
+
+        if (e.keyCode === 50) { // press 2
+          hideAll(root);
+          expandLevel(root, 2);
+          mm.setData(root);
+        }
+
+        if (e.keyCode === 51) { // press 3
+          hideAll(root);
+          expandLevel(root, 3);
+          mm.setData(root);
+        }
+      },
+      false
+    );
 
     if (mm) {
       // reuse instance, update data

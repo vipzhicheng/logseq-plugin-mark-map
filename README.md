@@ -1,8 +1,6 @@
 # Logseq Markmap Plugin
 
-![Screenshot 1](screenshot%201.png)
-
-![Screenshot 2](screenshot%202.png)
+![Screencast](./screencast.gif)
 
 This is a plugin for [Logseq](https://github.com/logseq/logseq) to provide mindmap support based on [Markmap](https://github.com/gera2ld/markmap).
 
@@ -46,6 +44,16 @@ Most of features come from `Markmap` project.
 * Logseq embeded feature not supported.
 * Only tested on `Markdown` mode, not `Org` mode, sorry!
 * Tested on Logseq `v0.2.8` with the temp plugin infrastructure.
+
+## Shortcuts
+
+* `space`: fit window in center in case you move or zoom it.
+* `0`: hide all except the central one.
+* `9`: show all.
+* `1`: expand level 1.
+* `2`: expand level 2.
+* `3`: expand level 3.
+* `ESC`: close the mindmap.
 ## Contribution
 
 Issues and PRs are welcome!
