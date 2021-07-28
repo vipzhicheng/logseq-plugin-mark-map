@@ -125,40 +125,47 @@ async function main() {
     document.addEventListener(
       'keydown',
       async function (e) {
-        if (e.keyCode === 27) { // Esc
-          logseq.hideMainUI();
-        }
+        switch (e.keyCode) {
+          case 27:
+            logseq.hideMainUI();
+            break;
+          case 32:
+            await mm?.fit();
+            break;
+          case 48:
+            hideAll(root);
+            mm.setData(root);
 
-        if (e.keyCode === 32) { // Space
-          await mm?.fit();
-        }
+            break;
+          case 57:
+            showAll(root);
+            mm.setData(root);
 
-        if (e.keyCode === 48) { // press 0
-          hideAll(root);
-          mm.setData(root);
-        }
+            break;
+          case 49:
+            hideAll(root);
+            expandLevel(root, 1);
+            mm.setData(root);
 
-        if (e.keyCode === 57) { // press 9
-          showAll(root);
-          mm.setData(root);
-        }
+            break;
+          case 50:
+            hideAll(root);
+            expandLevel(root, 2);
+            mm.setData(root);
 
-        if (e.keyCode === 49) { // press 1
-          hideAll(root);
-          expandLevel(root, 1);
-          mm.setData(root);
-        }
+            break;
+          case 51:
+            hideAll(root);
+            expandLevel(root, 3);
+            mm.setData(root);
 
-        if (e.keyCode === 50) { // press 2
-          hideAll(root);
-          expandLevel(root, 2);
-          mm.setData(root);
-        }
-
-        if (e.keyCode === 51) { // press 3
-          hideAll(root);
-          expandLevel(root, 3);
-          mm.setData(root);
+            break;
+          case 187:
+            await mm.rescale(1.25);
+            break;
+          case 189:
+            await mm.rescale(0.8);
+            break;
         }
       },
       false
@@ -186,10 +193,9 @@ async function main() {
         title: 'Save as png',
         content: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>',
         onClick: async () => {
-          await mm.fit();
           let el = document.getElementById('markmap-container');
           if (el) {
-            html2canvas(el).then(function(canvas) {
+            html2canvas(el).then(function (canvas) {
               const title = page?.originalName;
               let url = canvas.toDataURL('image/png');
               var oA = document.createElement('a');
@@ -207,7 +213,7 @@ async function main() {
       el.style.position = 'absolute';
       el.style.bottom = '0.5rem';
       el.style.right = '0.5rem';
-      document.getElementById('markmap-container')?.append(el);
+      document.getElementById('markmap-toolbar')?.append(el);
     }
   });
 }

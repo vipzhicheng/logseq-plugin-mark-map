@@ -50,9 +50,11 @@ Most of features come from `Markmap` project.
 * `space`: fit window in center in case you move or zoom it.
 * `0`: hide all except the central one.
 * `9`: show all.
-* `1`: expand level 1.
-* `2`: expand level 2.
-* `3`: expand level 3.
+* `1`: expand to level 1.
+* `2`: expand to level 2.
+* `3`: expand to level 3.
+* `+`: zoomIn
+* `-`: zoomOut
 * `ESC`: close the mindmap.
 ## Contribution
 
