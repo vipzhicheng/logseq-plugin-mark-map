@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@logseq/libs": "0.0.1-alpha.26",
+    "html2canvas": "^1.1.4",
     "markmap-lib": "^0.11.6",
     "markmap-toolbar": "^0.1.6",
     "markmap-view": "^0.2.6"

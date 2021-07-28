@@ -4,7 +4,7 @@ import * as markmap from 'markmap-view';
 import { Markmap } from 'markmap-view';
 import { Toolbar } from 'markmap-toolbar';
 import { INode } from 'markmap-common';
-
+import html2canvas from 'html2canvas';
 const transformer = new Transformer();
 
 /**
@@ -179,8 +179,29 @@ async function main() {
 
       // Customize toolbar
       const toolbar = new Toolbar();
-      toolbar.setItems(['zoomIn', 'zoomOut', 'fit']);
+      toolbar.setItems(['zoomIn', 'zoomOut', 'fit', 'save']);
       toolbar.setBrand(false);
+      toolbar.register({
+        id: 'save',
+        title: 'Save as png',
+        content: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>',
+        onClick: async () => {
+          await mm.fit();
+          let el = document.getElementById('markmap-container');
+          if (el) {
+            html2canvas(el).then(function(canvas) {
+              const title = page?.originalName;
+              let url = canvas.toDataURL('image/png');
+              var oA = document.createElement('a');
+              oA.download = title || '';
+              oA.href = url;
+              document.body.appendChild(oA);
+              oA.click();
+              oA.remove();
+            });
+          }
+        },
+      });
       toolbar.attach(mm);
       const el = toolbar.render();
       el.style.position = 'absolute';
