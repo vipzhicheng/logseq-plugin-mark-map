@@ -38,6 +38,7 @@ async function main() {
   // iterate blocks
   const walkTransformBlocks = (blocks: any, depth = 0) => {
     currentLevel = Math.min(5, Math.max(currentLevel, depth + 1));
+    totalLevel = Math.min(5, Math.max(currentLevel, depth + 1));
     return blocks.map((it: any) => {
       const { children, uuid, title, content } = it;
 
@@ -62,6 +63,7 @@ async function main() {
 
   let mm: Markmap;
   let currentLevel: number;
+  let totalLevel: number;
 
   logseq.on('ui:visible:changed', async ({ visible }) => {
     if (!visible) {
@@ -152,11 +154,13 @@ async function main() {
               break;
             case 48:
               hideAll(root);
+              currentLevel = 0;
               mm.setData(root);
 
               break;
             case 57:
               showAll(root);
+              currentLevel = totalLevel;
               mm.setData(root);
 
               break;
