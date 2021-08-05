@@ -37,6 +37,7 @@ async function main() {
 
   // iterate blocks
   const walkTransformBlocks = (blocks: any, depth = 0) => {
+    currentLevel = Math.min(5, Math.max(currentLevel, depth + 1));
     return blocks.map((it: any) => {
       const { children, uuid, title, content } = it;
 
@@ -60,6 +61,7 @@ async function main() {
   };
 
   let mm: Markmap;
+  let currentLevel: number;
 
   logseq.on('ui:visible:changed', async ({ visible }) => {
     if (!visible) {
@@ -71,6 +73,7 @@ async function main() {
     const title = page?.originalName;
 
     // Build markdown
+    currentLevel = -1; // reset level;
     const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks).join('\n');
 
     let { root, features } = transformer.transform(md);
@@ -107,6 +110,7 @@ async function main() {
     // 展开指定级别
     const expandLevel = (target: INode, level = 1) => {
       if (level <= 0) {
+        hideAll(target);
         return;
       }
       level--;
@@ -121,56 +125,6 @@ async function main() {
       });
     };
 
-    // Shortcuts
-    document.addEventListener(
-      'keydown',
-      async function (e) {
-        switch (e.keyCode) {
-          case 27:
-            logseq.hideMainUI();
-            break;
-          case 32:
-            await mm?.fit();
-            break;
-          case 48:
-            hideAll(root);
-            mm.setData(root);
-
-            break;
-          case 57:
-            showAll(root);
-            mm.setData(root);
-
-            break;
-          case 49:
-            hideAll(root);
-            expandLevel(root, 1);
-            mm.setData(root);
-
-            break;
-          case 50:
-            hideAll(root);
-            expandLevel(root, 2);
-            mm.setData(root);
-
-            break;
-          case 51:
-            hideAll(root);
-            expandLevel(root, 3);
-            mm.setData(root);
-
-            break;
-          case 187:
-            await mm.rescale(1.25);
-            break;
-          case 189:
-            await mm.rescale(0.8);
-            break;
-        }
-      },
-      false
-    );
-
     if (mm) {
       // reuse instance, update data
       mm.setData(root);
@@ -184,6 +138,85 @@ async function main() {
         root
       );
 
+      // Shortcuts
+      document.addEventListener(
+        'keydown',
+        async function (e) {
+          switch (e.keyCode) {
+            case 27:
+            case 81:
+              logseq.hideMainUI();
+              break;
+            case 32:
+              await mm?.fit();
+              break;
+            case 48:
+              hideAll(root);
+              mm.setData(root);
+
+              break;
+            case 57:
+              showAll(root);
+              mm.setData(root);
+
+              break;
+            case 49:
+              hideAll(root);
+              expandLevel(root, 1);
+              currentLevel = 1;
+              mm.setData(root);
+
+              break;
+            case 50:
+              hideAll(root);
+              expandLevel(root, 2);
+              currentLevel = 2;
+              mm.setData(root);
+
+              break;
+            case 51:
+              hideAll(root);
+              expandLevel(root, 3);
+              currentLevel = 3;
+              mm.setData(root);
+
+              break;
+            case 52:
+              hideAll(root);
+              expandLevel(root, 4);
+              currentLevel = 4;
+              mm.setData(root);
+
+              break;
+            case 53:
+              hideAll(root);
+              expandLevel(root, 5);
+              currentLevel = 5;
+              mm.setData(root);
+
+              break;
+            case 72:
+              hideAll(root);
+              expandLevel(root, currentLevel > 0 ? --currentLevel : 0);
+              mm.setData(root);
+              break;
+            case 76:
+              hideAll(root);
+              expandLevel(root, currentLevel < 5 ? ++currentLevel : 5);
+              mm.setData(root);
+              break;
+
+            case 187:
+              await mm.rescale(1.25);
+              break;
+            case 189:
+              await mm.rescale(0.8);
+              break;
+          }
+        },
+        false
+      );
+
       // Customize toolbar
       const toolbar = new Toolbar();
       toolbar.setItems(['zoomIn', 'zoomOut', 'fit', 'save']);
@@ -191,7 +224,8 @@ async function main() {
       toolbar.register({
         id: 'save',
         title: 'Save as png',
-        content: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>',
+        content:
+          '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>',
         onClick: async () => {
           let el = document.getElementById('markmap-container');
           if (el) {

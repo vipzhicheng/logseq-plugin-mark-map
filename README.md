@@ -53,9 +53,14 @@ Most of features come from `Markmap` project.
 * `1`: expand to level 1.
 * `2`: expand to level 2.
 * `3`: expand to level 3.
-* `+`: zoomIn
-* `-`: zoomOut
+* `4`: expand to level 4.
+* `5`: expand to level 5.
+* `+`: zoom in.
+* `-`: zoom out.
+* `h`: level up.
+* `l`: level down.
 * `ESC`: close the mindmap.
+* `q`: close the mindmap.
 ## Contribution
 
 Issues and PRs are welcome!
