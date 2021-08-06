@@ -37,8 +37,8 @@ async function main() {
 
   // iterate blocks
   const walkTransformBlocks = (blocks: any, depth = 0) => {
-    currentLevel = Math.min(5, Math.max(currentLevel, depth + 1));
-    totalLevel = Math.min(5, Math.max(currentLevel, depth + 1));
+    currentLevel = Math.min(5, Math.max(currentLevel, depth));
+    totalLevel = Math.min(5, Math.max(currentLevel, depth));
     return blocks.map((it: any) => {
       const { children, uuid, title, content } = it;
 
@@ -206,7 +206,7 @@ async function main() {
               break;
             case 76:
               hideAll(root);
-              expandLevel(root, currentLevel < 5 ? ++currentLevel : 5);
+              expandLevel(root, currentLevel < totalLevel ? ++currentLevel : totalLevel);
               mm.setData(root);
               break;
 
