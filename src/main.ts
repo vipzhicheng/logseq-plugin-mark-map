@@ -79,6 +79,8 @@ async function main() {
     const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks).join('\n');
 
     let { root, features } = transformer.transform(md);
+    // @ts-ignore
+    window.root = root;
     const { styles, scripts } = transformer.getUsedAssets(features);
     const { Markmap, loadCSS, loadJS } = markmap;
 
@@ -127,6 +129,84 @@ async function main() {
       });
     };
 
+    const listener = async function(e: any) {
+      // @ts-ignore
+      const root = window.root;
+      switch (e.keyCode) {
+        case 27:
+        case 81:
+          logseq.hideMainUI();
+          break;
+        case 32:
+          await mm?.fit();
+          break;
+        case 48:
+          hideAll(root);
+          currentLevel = 0;
+          mm.setData(root);
+
+          break;
+        case 57:
+          showAll(root);
+          currentLevel = totalLevel;
+          mm.setData(root);
+
+          break;
+        case 49:
+          hideAll(root);
+          expandLevel(root, 1);
+          currentLevel = 1;
+          mm.setData(root);
+
+          break;
+        case 50:
+          hideAll(root);
+          expandLevel(root, 2);
+          currentLevel = 2;
+          mm.setData(root);
+
+          break;
+        case 51:
+          hideAll(root);
+          expandLevel(root, 3);
+          currentLevel = 3;
+          mm.setData(root);
+
+          break;
+        case 52:
+          hideAll(root);
+          expandLevel(root, 4);
+          currentLevel = 4;
+          mm.setData(root);
+
+          break;
+        case 53:
+          hideAll(root);
+          expandLevel(root, 5);
+          currentLevel = 5;
+          mm.setData(root);
+
+          break;
+        case 72:
+          hideAll(root);
+          expandLevel(root, currentLevel > 0 ? --currentLevel : 0);
+          mm.setData(root);
+          break;
+        case 76:
+          hideAll(root);
+          expandLevel(root, currentLevel < totalLevel ? ++currentLevel : totalLevel);
+          mm.setData(root);
+          break;
+
+        case 187:
+          await mm.rescale(1.25);
+          break;
+        case 189:
+          await mm.rescale(0.8);
+          break;
+      }
+    };
+
     if (mm) {
       // reuse instance, update data
       mm.setData(root);
@@ -140,86 +220,7 @@ async function main() {
         root
       );
 
-      // Shortcuts
-      document.addEventListener(
-        'keydown',
-        async function (e) {
-          switch (e.keyCode) {
-            case 27:
-            case 81:
-              logseq.hideMainUI();
-              break;
-            case 32:
-              await mm?.fit();
-              break;
-            case 48:
-              hideAll(root);
-              currentLevel = 0;
-              mm.setData(root);
-
-              break;
-            case 57:
-              showAll(root);
-              currentLevel = totalLevel;
-              mm.setData(root);
-
-              break;
-            case 49:
-              hideAll(root);
-              expandLevel(root, 1);
-              currentLevel = 1;
-              mm.setData(root);
-
-              break;
-            case 50:
-              hideAll(root);
-              expandLevel(root, 2);
-              currentLevel = 2;
-              mm.setData(root);
-
-              break;
-            case 51:
-              hideAll(root);
-              expandLevel(root, 3);
-              currentLevel = 3;
-              mm.setData(root);
-
-              break;
-            case 52:
-              hideAll(root);
-              expandLevel(root, 4);
-              currentLevel = 4;
-              mm.setData(root);
-
-              break;
-            case 53:
-              hideAll(root);
-              expandLevel(root, 5);
-              currentLevel = 5;
-              mm.setData(root);
-
-              break;
-            case 72:
-              hideAll(root);
-              expandLevel(root, currentLevel > 0 ? --currentLevel : 0);
-              mm.setData(root);
-              break;
-            case 76:
-              hideAll(root);
-              expandLevel(root, currentLevel < totalLevel ? ++currentLevel : totalLevel);
-              mm.setData(root);
-              break;
-
-            case 187:
-              await mm.rescale(1.25);
-              break;
-            case 189:
-              await mm.rescale(0.8);
-              break;
-          }
-        },
-        false
-      );
+      document.addEventListener( 'keydown', listener, false);
 
       // Customize toolbar
       const toolbar = new Toolbar();
