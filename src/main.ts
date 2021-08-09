@@ -39,7 +39,23 @@ async function main() {
   const walkTransformBlocks = (blocks: any, depth = 0) => {
     currentLevel = Math.min(5, Math.max(currentLevel, depth));
     totalLevel = Math.min(5, Math.max(currentLevel, depth));
-    return blocks.map((it: any) => {
+    return blocks.filter((it: any) => {
+      const { children, uuid, title, content } = it;
+      let contentFiltered = content
+        .split('\n')
+        .filter((line: string) => line.indexOf('::') === -1)
+        .join('\n');
+      const topic = contentFiltered
+        .replace(/^[#\s]+/, '')
+        .replace(/#[\s\S]+/, '')
+        .trim();
+
+      if (topic.length === 0 && children.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    }).map((it: any) => {
       const { children, uuid, title, content } = it;
 
       let contentFiltered = content
