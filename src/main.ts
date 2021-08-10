@@ -80,7 +80,8 @@ async function main() {
   let mm: Markmap;
   let currentLevel: number;
   let totalLevel: number;
-  let originalRoot;
+  let originalRoot: INode;
+  let originalTotalLevel: number;
 
   logseq.on('ui:visible:changed', async ({ visible }) => {
     if (!visible) {
@@ -97,6 +98,7 @@ async function main() {
 
     let { root, features } = transformer.transform(md);
     originalRoot = root;
+    originalTotalLevel = totalLevel;
     // @ts-ignore
     window.root = root;
     const { styles, scripts } = transformer.getUsedAssets(features);
@@ -187,88 +189,169 @@ async function main() {
       });
     };
 
+    let stack: INode[] = [];
+    let pointerStack: number[] = [];
+    let pointer: number;
+
+    const focusIn = (root: INode) => {
+      if (root.c) {
+        pointerStack.push(pointer);
+        pointer = 0;
+        stack.push(root);
+        root = root.c[pointer];
+        // @ts-ignore
+        window.root = root;
+        showAll(root);
+        mm.setData(root);
+        totalLevel--;
+        currentLevel = totalLevel;
+      }
+    };
+
+    const focusOut = () => {
+      if (stack.length > 0) {
+        root = stack.pop() as INode;
+        pointer = pointerStack.pop() as number;
+
+        // @ts-ignore
+        window.root = root;
+        showAll(root);
+        mm.setData(root);
+
+        totalLevel++;
+        currentLevel = totalLevel;
+      }
+    };
+
+    const focusNext = () => {
+      const top = stack[stack.length - 1];
+      if (top && top.c && pointer + 1 <= top.c.length - 1) {
+        root = top.c[++pointer];
+        // @ts-ignore
+        window.root = root;
+        mm.setData(root);
+      }
+
+    };
+
+    const focusPrevious = () => {
+      const top = stack[stack.length - 1];
+      if (top && top.c && pointer - 1 >= 0) {
+        root = top.c[--pointer];
+        // @ts-ignore
+        window.root = root;
+        mm.setData(root);
+      }
+    };
+
+    const focusReset = () => {
+      root = originalRoot;
+      // @ts-ignore
+      window.root = root;
+      stack = [];
+      mm.setData(root);
+      totalLevel = originalTotalLevel;
+      currentLevel = totalLevel;
+    };
+
     const listener = async function(e: any) {
       // @ts-ignore
       const root = window.root;
+      console.log(e.keyCode);
       switch (e.keyCode) {
-        case 27:
-        case 81:
+        case 80: // p
+          focusPrevious();
+          break;
+        case 78: // n
+          focusNext();
+          break;
+        case 191: // /
+          focusOut();
+          break;
+        case 188: // .
+          focusReset();
+          break;
+        case 190: // ,
+          focusIn(root);
+          break;
+        case 27: // ESC
+        case 81: // q
           logseq.hideMainUI();
           break;
-        case 32:
+        case 32: // space
           await mm?.fit();
           break;
-        case 48:
+        case 48: // 0
           hideAll(root);
           currentLevel = 0;
           mm.setData(root);
 
           break;
-        case 57:
+        case 57: // 9
           showAll(root);
           currentLevel = totalLevel;
           mm.setData(root);
 
           break;
-        case 49:
+        case 49: // 1
           hideAll(root);
           expandLevel(root, 1);
           currentLevel = 1;
           mm.setData(root);
 
           break;
-        case 50:
+        case 50: // 2
           hideAll(root);
           expandLevel(root, 2);
           currentLevel = 2;
           mm.setData(root);
 
           break;
-        case 51:
+        case 51: // 3
           hideAll(root);
           expandLevel(root, 3);
           currentLevel = 3;
           mm.setData(root);
 
           break;
-        case 52:
+        case 52: // 4
           hideAll(root);
           expandLevel(root, 4);
           currentLevel = 4;
           mm.setData(root);
 
           break;
-        case 53:
+        case 53: // 5
           hideAll(root);
           expandLevel(root, 5);
           currentLevel = 5;
           mm.setData(root);
 
           break;
-        case 72:
+        case 72: // h
           hideAll(root);
           expandLevel(root, currentLevel > 0 ? --currentLevel : 0);
           mm.setData(root);
           break;
-        case 76:
+        case 76: // l
           hideAll(root);
           expandLevel(root, currentLevel < totalLevel ? ++currentLevel : totalLevel);
           mm.setData(root);
           break;
 
-        case 74:
+        case 74: // j
           expandStepByStep(root);
           mm.setData(root);
           break;
-        case 75:
+        case 75: // k
           collapseStepByStep(root);
           mm.setData(root);
           break;
 
-        case 187:
+        case 187: // +
           await mm.rescale(1.25);
           break;
-        case 189:
+        case 189: // -
           await mm.rescale(0.8);
           break;
       }
