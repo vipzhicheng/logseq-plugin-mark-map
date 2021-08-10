@@ -61,13 +61,12 @@ Most of features come from `Markmap` project.
 * `l`: level down.
 * `j`: expand step by step.
 * `k`: collapse step by step.
-* `,`: focus in to children level.
-* `/`: focus out to parent level.
-* `.`: reset to original tree.
+* `.`: focus in to children level.
+* `b`: focus out to parent level.
+* `,`: reset to original tree.
 * `n`: focus to next sibling.
 * `p`: focus to previous sibling.
-* `ESC`: close the mindmap.
-* `q`: close the mindmap.
+* `ESC` & `q`: close the mindmap.
 ## Contribution
 
 Issues and PRs are welcome!

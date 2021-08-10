@@ -249,6 +249,7 @@ async function main() {
       // @ts-ignore
       window.root = root;
       stack = [];
+      showAll(root);
       mm.setData(root);
       totalLevel = originalTotalLevel;
       currentLevel = totalLevel;
@@ -257,7 +258,6 @@ async function main() {
     const listener = async function(e: any) {
       // @ts-ignore
       const root = window.root;
-      console.log(e.keyCode);
       switch (e.keyCode) {
         case 80: // p
           focusPrevious();
@@ -265,7 +265,7 @@ async function main() {
         case 78: // n
           focusNext();
           break;
-        case 191: // /
+        case 66: // /
           focusOut();
           break;
         case 188: // .
