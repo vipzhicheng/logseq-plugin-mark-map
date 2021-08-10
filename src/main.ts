@@ -80,6 +80,7 @@ async function main() {
   let mm: Markmap;
   let currentLevel: number;
   let totalLevel: number;
+  let originalRoot;
 
   logseq.on('ui:visible:changed', async ({ visible }) => {
     if (!visible) {
@@ -95,6 +96,7 @@ async function main() {
     const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks).join('\n');
 
     let { root, features } = transformer.transform(md);
+    originalRoot = root;
     // @ts-ignore
     window.root = root;
     const { styles, scripts } = transformer.getUsedAssets(features);
@@ -127,7 +129,47 @@ async function main() {
       });
     };
 
-    // 展开指定级别
+    // 逐级展开
+    const expandStepByStep = (target: INode): boolean => {
+      let find = false;
+      if (target.p?.f && target.c) {
+        target.p.f = false;
+        find = true;
+      }
+      if (!find && target.c) {
+          for (let t of target.c) {
+            find = expandStepByStep(t);
+            if (find) {
+              return find;
+            }
+          }
+
+      }
+
+      return find;
+    };
+
+    const collapseStepByStep = (target: INode): boolean => {
+      let find = false;
+
+      if (target.c) {
+        const length = target.c.length;
+        for (let i = length - 1; i >= 0; i--) {
+          const t = target.c[i];
+          find = collapseStepByStep(t);
+          if (find) {
+            return find;
+          }
+        }
+      }
+
+      if (!target.p?.f && target.c) {
+        target.p.f = true;
+        find = true;
+      }
+      return find;
+    };
+
     const expandLevel = (target: INode, level = 1) => {
       if (level <= 0) {
         hideAll(target);
@@ -211,6 +253,15 @@ async function main() {
         case 76:
           hideAll(root);
           expandLevel(root, currentLevel < totalLevel ? ++currentLevel : totalLevel);
+          mm.setData(root);
+          break;
+
+        case 74:
+          expandStepByStep(root);
+          mm.setData(root);
+          break;
+        case 75:
+          collapseStepByStep(root);
           mm.setData(root);
           break;
 

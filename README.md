@@ -59,6 +59,8 @@ Most of features come from `Markmap` project.
 * `-`: zoom out.
 * `h`: level up.
 * `l`: level down.
+* `j`: expand step by step.
+* `k`: collapse step by step.
 * `ESC`: close the mindmap.
 * `q`: close the mindmap.
 ## Contribution
