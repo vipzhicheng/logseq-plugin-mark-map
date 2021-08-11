@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.0.3
+
+* Fix some level and page switch issues.
+* Add more shortcuts include traverse step by step, level by level, focus in and out.
+
 ## 0.0.2
 
 * Add shortcuts support.
