@@ -1,6 +1,16 @@
 # Logseq Markmap Plugin
 
-![Screencast](./screencast.gif)
+***Basic shortcuts***
+
+![Screencast1](./screencast1.gif)
+
+***Traverse level by level and step by step***
+
+![Screencast2](./screencast2.gif)
+
+***Focus in and out***
+
+![Screencast3](./screencast3.gif)
 
 This is a plugin for [Logseq](https://github.com/logseq/logseq) to provide mindmap support based on [Markmap](https://github.com/gera2ld/markmap).
 
@@ -12,12 +22,12 @@ npm run build:prod # For real
 npm run build # For development
 ```
 
-load unpack plugin from `dist` directory
+Load unpack plugin from `dist` directory
 
 ## Stack
 
 * Typescript
-* Tailwind
+* TailwindCSS
 * Markmap related packages
 
 ## Features
@@ -31,6 +41,7 @@ Most of features come from `Markmap` project.
 * Support normal links.
 * Support inline latex syntax.
 * Support mouse drag and drop, double click, scrollwheel zoom.
+* Provice many convenient shortcuts.
 
 ## Notes
 
