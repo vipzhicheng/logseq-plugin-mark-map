@@ -41,6 +41,9 @@ async function main() {
     totalLevel = Math.min(5, Math.max(currentLevel, depth));
     return blocks.filter((it: any) => {
       const { children, uuid, title, content } = it;
+      if (!content || content.startsWith('---\n')) {
+        return false;
+      }
       let contentFiltered = content
         .split('\n')
         .filter((line: string) => line.indexOf('::') === -1)
@@ -91,6 +94,8 @@ async function main() {
     const blocks = await logseq.Editor.getCurrentPageBlocksTree();
     const page = await logseq.Editor.getCurrentPage();
     const title = page?.originalName;
+
+    console.log('blocks', blocks);
 
     // Build markdown
     currentLevel = -1; // reset level;
