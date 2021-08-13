@@ -47,7 +47,6 @@ Most of features come from `Markmap` project.
 
 * The mindmap is not editable.
 * Properies are ignored.
-* `#` Tags are ignored.
 * Text length is unlimited.
 * `#` head markdown syntax is ignored, use hierarchical blocks instead.
 * image not supported.

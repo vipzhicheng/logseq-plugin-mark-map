@@ -50,7 +50,6 @@ async function main() {
         .join('\n');
       const topic = contentFiltered
         .replace(/^[#\s]+/, '')
-        .replace(/#[\s\S]+/, '')
         .trim();
 
       if (topic.length === 0 && children.length === 0) {
@@ -67,7 +66,6 @@ async function main() {
         .join('\n');
       const topic = contentFiltered
         .replace(/^[#\s]+/, '')
-        .replace(/#[\s\S]+/, '')
         .trim();
 
       let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic;
