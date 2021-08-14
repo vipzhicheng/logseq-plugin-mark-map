@@ -1,9 +1,9 @@
 module.exports = {
   mode: 'jit',
+  darkMode: 'media',
   purge: [
     'src/index.html'
   ],
-  darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {},
   },

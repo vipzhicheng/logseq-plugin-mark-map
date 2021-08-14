@@ -93,8 +93,6 @@ async function main() {
     const page = await logseq.Editor.getCurrentPage();
     const title = page?.originalName;
 
-    console.log('blocks', blocks);
-
     // Build markdown
     currentLevel = -1; // reset level;
     const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks).join('\n');
