@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.0.4
+
+* Filter out front matter block.
+* Show Logseq block tag.
+* Add blur background effect.
+* Support auto dark mode based on system theme.
+
 ## 0.0.3
 
 * Fix some level and page switch issues.
