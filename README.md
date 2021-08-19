@@ -42,7 +42,7 @@ Most of features come from `Markmap` project.
 * Support inline latex syntax.
 * Support mouse drag and drop, double click, scrollwheel zoom.
 * Provice many convenient shortcuts.
-* Support auto dark mode, not based on Logseq theme, system theme instead.
+* Support dark mode, and up to 16 themes.
 
 ## Notes
 

@@ -4,15 +4,66 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.jsdelivr.net/npm/d3@6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
   <title>Markmap Integration For Logseq</title>
+  <script defer src="https://unpkg.com/alpinejs@3.2.3/dist/cdn.min.js"></script>
+
 </head>
-<body class="relative">
-  <div class="h-screen bg-white dark:bg-gray-900 dark:text-gray-50 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-sm items-center justify-center flex w-full" id="markmap-container">
-    <svg class="w-11/12 h-5/6"
-    id="markmap"></svg>
+<body x-data="{ theme: '', manual: false, front: 'text-gray-900', bg: 'bg-gray-100' }" x-init="theme = JSON.parse(localStorage.getItem('theme')); console.log('theme', theme); console.log('manual', manual);"  class="relative" :class="!manual && theme === 'dark' ? 'dark' : '' ">
+  <div class="h-screen dark:bg-gray-900 dark:text-gray-50 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-sm items-center justify-center flex w-full" :class="{[front]: true, [bg]: true}" id="markmap-container">
+    <svg class="w-11/12 h-5/6" id="markmap"></svg>
+
+    <div x-data="{
+      themeList: {
+        'bg-gray-100': 'text-gray-900',
+        'bg-red-100': 'text-red-900',
+        'bg-blue-100': 'text-blue-900',
+        'bg-green-100': 'text-green-900',
+        'bg-yellow-100': 'text-yellow-900',
+        'bg-purple-100': 'text-purple-900',
+        'bg-pink-100': 'text-pink-900',
+        'bg-indigo-100': 'text-indigo-900',
+        'bg-indigo-900': 'text-indigo-100',
+        'bg-pink-900': 'text-pink-100',
+        'bg-purple-900': 'text-purple-100',
+        'bg-yellow-900': 'text-yellow-100',
+        'bg-green-900': 'text-green-100',
+        'bg-blue-900': 'text-blue-100',
+        'bg-red-900': 'text-red-100',
+        'bg-gray-900': 'text-gray-100',
+      }
+
+    }" class="absolute bottom-4 w-full flex items-center justify-center opacity-0 hover:opacity-100">
+      <div class="flex flex-row gap-2 w-auto">
+        <div x-data title="Random">
+          <svg @click="manual = true; bg = Object.keys(themeList)[Math.floor(Math.random() * Object.keys(themeList).length)]; front = themeList[bg]" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div title="Light gray"  @click="manual = true; bg = 'bg-gray-100'; front = themeList[bg]" class="w-4 h-4 bg-gray-200 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Light red"  @click="manual = true; bg = 'bg-red-100'; front = themeList[bg]" class="w-4 h-4 bg-red-200 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Light blue"  @click="manual = true; bg = 'bg-blue-100'; front = themeList[bg]" class="w-4 h-4 bg-blue-200 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Light green" @click="manual = true; bg = 'bg-green-100'; front = themeList[bg]" class="w-4 h-4 bg-green-200 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Light yellow" @click="manual = true; bg = 'bg-yellow-100'; front = themeList[bg]" class="w-4 h-4 bg-yellow-200 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Light pink" @click="manual = true; bg = 'bg-pink-100'; front = themeList[bg]" class="w-4 h-4 bg-purple-200 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Light purple" @click="manual = true; bg = 'bg-purple-100'; front = themeList[bg]" class="w-4 h-4 bg-pink-200 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Light indigo" @click="manual = true; bg = 'bg-indigo-100'; front = themeList[bg]" class="w-4 h-4 bg-indigo-200 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Dark indigo" @click="manual = true; bg = 'bg-indigo-900'; front = themeList[bg]" class="w-4 h-4 bg-indigo-700 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Dark purple" @click="manual = true; bg = 'bg-purple-900'; front = themeList[bg]" class="w-4 h-4 bg-pink-700 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Dark pink" @click="manual = true; bg = 'bg-pink-900'; front = themeList[bg]" class="w-4 h-4 bg-purple-700 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Dark yellow" @click="manual = true; bg = 'bg-yellow-900'; front = themeList[bg]" class="w-4 h-4 bg-yellow-700 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Dark green" @click="manual = true; bg = 'bg-green-900'; front = themeList[bg]" class="w-4 h-4 bg-green-700 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Dark blue" @click="manual = true; bg = 'bg-blue-900'; front = themeList[bg]" class="w-4 h-4 bg-blue-700 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Dark red" @click="manual = true; bg = 'bg-red-900'; front = themeList[bg]" class="w-4 h-4 bg-red-700 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Dark gray" @click="manual = true; bg = 'bg-gray-900'; front = themeList[bg]" class="w-4 h-4 bg-gray-700 rounded-full shadow-2xl cursor-pointer"></div>
+        <div title="Reset">
+          <svg @click="manual = false; theme = JSON.parse(localStorage.getItem('theme')); front = 'text-gray-900'; bg = 'bg-gray-100'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+    </div>
   </div>
-  <div id="markmap-toolbar" class="cursor-pointer"></div>
+  <div id="markmap-toolbar" class="cursor-pointer dark:text-gray-50" :class="bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'"></div>
+
 </body>
 </html>

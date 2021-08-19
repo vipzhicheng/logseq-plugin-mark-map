@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.0.5
+
+* (feat): Add up to 16 themes.
+* (feat): Change auto dark mode to follow Logseq theme.
+* Fix: corner toolbar color change with theme changing.
+
 ## 0.0.4
 
 * Filter out front matter block.
