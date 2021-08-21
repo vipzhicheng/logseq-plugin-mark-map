@@ -256,10 +256,28 @@ async function main() {
       currentLevel = totalLevel;
     };
 
+    function eventFire(el: any, etype: string){
+      if (el.fireEvent) {
+        el.fireEvent('on' + etype);
+      } else {
+        var evObj = document.createEvent('Events');
+        evObj.initEvent(etype, true, false);
+        el.dispatchEvent(evObj);
+      }
+    }
+
     const listener = async function(e: any) {
       // @ts-ignore
       const root = window.root;
       switch (e.keyCode) {
+        case 82: // r
+          const elRandomButton = document.getElementById('random-button');
+          eventFire(elRandomButton, 'click');
+          break;
+        case 90: // z
+          const elResetButton = document.getElementById('reset-button');
+          eventFire(elResetButton, 'click');
+          break;
         case 80: // p
           focusPrevious();
           break;

@@ -77,6 +77,8 @@ Most of features come from `Markmap` project.
 * `,`: reset to original tree.
 * `n`: focus to next sibling.
 * `p`: focus to previous sibling.
+* `r`: random change theme.
+* `z`: reset theme according to Logseq theme.
 * `ESC` & `q`: close the mindmap.
 ## Contribution
 
