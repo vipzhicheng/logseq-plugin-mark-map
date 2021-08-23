@@ -6,6 +6,7 @@ import { Toolbar } from 'markmap-toolbar';
 import { INode } from 'markmap-common';
 import html2canvas from 'html2canvas';
 const transformer = new Transformer();
+import * as d3 from 'd3';
 
 /**
  * User model
@@ -265,11 +266,59 @@ async function main() {
         el.dispatchEvent(evObj);
       }
     }
-
+    let svgNode;
     const listener = async function(e: any) {
       // @ts-ignore
       const root = window.root;
       switch (e.keyCode) {
+        case 37:
+          svgNode = mm.svg.node();
+          if (svgNode) {
+            // @ts-ignore
+            const transform = d3.zoomTransform(mm.svg.node());
+            // @ts-ignore
+            transform.x = transform.x - 100;
+            // @ts-ignore
+            mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+          }
+
+          break;
+        case 39:
+          svgNode = mm.svg.node();
+          if (svgNode) {
+            // @ts-ignore
+            const transform = d3.zoomTransform(mm.svg.node());
+            // @ts-ignore
+            transform.x = transform.x + 100;
+            // @ts-ignore
+            mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+          }
+
+          break;
+        case 38:
+          svgNode = mm.svg.node();
+          if (svgNode) {
+            // @ts-ignore
+            const transform = d3.zoomTransform(mm.svg.node());
+            // @ts-ignore
+            transform.y = transform.y - 100;
+            // @ts-ignore
+            mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+          }
+
+          break;
+        case 40:
+          svgNode = mm.svg.node();
+          if (svgNode) {
+            // @ts-ignore
+            const transform = d3.zoomTransform(mm.svg.node());
+            // @ts-ignore
+            transform.y = transform.y + 100;
+            // @ts-ignore
+            mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+          }
+
+          break;
         case 191:
           // @ts-ignore
           Alpine.store('showHelp').toggle();
