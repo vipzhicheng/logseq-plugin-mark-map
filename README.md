@@ -80,6 +80,10 @@ Most of features come from `Markmap` project.
 * `r`: random change theme.
 * `z`: reset theme according to Logseq theme.
 * `ESC` & `q`: close the mindmap.
+* `UP`: move mindmap up.
+* `DOWN`: move mindmap down.
+* `LEFT`: move mindmap left.
+* `RIGHT`: move mindmap right.
 ## Contribution
 
 Issues and PRs are welcome!
