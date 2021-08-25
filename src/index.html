@@ -214,6 +214,18 @@
 
             toggle() {
                 this.on = ! this.on
+            },
+
+            close() {
+              this.on = false
+            },
+
+            open() {
+              this.on = true
+            },
+
+            get() {
+              return this.on
             }
         })
     })

@@ -14,6 +14,8 @@ import * as d3 from 'd3';
 function createModel() {
   return {
     openMindMap() {
+      // @ts-ignore
+      Alpine.store('showHelp').close();
       logseq.showMainUI();
     },
   };
@@ -268,10 +270,18 @@ async function main() {
     }
     let svgNode;
     const listener = async function(e: any) {
+
+      // @ts-ignore
+      const showHelp = Alpine.store('showHelp').get();
+
+      if (showHelp && ![191, 81, 27].includes(e.keyCode)) {
+        return;
+      }
+
       // @ts-ignore
       const root = window.root;
       switch (e.keyCode) {
-        case 37:
+        case 37: // LEFT
           svgNode = mm.svg.node();
           if (svgNode) {
             // @ts-ignore
@@ -283,7 +293,7 @@ async function main() {
           }
 
           break;
-        case 39:
+        case 39: // RIGHT
           svgNode = mm.svg.node();
           if (svgNode) {
             // @ts-ignore
@@ -295,7 +305,7 @@ async function main() {
           }
 
           break;
-        case 38:
+        case 38: // UP
           svgNode = mm.svg.node();
           if (svgNode) {
             // @ts-ignore
@@ -307,7 +317,7 @@ async function main() {
           }
 
           break;
-        case 40:
+        case 40: // DOWN
           svgNode = mm.svg.node();
           if (svgNode) {
             // @ts-ignore
@@ -319,7 +329,7 @@ async function main() {
           }
 
           break;
-        case 191:
+        case 191: // /
           // @ts-ignore
           Alpine.store('showHelp').toggle();
           break;
@@ -337,7 +347,7 @@ async function main() {
         case 78: // n
           focusNext();
           break;
-        case 66: // /
+        case 66: // b
           focusOut();
           break;
         case 188: // .
