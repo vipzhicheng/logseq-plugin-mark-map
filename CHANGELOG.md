@@ -1,9 +1,15 @@
 # CHANGELOG
 
+## 0.0.6
+
+* feat: Add a help popup modal, press `/` to trigger.
+* feat: Add more shortcuts to change theme, move mindmap up, down, left, right.
+* fix: Wrong "save as png" file name sometimes.
+
 ## 0.0.5
 
-* (feat): Add up to 16 themes.
-* (feat): Change auto dark mode to follow Logseq theme.
+* feat: Add up to 16 themes.
+* feat: Change auto dark mode to follow Logseq theme.
 * Fix: corner toolbar color change with theme changing.
 
 ## 0.0.4
