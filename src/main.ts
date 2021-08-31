@@ -7,6 +7,8 @@ import { INode } from 'markmap-common';
 import html2canvas from 'html2canvas';
 const transformer = new Transformer();
 import * as d3 from 'd3';
+import org from 'org';
+import TurndownService from 'turndown';
 
 /**
  * User model
@@ -39,7 +41,7 @@ async function main() {
   });
 
   // iterate blocks
-  const walkTransformBlocks = (blocks: any, depth = 0) => {
+  const walkTransformBlocks = (blocks: any, depth = 0, config = {}) => {
     currentLevel = Math.min(5, Math.max(currentLevel, depth));
     totalLevel = Math.min(5, Math.max(currentLevel, depth));
     return blocks.filter((it: any) => {
@@ -67,14 +69,34 @@ async function main() {
         .split('\n')
         .filter((line: string) => line.indexOf('::') === -1)
         .join('\n');
-      const topic = contentFiltered
-        .replace(/^[#\s]+/, '')
-        .trim();
+      let topic = contentFiltered;
+
+      // @ts-ignore
+      if (config.preferredFormat === 'org') {
+        const turndownService = new TurndownService({
+          headingStyle: 'atx',
+          codeBlockStyle: 'fenced',
+        });
+
+        const parser = new org.Parser();
+        const orgDocument = parser.parse(topic);
+        const orgHTMLDocument = orgDocument.convert(org.ConverterHTML, {
+          headerOffset: 1,
+          exportFromLineNumber: false,
+          suppressSubScriptHandling: false,
+          suppressAutoLink: false
+        });
+
+        topic = orgHTMLDocument.toString();  // to html
+        topic = turndownService.turndown(topic); // to markdown
+      }
+
+      topic = topic.replace(/^[#\s]+/, '').trim();
 
       let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic;
 
       if (children) {
-        ret += '\n' + walkTransformBlocks(children, depth + 1).join('\n');
+        ret += '\n' + walkTransformBlocks(children, depth + 1, config).join('\n');
       }
 
       return ret;
@@ -92,13 +114,15 @@ async function main() {
       return;
     }
 
+    const config = await logseq.App.getUserConfigs();
+
     const blocks = await logseq.Editor.getCurrentPageBlocksTree();
     const page = await logseq.Editor.getCurrentPage();
     const title = page?.originalName;
 
     // Build markdown
     currentLevel = -1; // reset level;
-    const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks).join('\n');
+    const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks, 0, config).join('\n');
 
     let { root, features } = transformer.transform(md);
     originalRoot = root;
