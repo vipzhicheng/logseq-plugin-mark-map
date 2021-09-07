@@ -92,9 +92,11 @@ async function main() {
       }
 
       topic = topic.replace(/^[#\s]+/, '').trim();
-
+      const regexUrl = /^https?:\/\/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
       if (topic.indexOf('```') === 0) {
         topic = '\n' + topic;
+      } else if (regexUrl.test(topic)) {
+        topic = '<' + topic + '>';
       }
 
       let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic;
