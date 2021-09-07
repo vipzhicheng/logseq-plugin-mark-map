@@ -86,7 +86,6 @@ async function main() {
           suppressSubScriptHandling: false,
           suppressAutoLink: false
         });
-
         topic = orgHTMLDocument.toString();  // to html
         topic = turndownService.turndown(topic); // to markdown
       }
@@ -104,8 +103,6 @@ async function main() {
       if (children) {
         ret += '\n' + walkTransformBlocks(children, depth + 1, config).join('\n');
       }
-
-      console.log('ret', ret);
 
       return ret;
     });
@@ -127,8 +124,6 @@ async function main() {
     const blocks = await logseq.Editor.getCurrentPageBlocksTree();
     const page = await logseq.Editor.getCurrentPage();
     const title = page?.originalName;
-
-    console.log('blocks', blocks);
 
     // Build markdown
     currentLevel = -1; // reset level;
