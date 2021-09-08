@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.0.7
+
+* feat: Support org format in a non-perfect way.
+* feat: Make pure url clickable on Markmap.
+* fix: Code block render issue.
+
 ## 0.0.6
 
 * feat: Add a help popup modal, press `/` to trigger.
