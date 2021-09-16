@@ -9,7 +9,7 @@ const transformer = new Transformer();
 import * as d3 from 'd3';
 import org from 'org';
 import TurndownService from 'turndown';
-
+import remarkableExternalLink from 'remarkable-external-link';
 /**
  * User model
  */
@@ -138,7 +138,18 @@ async function main() {
     currentLevel = -1; // reset level;
     const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks, 0, config).join('\n');
 
+    const defaultRender = transformer.md.renderer.rules.link_open;
+    transformer.md.renderer.rules.link_open = function (tokens, idx: number, ...args: []) {
+      let result = defaultRender(tokens, idx, ...args);
+
+      if (tokens[idx] && tokens[idx].href) {
+        result = result.replace('>', ' target="_blank">');
+      }
+
+      return result;
+    };
     let { root, features } = transformer.transform(md);
+    console.log('root', root);
     originalRoot = root;
     originalTotalLevel = totalLevel;
     // @ts-ignore
