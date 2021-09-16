@@ -9,7 +9,7 @@ const transformer = new Transformer();
 import * as d3 from 'd3';
 import org from 'org';
 import TurndownService from 'turndown';
-import remarkableExternalLink from 'remarkable-external-link';
+
 /**
  * User model
  */
