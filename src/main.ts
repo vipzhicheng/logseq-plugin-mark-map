@@ -78,6 +78,13 @@ async function main() {
           codeBlockStyle: 'fenced',
         });
 
+        turndownService.addRule('strikethrough', {
+          filter: ['del', 's', 'strike'],
+          replacement: function (content) {
+            return '~~' + content + '~~';
+          }
+        });
+
         const parser = new org.Parser();
         const orgDocument = parser.parse(topic);
         const orgHTMLDocument = orgDocument.convert(org.ConverterHTML, {
@@ -87,7 +94,9 @@ async function main() {
           suppressAutoLink: false
         });
         topic = orgHTMLDocument.toString();  // to html
+        console.log('html', topic);
         topic = turndownService.turndown(topic); // to markdown
+        console.log('markdown', topic);
       }
 
       topic = topic.replace(/^[#\s]+/, '').trim();
