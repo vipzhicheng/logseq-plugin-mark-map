@@ -10,6 +10,11 @@ import * as d3 from 'd3';
 import org from 'org';
 import TurndownService from 'turndown';
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 /**
  * User model
  */
@@ -153,9 +158,6 @@ async function main() {
     window.root = root;
     const { styles, scripts } = transformer.getUsedAssets(features);
     const { Markmap, loadCSS, loadJS } = markmap;
-
-    if (styles) loadCSS(styles);
-    if (scripts) loadJS(scripts, { getMarkmap: () => markmap });
 
     // 隐藏所有子节点
     const hideAll = (target: INode) => {
@@ -489,6 +491,9 @@ async function main() {
       // reuse instance, update data
       mm.setData(root);
     } else {
+      if (styles) loadCSS(styles);
+      if (scripts) await loadJS(scripts);
+
       // initialize instance
       mm = Markmap.create(
         '#markmap',
@@ -497,6 +502,7 @@ async function main() {
         },
         root
       );
+
 
       document.addEventListener( 'keydown', listener, false);
 
@@ -541,7 +547,7 @@ async function main() {
       el.style.bottom = '0.5rem';
       el.style.right = '0.5rem';
       document.getElementById('markmap-toolbar')?.append(el);
-    }
+    };
   });
 }
 logseq.ready(createModel(), main).catch(e => console.error);
