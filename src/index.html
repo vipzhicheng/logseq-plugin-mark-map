@@ -7,6 +7,7 @@
   <title>Markmap Integration For Logseq</title>
   <script defer src="https://unpkg.com/alpinejs@3.2.3/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+  <script src="https://unpkg.com/hotkeys-js/dist/hotkeys.min.js"></script>
 
 </head>
 <body x-data="{ theme: '', manual: false, front: 'text-gray-900', bg: 'bg-gray-100', showHelp: false }" x-init="theme = JSON.parse(localStorage.getItem('theme')); "  class="relative" :class="!manual && theme === 'dark' ? 'dark' : '' ">

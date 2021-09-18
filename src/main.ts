@@ -10,10 +10,6 @@ import * as d3 from 'd3';
 import org from 'org';
 import TurndownService from 'turndown';
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 /**
  * User model
  */
@@ -133,7 +129,6 @@ async function main() {
     }
 
     const config = await logseq.App.getUserConfigs();
-
     const blocks = await logseq.Editor.getCurrentPageBlocksTree();
     const page = await logseq.Editor.getCurrentPage();
     const title = page?.originalName;
@@ -322,175 +317,193 @@ async function main() {
       }
     }
     let svgNode;
-    const listener = async function(e: any) {
 
-      // @ts-ignore
-      const showHelp = Alpine.store('showHelp').get();
-
-      if (showHelp && ![191, 81, 27].includes(e.keyCode)) {
-        return;
-      }
-
-      // @ts-ignore
-      const root = window.root;
-      switch (e.keyCode) {
-        case 37: // LEFT
-          svgNode = mm.svg.node();
-          if (svgNode) {
-            // @ts-ignore
-            const transform = d3.zoomTransform(mm.svg.node());
-            // @ts-ignore
-            transform.x = transform.x - 100;
-            // @ts-ignore
-            mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
-          }
-
-          break;
-        case 39: // RIGHT
-          svgNode = mm.svg.node();
-          if (svgNode) {
-            // @ts-ignore
-            const transform = d3.zoomTransform(mm.svg.node());
-            // @ts-ignore
-            transform.x = transform.x + 100;
-            // @ts-ignore
-            mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
-          }
-
-          break;
-        case 38: // UP
-          svgNode = mm.svg.node();
-          if (svgNode) {
-            // @ts-ignore
-            const transform = d3.zoomTransform(mm.svg.node());
-            // @ts-ignore
-            transform.y = transform.y - 100;
-            // @ts-ignore
-            mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
-          }
-
-          break;
-        case 40: // DOWN
-          svgNode = mm.svg.node();
-          if (svgNode) {
-            // @ts-ignore
-            const transform = d3.zoomTransform(mm.svg.node());
-            // @ts-ignore
-            transform.y = transform.y + 100;
-            // @ts-ignore
-            mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
-          }
-
-          break;
-        case 191: // /
+    const hotkeys = (window as any)?.hotkeys;
+    const bindKeys = async function() {
+      if (hotkeys) {
+        hotkeys('.', function() {
           // @ts-ignore
-          Alpine.store('showHelp').toggle();
-          break;
-        case 82: // r
-          const elRandomButton = document.getElementById('random-button');
-          eventFire(elRandomButton, 'click');
-          break;
-        case 90: // z
-          const elResetButton = document.getElementById('reset-button');
-          eventFire(elResetButton, 'click');
-          break;
-        case 80: // p
-          focusPrevious();
-          break;
-        case 78: // n
-          focusNext();
-          break;
-        case 66: // b
-          focusOut();
-          break;
-        case 188: // .
-          focusReset();
-          break;
-        case 190: // ,
+          const root = window.root;
           focusIn(root);
-          break;
-        case 27: // ESC
-        case 81: // q
-          logseq.hideMainUI();
-          break;
-        case 32: // space
-          await mm?.fit();
-          break;
-        case 48: // 0
-          hideAll(root);
-          currentLevel = 0;
-          mm.setData(root);
+          return false;
+        });
+        hotkeys(',', function() {
+          focusReset();
+          return false;
+        });
+        hotkeys('up,down,left,right,esc,space,z,r,h,j,k,l,n,p,b,q,-,=,0,9,1,2,3,4,5,/', async function (event, handler) {
+          // @ts-ignore
+          const showHelp = Alpine.store('showHelp').get();
 
-          break;
-        case 57: // 9
-          showAll(root);
-          currentLevel = totalLevel;
-          mm.setData(root);
+          if (showHelp && !['/', 'q', 'esc'].includes(handler.key)) {
+            return;
+          }
 
-          break;
-        case 49: // 1
-          hideAll(root);
-          expandLevel(root, 1);
-          currentLevel = 1;
-          mm.setData(root);
+          // @ts-ignore
+          const root = window.root;
+          switch (handler.key) {
+            case 'p': // p
+              focusPrevious();
+              break;
+            case 'n': // n
+              focusNext();
+              break;
+            case 'b': // b
+              focusOut();
+              break;
+            case '.': // .
+              focusReset();
+              break;
+            case ',': // ,
+              focusIn(root);
+              break;
+            case 'esc': // ESC
+            case 'q': // q
+              logseq.hideMainUI();
+              break;
+            case 'space': // space
+              await mm?.fit();
+              break;
+            case '0': // 0
+              hideAll(root);
+              currentLevel = 0;
+              mm.setData(root);
 
-          break;
-        case 50: // 2
-          hideAll(root);
-          expandLevel(root, 2);
-          currentLevel = 2;
-          mm.setData(root);
+              break;
+            case '9': // 9
+              showAll(root);
+              currentLevel = totalLevel;
+              mm.setData(root);
 
-          break;
-        case 51: // 3
-          hideAll(root);
-          expandLevel(root, 3);
-          currentLevel = 3;
-          mm.setData(root);
+              break;
+            case '1': // 1
+              hideAll(root);
+              expandLevel(root, 1);
+              currentLevel = 1;
+              mm.setData(root);
 
-          break;
-        case 52: // 4
-          hideAll(root);
-          expandLevel(root, 4);
-          currentLevel = 4;
-          mm.setData(root);
+              break;
+            case '2': // 2
+              hideAll(root);
+              expandLevel(root, 2);
+              currentLevel = 2;
+              mm.setData(root);
 
-          break;
-        case 53: // 5
-          hideAll(root);
-          expandLevel(root, 5);
-          currentLevel = 5;
-          mm.setData(root);
+              break;
+            case '3': // 3
+              hideAll(root);
+              expandLevel(root, 3);
+              currentLevel = 3;
+              mm.setData(root);
 
-          break;
-        case 72: // h
-          hideAll(root);
-          expandLevel(root, currentLevel > 0 ? --currentLevel : 0);
-          mm.setData(root);
-          break;
-        case 76: // l
-          hideAll(root);
-          expandLevel(root, currentLevel < totalLevel ? ++currentLevel : totalLevel);
-          mm.setData(root);
-          break;
+              break;
+            case '4': // 4
+              hideAll(root);
+              expandLevel(root, 4);
+              currentLevel = 4;
+              mm.setData(root);
 
-        case 74: // j
-          expandStepByStep(root);
-          mm.setData(root);
-          break;
-        case 75: // k
-          collapseStepByStep(root);
-          mm.setData(root);
-          break;
+              break;
+            case '5': // 5
+              hideAll(root);
+              expandLevel(root, 5);
+              currentLevel = 5;
+              mm.setData(root);
 
-        case 187: // +
-          await mm.rescale(1.25);
-          break;
-        case 189: // -
-          await mm.rescale(0.8);
-          break;
+              break;
+            case 'h': // h
+              hideAll(root);
+              expandLevel(root, currentLevel > 0 ? --currentLevel : 0);
+              mm.setData(root);
+              break;
+            case 'l': // l
+              hideAll(root);
+              expandLevel(root, currentLevel < totalLevel ? ++currentLevel : totalLevel);
+              mm.setData(root);
+              break;
+
+            case 'j': // j
+              expandStepByStep(root);
+              mm.setData(root);
+              break;
+            case 'k': // k
+              collapseStepByStep(root);
+              mm.setData(root);
+              break;
+
+            case '=': // +
+              await mm.rescale(1.25);
+              break;
+            case '-': // -
+              await mm.rescale(0.8);
+              break;
+            case 'z':
+              const elResetButton = document.getElementById('reset-button');
+              eventFire(elResetButton, 'click');
+            break;
+            case 'r':
+              const elRandomButton = document.getElementById('random-button');
+              eventFire(elRandomButton, 'click');
+            break;
+            case 'up':
+              svgNode = mm.svg.node();
+              if (svgNode) {
+                // @ts-ignore
+                const transform = d3.zoomTransform(mm.svg.node());
+                // @ts-ignore
+                transform.y = transform.y - 100;
+                // @ts-ignore
+                mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+              }
+            break;
+            case 'down':
+              svgNode = mm.svg.node();
+              if (svgNode) {
+                // @ts-ignore
+                const transform = d3.zoomTransform(mm.svg.node());
+                // @ts-ignore
+                transform.y = transform.y + 100;
+                // @ts-ignore
+                mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+              }
+            break;
+
+            case 'left':
+              svgNode = mm.svg.node();
+              if (svgNode) {
+                // @ts-ignore
+                const transform = d3.zoomTransform(mm.svg.node());
+                // @ts-ignore
+                transform.x = transform.x - 100;
+                // @ts-ignore
+                mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+              }
+            break;
+            case 'right':
+              svgNode = mm.svg.node();
+              if (svgNode) {
+                // @ts-ignore
+                const transform = d3.zoomTransform(mm.svg.node());
+                // @ts-ignore
+                transform.x = transform.x + 100;
+                // @ts-ignore
+                mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+              }
+            break;
+
+            case '/':
+              // @ts-ignore
+              Alpine.store('showHelp').toggle();
+            break;
+            default:
+              console.log(handler.key);
+            break;
+          }
+          return false;
+        });
       }
     };
+
 
     if (mm) {
       // reuse instance, update data
@@ -505,13 +518,8 @@ async function main() {
         root
       );
 
-      setTimeout(() => {
-
-        markmap.refreshHook.call();
-      }, 5000);
-
-
-      document.addEventListener( 'keydown', listener, false);
+      // Only bind once
+      bindKeys();
 
       // Customize toolbar
       const toolbar = new Toolbar();
