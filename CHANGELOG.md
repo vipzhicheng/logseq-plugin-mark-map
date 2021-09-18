@@ -5,6 +5,7 @@
 * fix: Org-mode, strikethrough(del) syntax not work, #3
 * fix: Make all urls in mindmap opened to system browser to prevent stuck in Logseq, #4
 * fix: Latex syntax not rendered at first time.
+* feat: Improve parsing links, now pure link with text can be parsed correctly.
 
 ## 0.0.7
 

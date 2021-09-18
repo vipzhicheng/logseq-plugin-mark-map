@@ -28,6 +28,7 @@ Load unpack plugin from `dist` directory
 
 * Typescript
 * TailwindCSS
+* Alpine.js
 * Markmap related packages
 
 ## Features
@@ -53,8 +54,8 @@ Most of features come from `Markmap` project.
 * image not supported.
 * Hiccup not supported.
 * Logseq embeded feature not supported.
-* Only tested on `Markdown` mode, not `Org` mode, sorry!
-* Tested on Logseq `v0.2.8` with the temp plugin infrastructure.
+* Mainly support `Markdown` mode, `Org` mode partly supported
+* Tested on Logseq `v0.3.9` with the temp plugin infrastructure.
 
 ## Shortcuts
 
