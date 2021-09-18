@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.0.8
+
+* fix: Org-mode, strikethrough(del) syntax not work, #3
+* fix: Make all urls in mindmap opened to system browser to prevent stuck in Logseq, #4
+* fix: Latex syntax not rendered at first time.
+
 ## 0.0.7
 
 * feat: Support org format in a non-perfect way.

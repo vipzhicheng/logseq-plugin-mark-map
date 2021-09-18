@@ -14,7 +14,6 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
 /**
  * User model
  */
@@ -158,6 +157,10 @@ async function main() {
     window.root = root;
     const { styles, scripts } = transformer.getUsedAssets(features);
     const { Markmap, loadCSS, loadJS } = markmap;
+    if (styles) loadCSS(styles);
+    if (scripts) await loadJS(scripts, {
+      getMarkmap: () => markmap
+    });
 
     // 隐藏所有子节点
     const hideAll = (target: INode) => {
@@ -491,66 +494,65 @@ async function main() {
       // reuse instance, update data
       mm.setData(root);
     } else {
-      if (styles) loadCSS(styles);
-      if (scripts) await loadJS(scripts);
+      // initialize instance
+      mm = Markmap.create(
+        '#markmap',
+        {
+          autoFit: true,
+        },
+        root
+      );
 
-      setTimeout(function() {
-        // initialize instance
-        mm = Markmap.create(
-          '#markmap',
-          {
-            autoFit: true,
-          },
-          root
-        );
+      setTimeout(() => {
+
+        markmap.refreshHook.call();
+      }, 5000);
 
 
-        document.addEventListener( 'keydown', listener, false);
+      document.addEventListener( 'keydown', listener, false);
 
-        // Customize toolbar
-        const toolbar = new Toolbar();
-        toolbar.setItems(['zoomIn', 'zoomOut', 'fit', 'save', 'help']);
-        toolbar.setBrand(false);
-        toolbar.register({
-          id: 'save',
-          title: 'Save as png',
-          content:
-            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>',
-          onClick: async () => {
-            let el = document.getElementById('markmap-container');
-            const page = await logseq.Editor.getCurrentPage();
-            if (el) {
-              html2canvas(el).then(function (canvas) {
-                const title = page?.originalName;
-                let url = canvas.toDataURL('image/png');
-                var oA = document.createElement('a');
-                oA.download = title || '';
-                oA.href = url;
-                document.body.appendChild(oA);
-                oA.click();
-                oA.remove();
-              });
-            }
-          },
-        });
-        toolbar.register({
-          id: 'help',
-          title: 'Show shortcuts description',
-          content: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /> </svg>',
-          onClick: async () => {
-            // @ts-ignore
-            Alpine.store('showHelp').toggle();
+      // Customize toolbar
+      const toolbar = new Toolbar();
+      toolbar.setItems(['zoomIn', 'zoomOut', 'fit', 'save', 'help']);
+      toolbar.setBrand(false);
+      toolbar.register({
+        id: 'save',
+        title: 'Save as png',
+        content:
+          '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>',
+        onClick: async () => {
+          let el = document.getElementById('markmap-container');
+          const page = await logseq.Editor.getCurrentPage();
+          if (el) {
+            html2canvas(el).then(function (canvas) {
+              const title = page?.originalName;
+              let url = canvas.toDataURL('image/png');
+              var oA = document.createElement('a');
+              oA.download = title || '';
+              oA.href = url;
+              document.body.appendChild(oA);
+              oA.click();
+              oA.remove();
+            });
           }
-        });
-        toolbar.attach(mm);
-        const el = toolbar.render();
-        el.style.position = 'absolute';
-        el.style.bottom = '0.5rem';
-        el.style.right = '0.5rem';
-        document.getElementById('markmap-toolbar')?.append(el);
-      }, 30000);
+        },
+      });
+      toolbar.register({
+        id: 'help',
+        title: 'Show shortcuts description',
+        content: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /> </svg>',
+        onClick: async () => {
+          // @ts-ignore
+          Alpine.store('showHelp').toggle();
+        }
+      });
+      toolbar.attach(mm);
+      const el = toolbar.render();
+      el.style.position = 'absolute';
+      el.style.bottom = '0.5rem';
+      el.style.right = '0.5rem';
+      document.getElementById('markmap-toolbar')?.append(el);
     };
-
   });
 }
 logseq.ready(createModel(), main).catch(e => console.error);
