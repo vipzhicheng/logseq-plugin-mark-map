@@ -7,6 +7,7 @@
 * fix: Latex syntax not rendered at first time.
 * fix: shortcut r conflicts with Logseq cmd+r.
 * feat: Improve parsing links, now pure link with text can be parsed correctly.
+* feat: Finally, image partly supported, and will be convert to image link.
 
 ## 0.0.7
 

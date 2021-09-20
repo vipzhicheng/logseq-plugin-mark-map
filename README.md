@@ -51,7 +51,7 @@ Most of features come from `Markmap` project.
 * Properies are ignored.
 * Text length is unlimited.
 * `#` head markdown syntax is ignored, use hierarchical blocks instead.
-* image not supported.
+* image partly supported, will be converted to image link.
 * Hiccup not supported.
 * Logseq embeded feature not supported.
 * Mainly support `Markdown` mode, `Org` mode partly supported

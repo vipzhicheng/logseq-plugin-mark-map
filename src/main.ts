@@ -9,6 +9,7 @@ const transformer = new Transformer();
 import * as d3 from 'd3';
 import org from 'org';
 import TurndownService from 'turndown';
+import cheerio from 'cheerio';
 
 /**
  * User model
@@ -137,13 +138,25 @@ async function main() {
     currentLevel = -1; // reset level;
     const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks, 0, config).join('\n');
 
-    const defaultRender = transformer.md.renderer.rules.link_open;
+    const defaultLinkRender = transformer.md.renderer.rules.link_open;
     transformer.md.renderer.rules.link_open = function (tokens, idx: number, ...args: []) {
-      let result = defaultRender(tokens, idx, ...args);
+      let result = defaultLinkRender(tokens, idx, ...args);
 
       if (tokens[idx] && tokens[idx].href) {
         result = result.replace('>', ' target="_blank">');
       }
+
+      return result;
+    };
+
+    const defaultImageRender = transformer.md.renderer.rules.image;
+    transformer.md.renderer.rules.image = function (tokens, idx: number, ...args: []) {
+      let result = defaultImageRender(tokens, idx, ...args);
+      const $ = cheerio.load(result);
+      const src = $('img').attr('src') || $('a').attr('href');
+      const alt = $('img').attr('alt') || $('a').attr('title') || '';
+
+      result = `<a target="_blank" title="${alt}" href="${src}">${alt} 🖼　</a>`;
 
       return result;
     };
