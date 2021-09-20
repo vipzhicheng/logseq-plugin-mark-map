@@ -3,10 +3,10 @@
 ## 0.0.8
 
 * fix: Org-mode, strikethrough(del) syntax not work, #3
-* fix: Make all urls in mindmap opened to system browser to prevent stuck in Logseq, #4
+* fix: Make all URLs in MindMap opened to system browser to prevent stuck in Logseq, #4
 * fix: Latex syntax not rendered at first time.
 * fix: Shortcut `r` conflicts with Logseq `cmd`+`r`.
-* feat: Improve parsing links, now pure link with text can be parsed correctly.
+* feat: Improve parsing links, now pure links with text can be parsed correctly.
 * feat: Finally, image partly supported, and will be convert to image link.
 
 ## 0.0.7
