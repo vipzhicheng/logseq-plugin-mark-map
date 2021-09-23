@@ -1,12 +1,16 @@
 # CHANGELOG
 
-## 0.0.9
+## 0.0.10
 
 * feat: Support highlight syntax, `==` in Markdown mode, `^^` in Org mode.
 * feat: Support Logseq block reference.
 * feat: Support Logseq embed block reference.
 * feat: Support Logseq page reference.
+* feat: Support Logseq embed page reference.
 
+## 0.0.9
+
+* no new features or bug fixes, just fix meta data.
 ## 0.0.8
 
 * fix: Org-mode, strikethrough(del) syntax not work, #3

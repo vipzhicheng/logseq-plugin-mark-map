@@ -10,6 +10,7 @@ import * as d3 from 'd3';
 import org from 'org';
 import TurndownService from 'turndown';
 import cheerio from 'cheerio';
+import replaceAsync from 'string-replace-async';
 
 /**
  * User model
@@ -75,34 +76,40 @@ async function main() {
         .join('\n');
       let topic = contentFiltered;
 
-      let regexBlockRef = /^\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)$/i;
-      let regexEmbedBlockRef = /^\{\{embed\s+\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\}\}$/i;
-      if (regexBlockRef.test(topic)) {
-        const blockId = topic.replace(regexBlockRef, (match, p1) => {
-          return p1;
+      let regexBlockRef = /\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)/ig;
+      let regexEmbedBlockRef = /\{\{embed\s+\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\}\}/ig;
+      if (regexEmbedBlockRef.test(topic)) {
+        topic = await replaceAsync(topic, regexEmbedBlockRef, async (match, p1) => {
+          const block = await logseq.Editor.getBlock(p1);
+          if (block) {
+            return block.content;
+          }
+          return '[MISSING BLOCK]';
         });
-
-        const block = await logseq.Editor.getBlock(blockId);
-        if (block) {
-          topic = block.content;
-        }
-      } else if (regexEmbedBlockRef.test(topic)) {
-        const blockId = topic.replace(regexEmbedBlockRef, (match, p1) => {
-          return p1;
-        });
-
-        const block = await logseq.Editor.getBlock(blockId);
-        if (block) {
-          topic = block.content;
-        }
       }
 
-      let regexPageRef = /^\[\[([^\[\]]*?)\]\]/i;
-      if (regexPageRef.test(topic)) {
-        const pageName = topic.replace(regexPageRef, (match, p1) => {
-          return p1;
+      if (regexBlockRef.test(topic)) {
+        topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
+          const block = await logseq.Editor.getBlock(p1);
+          if (block) {
+            return block.content;
+          }
+          return '[MISSING BLOCK]';
         });
-        topic = `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${pageName}' }); logseq.hideMainUI();">test</a>`;
+      }
+
+      let regexPageRef = /\[\[([^\[\]]*?)\]\]/ig;
+      let regexEmbedPageRef = /\{\{embed\s+\[\[([^\[\]]*?)\]\]\}\}/ig;
+      if (regexEmbedPageRef.test(topic)) {
+        topic = topic.replace(regexEmbedPageRef, (match, p1) => {
+          return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">${p1}</a>`;
+        });
+      }
+
+      if (regexPageRef.test(topic)) {
+        topic = topic.replace(regexPageRef, (match, p1) => {
+          return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">${p1}</a>`;
+        });
       }
 
       // @ts-ignore
