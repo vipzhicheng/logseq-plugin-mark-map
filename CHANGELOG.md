@@ -4,6 +4,8 @@
 
 * feat: Support highlight syntax, `==` in Markdown mode, `^^` in Org mode.
 * feat: Support Logseq block reference.
+* feat: Support Logseq embed block reference.
+* feat: Support Logseq page reference.
 
 ## 0.0.8
 

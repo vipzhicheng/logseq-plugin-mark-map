@@ -97,6 +97,14 @@ async function main() {
         }
       }
 
+      let regexPageRef = /^\[\[([^\[\]]*?)\]\]/i;
+      if (regexPageRef.test(topic)) {
+        const pageName = topic.replace(regexPageRef, (match, p1) => {
+          return p1;
+        });
+        topic = `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${pageName}' }); logseq.hideMainUI();">test</a>`;
+      }
+
       // @ts-ignore
       if (config.preferredFormat === 'org') {
         const turndownService = new TurndownService({
