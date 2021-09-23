@@ -3,10 +3,12 @@
 ## 0.0.10
 
 * feat: Support highlight syntax, `==` in Markdown mode, `^^` in Org mode.
-* feat: Support Logseq block reference.
+* feat: Support Logseq block reference. #5
 * feat: Support Logseq embed block reference.
 * feat: Support Logseq page reference.
 * feat: Support Logseq embed page reference.
+* feat: Support Logseq page tag
+* feat: Colorize workflow tags.
 
 ## 0.0.9
 

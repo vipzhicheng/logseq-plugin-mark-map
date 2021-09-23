@@ -42,6 +42,23 @@ async function main() {
     `,
   });
 
+  const themeWorkflowTag = str => {
+    return str.replace(/^(TODO|DOING|DONE|LATER|NOW) /, (match, p1) => {
+      switch (p1) {
+        case 'TODO':
+          return '<code style="background: #845EC2; color: #eee">' + p1 + '</code> ';
+        case 'DOING':
+          return '<code style="background: #FF8066; color: #eee">' + p1 + '</code> ';
+        case 'DONE':
+          return '<code style="background: #008B74; color: #eee">' + p1 + '</code> ';
+        case 'NOW':
+          return '<code style="background: #006C9A; color: #eee">' + p1 + '</code> ';
+        case 'LATER':
+          return '<code style="background: #911F27; color: #eee">' + p1 + '</code> ';
+      }
+    });
+  };
+
   // iterate blocks
   const walkTransformBlocks = async (blocks: any, depth = 0, config = {}): Promise<string[]> => {
     currentLevel = Math.min(5, Math.max(currentLevel, depth));
@@ -76,13 +93,25 @@ async function main() {
         .join('\n');
       let topic = contentFiltered;
 
+      // Process page tag
+      let regexPageTag = /#([^#\s]+)/ig;
+      if (regexPageTag.test(topic)) {
+        topic = topic.replace(regexPageTag, (match, p1) => {
+          return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">#${p1}</a>`;
+        });
+      }
+
+      // Theme workflow tag
+      topic = themeWorkflowTag(topic);
+
+      // Process block reference
       let regexBlockRef = /\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)/ig;
       let regexEmbedBlockRef = /\{\{embed\s+\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\}\}/ig;
       if (regexEmbedBlockRef.test(topic)) {
         topic = await replaceAsync(topic, regexEmbedBlockRef, async (match, p1) => {
           const block = await logseq.Editor.getBlock(p1);
           if (block) {
-            return block.content;
+            return themeWorkflowTag(block.content);
           }
           return '[MISSING BLOCK]';
         });
@@ -92,12 +121,13 @@ async function main() {
         topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
           const block = await logseq.Editor.getBlock(p1);
           if (block) {
-            return block.content;
+            return themeWorkflowTag(block.content);
           }
           return '[MISSING BLOCK]';
         });
       }
 
+      // Process page reference
       let regexPageRef = /\[\[([^\[\]]*?)\]\]/ig;
       let regexEmbedPageRef = /\{\{embed\s+\[\[([^\[\]]*?)\]\]\}\}/ig;
       if (regexEmbedPageRef.test(topic)) {
@@ -112,6 +142,9 @@ async function main() {
         });
       }
 
+
+
+      // Process org mode
       // @ts-ignore
       if (config.preferredFormat === 'org') {
         const turndownService = new TurndownService({
@@ -139,16 +172,22 @@ async function main() {
         topic = topic.replace(/\^\^/g, '=='); // try marked syntax
       }
 
+      // Remove leading heading syntax
       topic = topic.replace(/^[#\s]+/, '').trim();
+
+      // Process link parse
       const regexUrl = /(https?:\/\/[-a-zA-Z0-9@:%_\+.~#?&\/=]{2,256}\.[a-z]{2,4}(\/[-a-zA-Z0-9@:%_\+.~#?&\/=]*)?)(?=\s)/gi;
       const regexUrlMatchStartEnd = /^(https?:\/\/[-a-zA-Z0-9@:%_\+.~#?&\/=]{2,256}\.[a-z]{2,4}(\/[-a-zA-Z0-9@:%_\+.~#?&\/=]*)?)$/gi;
-      if (topic.indexOf('```') === 0) {
-        topic = '\n' + topic;
-      }
 
       topic = topic.replace(regexUrl, '<$1>'); // add <> to all links that followed by blank, means not markdown link
       topic = topic.replace(regexUrlMatchStartEnd, '<$1>'); // add <> to all pure link block
 
+      // Optimize code block
+      if (topic.indexOf('```') === 0) {
+        topic = '\n' + topic;
+      }
+
+      // Add leading syntax according to depth.
       let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic;
 
       if (children) {
