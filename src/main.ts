@@ -76,8 +76,18 @@ async function main() {
       let topic = contentFiltered;
 
       let regexBlockRef = /^\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)$/i;
+      let regexEmbedBlockRef = /^\{\{embed\s+\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\}\}$/i;
       if (regexBlockRef.test(topic)) {
         const blockId = topic.replace(regexBlockRef, (match, p1) => {
+          return p1;
+        });
+
+        const block = await logseq.Editor.getBlock(blockId);
+        if (block) {
+          topic = block.content;
+        }
+      } else if (regexEmbedBlockRef.test(topic)) {
+        const blockId = topic.replace(regexEmbedBlockRef, (match, p1) => {
           return p1;
         });
 
