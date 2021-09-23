@@ -44,6 +44,11 @@ Most of features come from `Markmap` project.
 * Support mouse drag and drop, double click, scrollwheel zoom.
 * Provice many convenient shortcuts.
 * Support dark mode, and up to 16 themes.
+* Support Logseq block reference and page reference and page tag.
+* Support highlight syntax `==` for Markdown, `^^` for Org mode.
+* Workflow tags are Colorized.
+* Image partly supported, will be converted to image link.
+* Mainly support `Markdown` mode, `Org` mode partly supported.
 
 ## Notes
 
@@ -51,11 +56,8 @@ Most of features come from `Markmap` project.
 * Properies are ignored.
 * Text length is unlimited.
 * `#` head markdown syntax is ignored, use hierarchical blocks instead.
-* image partly supported, will be converted to image link.
 * Hiccup not supported.
-* Logseq embeded feature not supported.
-* Mainly support `Markdown` mode, `Org` mode partly supported
-* Tested on Logseq `v0.3.9` with the temp plugin infrastructure.
+* Tested on Logseq `v0.4.0`.
 
 ## Shortcuts
 
