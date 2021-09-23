@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.0.9
+
+* feat: Support highlight syntax, `==` in Markdown mode, `^^` in Org mode.
+* feat: Support Logseq block reference.
+
 ## 0.0.8
 
 * fix: Org-mode, strikethrough(del) syntax not work, #3

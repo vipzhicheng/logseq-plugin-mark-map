@@ -42,10 +42,10 @@ async function main() {
   });
 
   // iterate blocks
-  const walkTransformBlocks = (blocks: any, depth = 0, config = {}) => {
+  const walkTransformBlocks = async (blocks: any, depth = 0, config = {}): Promise<string[]> => {
     currentLevel = Math.min(5, Math.max(currentLevel, depth));
     totalLevel = Math.min(5, Math.max(currentLevel, depth));
-    return blocks.filter((it: any) => {
+    blocks = blocks.filter((it: any) => {
       const { children, uuid, title, content } = it;
       if (!content || content.startsWith('---\n')) {
         return false;
@@ -63,7 +63,10 @@ async function main() {
       } else {
         return true;
       }
-    }).map((it: any) => {
+    });
+
+    let newBlocks = [];
+    for (let it of blocks) {
       const { children, uuid, title, content } = it;
 
       let contentFiltered = content
@@ -71,6 +74,18 @@ async function main() {
         .filter((line: string) => line.indexOf('::') === -1)
         .join('\n');
       let topic = contentFiltered;
+
+      let regexBlockRef = /^\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)$/i;
+      if (regexBlockRef.test(topic)) {
+        const blockId = topic.replace(regexBlockRef, (match, p1) => {
+          return p1;
+        });
+
+        const block = await logseq.Editor.getBlock(blockId);
+        if (block) {
+          topic = block.content;
+        }
+      }
 
       // @ts-ignore
       if (config.preferredFormat === 'org') {
@@ -112,11 +127,13 @@ async function main() {
       let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic;
 
       if (children) {
-        ret += '\n' + walkTransformBlocks(children, depth + 1, config).join('\n');
+        ret += '\n' + (await walkTransformBlocks(children, depth + 1, config)).join('\n');
       }
 
-      return ret;
-    });
+      newBlocks.push(ret);
+    };
+
+    return newBlocks;
   };
 
   let mm: Markmap;
@@ -137,7 +154,7 @@ async function main() {
 
     // Build markdown
     currentLevel = -1; // reset level;
-    const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks, 0, config).join('\n');
+    const md = '# ' + title + '\n\n' + (await walkTransformBlocks(blocks, 0, config)).join('\n');
 
     const defaultLinkRender = transformer.md.renderer.rules.link_open;
     transformer.md.inline.ruler.enable([ 'mark' ]);
