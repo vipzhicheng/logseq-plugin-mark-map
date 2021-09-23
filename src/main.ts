@@ -96,6 +96,7 @@ async function main() {
         });
         topic = orgHTMLDocument.toString();  // to html
         topic = turndownService.turndown(topic); // to markdown
+        topic = topic.replace(/\^\^/g, '=='); // try marked syntax
       }
 
       topic = topic.replace(/^[#\s]+/, '').trim();
@@ -139,6 +140,7 @@ async function main() {
     const md = '# ' + title + '\n\n' + walkTransformBlocks(blocks, 0, config).join('\n');
 
     const defaultLinkRender = transformer.md.renderer.rules.link_open;
+    transformer.md.inline.ruler.enable([ 'mark' ]);
     transformer.md.renderer.rules.link_open = function (tokens, idx: number, ...args: []) {
       let result = defaultLinkRender(tokens, idx, ...args);
 
