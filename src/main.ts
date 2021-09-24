@@ -97,7 +97,7 @@ async function main() {
       let regexPageTag = /#([^#\s]+)/ig;
       if (regexPageTag.test(topic)) {
         topic = topic.replace(regexPageTag, (match, p1) => {
-          return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">#${p1}</a>`;
+          return `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">#${p1}</a>`;
         });
       }
 
