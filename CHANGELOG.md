@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.11
+
+* feat: Custom center node by setting page property `mark-map-title`
+
 ## 0.0.10
 
 * feat: Support highlight syntax, `==` in Markdown mode, `^^` in Org mode.

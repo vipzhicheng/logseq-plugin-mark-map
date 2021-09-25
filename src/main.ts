@@ -213,8 +213,8 @@ async function main() {
 
     const config = await logseq.App.getUserConfigs();
     const blocks = await logseq.Editor.getCurrentPageBlocksTree();
-    const page = await logseq.Editor.getCurrentPage();
-    const title = page?.originalName;
+    const page = await logseq.Editor.getCurrentPage() as any;
+    const title = page?.properties?.markMapTitle || page?.originalName;
 
     // Build markdown
     currentLevel = -1; // reset level;
