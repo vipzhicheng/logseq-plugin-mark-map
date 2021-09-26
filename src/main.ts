@@ -64,7 +64,10 @@ async function main() {
     currentLevel = Math.min(5, Math.max(currentLevel, depth));
     totalLevel = Math.min(5, Math.max(currentLevel, depth));
     blocks = blocks.filter((it: any) => {
-      const { children, uuid, title, content } = it;
+      const { children, uuid, title, content, properties } = it;
+      if (properties?.markMapDisplay === 'hidden') {
+        return false;
+      }
       if (!content || content.startsWith('---\n')) {
         return false;
       }
@@ -244,6 +247,7 @@ async function main() {
       return result;
     };
     let { root, features } = transformer.transform(md);
+
     originalRoot = root;
     originalTotalLevel = totalLevel;
     // @ts-ignore

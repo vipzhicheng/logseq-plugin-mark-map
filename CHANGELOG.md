@@ -2,7 +2,8 @@
 
 ## 0.0.11
 
-* feat: Custom center node by setting page property `mark-map-title`
+* feat: Custom center node by setting page property `mark-map-title=blahblah`
+* feat: Hide any node by setting block property `mark-map-display:: hidden`
 
 ## 0.0.10
 
