@@ -186,7 +186,7 @@ async function main() {
       topic = topic.replace(regexUrlMatchStartEnd, '<$1>'); // add <> to all pure link block
 
       // Optimize code block
-      if (topic.indexOf('```') === 0) {
+      if (topic.indexOf('```') === 0 || topic.indexOf('- ') === 0) {
         topic = '\n' + topic;
       }
 

@@ -4,6 +4,7 @@
 
 * feat: Custom center node by setting page property `mark-map-title=blahblah`
 * feat: Hide any node by setting block property `mark-map-display:: hidden`
+* feat: Support multiline text by leading `- `
 
 ## 0.0.10
 
