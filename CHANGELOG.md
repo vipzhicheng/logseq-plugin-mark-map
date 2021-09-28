@@ -3,6 +3,7 @@
 ## 0.0.11
 
 * feat: Custom center node by setting page property `mark-map-title=blahblah`
+* feat: Hide any collapsed node by setting page property `mark-map-collapsed:: hidden`
 * feat: Hide any node by setting block property `mark-map-display:: hidden`
 * feat: Support multiline text by leading `- `
 

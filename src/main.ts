@@ -59,149 +59,6 @@ async function main() {
     });
   };
 
-  // iterate blocks
-  const walkTransformBlocks = async (blocks: any, depth = 0, config = {}): Promise<string[]> => {
-    currentLevel = Math.min(5, Math.max(currentLevel, depth));
-    totalLevel = Math.min(5, Math.max(currentLevel, depth));
-    blocks = blocks.filter((it: any) => {
-      const { children, uuid, title, content, properties } = it;
-      if (properties?.markMapDisplay === 'hidden') {
-        return false;
-      }
-      if (!content || content.startsWith('---\n')) {
-        return false;
-      }
-      let contentFiltered = content
-        .split('\n')
-        .filter((line: string) => line.indexOf('::') === -1)
-        .join('\n');
-      const topic = contentFiltered
-        .replace(/^[#\s]+/, '')
-        .trim();
-
-      if (topic.length === 0 && children.length === 0) {
-        return false;
-      } else {
-        return true;
-      }
-    });
-
-    let newBlocks = [];
-    for (let it of blocks) {
-      const { children, uuid, title, content } = it;
-
-      let contentFiltered = content
-        .split('\n')
-        .filter((line: string) => line.indexOf('::') === -1)
-        .join('\n');
-      let topic = contentFiltered;
-
-      // Process page tag
-      let regexPageTag = /#([^#\s]+)/ig;
-      if (regexPageTag.test(topic)) {
-        topic = topic.replace(regexPageTag, (match, p1) => {
-          return `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">#${p1}</a>`;
-        });
-      }
-
-      // Theme workflow tag
-      topic = themeWorkflowTag(topic);
-
-      // Process block reference
-      let regexBlockRef = /\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)/ig;
-      let regexEmbedBlockRef = /\{\{embed\s+\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\}\}/ig;
-      if (regexEmbedBlockRef.test(topic)) {
-        topic = await replaceAsync(topic, regexEmbedBlockRef, async (match, p1) => {
-          const block = await logseq.Editor.getBlock(p1);
-          if (block) {
-            return themeWorkflowTag(block.content);
-          }
-          return '[MISSING BLOCK]';
-        });
-      }
-
-      if (regexBlockRef.test(topic)) {
-        topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
-          const block = await logseq.Editor.getBlock(p1);
-          if (block) {
-            return themeWorkflowTag(block.content);
-          }
-          return '[MISSING BLOCK]';
-        });
-      }
-
-      // Process page reference
-      let regexPageRef = /\[\[([^\[\]]*?)\]\]/ig;
-      let regexEmbedPageRef = /\{\{embed\s+\[\[([^\[\]]*?)\]\]\}\}/ig;
-      if (regexEmbedPageRef.test(topic)) {
-        topic = topic.replace(regexEmbedPageRef, (match, p1) => {
-          return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">${p1}</a>`;
-        });
-      }
-
-      if (regexPageRef.test(topic)) {
-        topic = topic.replace(regexPageRef, (match, p1) => {
-          return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">${p1}</a>`;
-        });
-      }
-
-
-
-      // Process org mode
-      // @ts-ignore
-      if (config.preferredFormat === 'org') {
-        const turndownService = new TurndownService({
-          headingStyle: 'atx',
-          codeBlockStyle: 'fenced',
-        });
-
-        turndownService.addRule('strikethrough', {
-          filter: ['del', 's', 'strike'],
-          replacement: function (content) {
-            return '~~' + content + '~~';
-          }
-        });
-
-        const parser = new org.Parser();
-        const orgDocument = parser.parse(topic);
-        const orgHTMLDocument = orgDocument.convert(org.ConverterHTML, {
-          headerOffset: 1,
-          exportFromLineNumber: false,
-          suppressSubScriptHandling: false,
-          suppressAutoLink: false
-        });
-        topic = orgHTMLDocument.toString();  // to html
-        topic = turndownService.turndown(topic); // to markdown
-        topic = topic.replace(/\^\^/g, '=='); // try marked syntax
-      }
-
-      // Remove leading heading syntax
-      topic = topic.replace(/^[#\s]+/, '').trim();
-
-      // Process link parse
-      const regexUrl = /(https?:\/\/[-a-zA-Z0-9@:%_\+.~#?&\/=]{2,256}\.[a-z]{2,4}(\/[-a-zA-Z0-9@:%_\+.~#?&\/=]*)?)(?=\s)/gi;
-      const regexUrlMatchStartEnd = /^(https?:\/\/[-a-zA-Z0-9@:%_\+.~#?&\/=]{2,256}\.[a-z]{2,4}(\/[-a-zA-Z0-9@:%_\+.~#?&\/=]*)?)$/gi;
-
-      topic = topic.replace(regexUrl, '<$1>'); // add <> to all links that followed by blank, means not markdown link
-      topic = topic.replace(regexUrlMatchStartEnd, '<$1>'); // add <> to all pure link block
-
-      // Optimize code block
-      if (topic.indexOf('```') === 0 || topic.indexOf('- ') === 0) {
-        topic = '\n' + topic;
-      }
-
-      // Add leading syntax according to depth.
-      let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic;
-
-      if (children) {
-        ret += '\n' + (await walkTransformBlocks(children, depth + 1, config)).join('\n');
-      }
-
-      newBlocks.push(ret);
-    };
-
-    return newBlocks;
-  };
 
   let mm: Markmap;
   let currentLevel: number;
@@ -215,12 +72,158 @@ async function main() {
     }
 
     const config = await logseq.App.getUserConfigs();
-    const blocks = await logseq.Editor.getCurrentPageBlocksTree();
+    let blocks = await logseq.Editor.getCurrentPageBlocksTree();
     const page = await logseq.Editor.getCurrentPage() as any;
     const title = page?.properties?.markMapTitle || page?.originalName;
+    const collapsed = page?.properties?.markMapCollapsed;
 
     // Build markdown
     currentLevel = -1; // reset level;
+
+    // iterate blocks
+    const walkTransformBlocks = async (blocks: any, depth = 0, config = {}): Promise<string[]> => {
+      currentLevel = Math.min(5, Math.max(currentLevel, depth));
+      totalLevel = Math.min(5, Math.max(currentLevel, depth));
+      blocks = blocks.filter((it: any) => {
+        const { children, uuid, title, content, properties } = it;
+        if (properties?.markMapDisplay === 'hidden') {
+          return false;
+        }
+        if (!content || content.startsWith('---\n')) {
+          return false;
+        }
+        let contentFiltered = content
+          .split('\n')
+          .filter((line: string) => line.indexOf('::') === -1)
+          .join('\n');
+        const topic = contentFiltered
+          .replace(/^[#\s]+/, '')
+          .trim();
+
+        if (topic.length === 0 && children.length === 0) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+
+      let newBlocks = [];
+      for (let it of blocks) {
+        const { children, uuid, title, content, properties } = it;
+
+        let contentFiltered = content
+          .split('\n')
+          .filter((line: string) => line.indexOf('::') === -1)
+          .join('\n');
+        let topic = contentFiltered;
+
+        // Process page tag
+        let regexPageTag = /#([^#\s]+)/ig;
+        if (regexPageTag.test(topic)) {
+          topic = topic.replace(regexPageTag, (match, p1) => {
+            return `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">#${p1}</a>`;
+          });
+        }
+
+        // Theme workflow tag
+        topic = themeWorkflowTag(topic);
+
+        // Process block reference
+        let regexBlockRef = /\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)/ig;
+        let regexEmbedBlockRef = /\{\{embed\s+\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\}\}/ig;
+        if (regexEmbedBlockRef.test(topic)) {
+          topic = await replaceAsync(topic, regexEmbedBlockRef, async (match, p1) => {
+            const block = await logseq.Editor.getBlock(p1);
+            if (block) {
+              return themeWorkflowTag(block.content);
+            }
+            return '[MISSING BLOCK]';
+          });
+        }
+
+        if (regexBlockRef.test(topic)) {
+          topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
+            const block = await logseq.Editor.getBlock(p1);
+            if (block) {
+              return themeWorkflowTag(block.content);
+            }
+            return '[MISSING BLOCK]';
+          });
+        }
+
+        // Process page reference
+        let regexPageRef = /\[\[([^\[\]]*?)\]\]/ig;
+        let regexEmbedPageRef = /\{\{embed\s+\[\[([^\[\]]*?)\]\]\}\}/ig;
+        if (regexEmbedPageRef.test(topic)) {
+          topic = topic.replace(regexEmbedPageRef, (match, p1) => {
+            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">${p1}</a>`;
+          });
+        }
+
+        if (regexPageRef.test(topic)) {
+          topic = topic.replace(regexPageRef, (match, p1) => {
+            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">${p1}</a>`;
+          });
+        }
+
+
+
+        // Process org mode
+        // @ts-ignore
+        if (config.preferredFormat === 'org') {
+          const turndownService = new TurndownService({
+            headingStyle: 'atx',
+            codeBlockStyle: 'fenced',
+          });
+
+          turndownService.addRule('strikethrough', {
+            filter: ['del', 's', 'strike'],
+            replacement: function (content) {
+              return '~~' + content + '~~';
+            }
+          });
+
+          const parser = new org.Parser();
+          const orgDocument = parser.parse(topic);
+          const orgHTMLDocument = orgDocument.convert(org.ConverterHTML, {
+            headerOffset: 1,
+            exportFromLineNumber: false,
+            suppressSubScriptHandling: false,
+            suppressAutoLink: false
+          });
+          topic = orgHTMLDocument.toString();  // to html
+          topic = turndownService.turndown(topic); // to markdown
+          topic = topic.replace(/\^\^/g, '=='); // try marked syntax
+        }
+
+        // Remove leading heading syntax
+        topic = topic.replace(/^[#\s]+/, '').trim();
+
+        // Process link parse
+        const regexUrl = /(https?:\/\/[-a-zA-Z0-9@:%_\+.~#?&\/=]{2,256}\.[a-z]{2,4}(\/[-a-zA-Z0-9@:%_\+.~#?&\/=]*)?)(?=\s)/gi;
+        const regexUrlMatchStartEnd = /^(https?:\/\/[-a-zA-Z0-9@:%_\+.~#?&\/=]{2,256}\.[a-z]{2,4}(\/[-a-zA-Z0-9@:%_\+.~#?&\/=]*)?)$/gi;
+
+        topic = topic.replace(regexUrl, '<$1>'); // add <> to all links that followed by blank, means not markdown link
+        topic = topic.replace(regexUrlMatchStartEnd, '<$1>'); // add <> to all pure link block
+
+        // Optimize code block
+        if (topic.indexOf('```') === 0 || topic.indexOf('- ') === 0) {
+          topic = '\n' + topic;
+        }
+
+        // Add leading syntax according to depth.
+        let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic;
+
+        if (children && (properties?.collapsed !== true || collapsed !== 'hidden')) {
+          ret += '\n' + (await walkTransformBlocks(children, depth + 1, config)).join('\n');
+        }
+
+        newBlocks.push(ret);
+      };
+
+      return newBlocks;
+    };
+
     const md = '# ' + title + '\n\n' + (await walkTransformBlocks(blocks, 0, config)).join('\n');
 
     const defaultLinkRender = transformer.md.renderer.rules.link_open;
