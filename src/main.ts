@@ -76,6 +76,7 @@ async function main() {
     const page = await logseq.Editor.getCurrentPage() as any;
     const title = page?.properties?.markMapTitle || page?.originalName;
     const collapsed = page?.properties?.markMapCollapsed;
+    console.log('config', config);
 
     // Build markdown
     currentLevel = -1; // reset level;
@@ -242,10 +243,15 @@ async function main() {
     transformer.md.renderer.rules.image = function (tokens, idx: number, ...args: []) {
       let result = defaultImageRender(tokens, idx, ...args);
       const $ = cheerio.load(result);
-      const src = $('img').attr('src') || $('a').attr('href');
+      let src = $('img').attr('src') || $('a').attr('href');
       const alt = $('img').attr('alt') || $('a').attr('title') || '';
 
-      result = `<a target="_blank" title="${alt}"  data-lightbox="${src}" href="${src}">${alt} 🖼　</a>`;
+      // For now just support MacOS/Linux，Need to test and fix on Windows.
+      if (src.indexOf('http') !== 0 && src.indexOf('/') !== 0) {
+        src = config.currentGraph.substring(13) + '/' + src.replace(/\.\.\//g, '');
+      }
+
+      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${src}">${alt} 🖼　</a>`;
 
       return result;
     };
