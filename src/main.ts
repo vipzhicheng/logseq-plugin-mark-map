@@ -76,7 +76,6 @@ async function main() {
     const page = await logseq.Editor.getCurrentPage() as any;
     const title = page?.properties?.markMapTitle || page?.originalName;
     const collapsed = page?.properties?.markMapCollapsed;
-    console.log('config', config);
 
     // Build markdown
     currentLevel = -1; // reset level;
@@ -449,6 +448,14 @@ async function main() {
           }
 
           // @ts-ignore
+          const jQuery = window?.jQuery;
+          if (jQuery) {
+            if (jQuery('#lightboxOverlay').css('display') === 'block'  && !['q', 'esc'].includes(handler.key)) {
+              return false;
+            }
+          }
+
+          // @ts-ignore
           const root = window.root;
           switch (handler.key) {
             case 'p': // p
@@ -468,6 +475,17 @@ async function main() {
               break;
             case 'esc': // ESC
             case 'q': // q
+
+              // @ts-ignore
+              const jQuery = window?.jQuery;
+              // @ts-ignore
+              const lightbox = window?.lightbox;
+
+              if (jQuery) {
+                if (jQuery('#lightboxOverlay').css('display') === 'block') {
+                  lightbox.end();
+                }
+              }
               logseq.hideMainUI();
               break;
             case 'space': // space
@@ -605,7 +623,7 @@ async function main() {
               Alpine.store('showHelp').toggle();
             break;
             default:
-              console.log(handler.key);
+              // console.log(handler.key);
             break;
           }
           return false;
