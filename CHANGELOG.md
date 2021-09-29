@@ -6,6 +6,7 @@
 * feat: Hide any collapsed node by setting page property `mark-map-collapsed:: hidden`
 * feat: Hide any node by setting block property `mark-map-display:: hidden`
 * feat: Support multiline text by leading `- `
+* feat: Support images opened in a popup modal.
 
 ## 0.0.10
 

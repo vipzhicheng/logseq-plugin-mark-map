@@ -245,7 +245,7 @@ async function main() {
       const src = $('img').attr('src') || $('a').attr('href');
       const alt = $('img').attr('alt') || $('a').attr('title') || '';
 
-      result = `<a target="_blank" title="${alt}" href="${src}">${alt} 🖼　</a>`;
+      result = `<a target="_blank" title="${alt}"  data-lightbox="${src}" href="${src}">${alt} 🖼　</a>`;
 
       return result;
     };
