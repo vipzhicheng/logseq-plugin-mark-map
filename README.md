@@ -87,6 +87,13 @@ Most of features come from `Markmap` project.
 * `DOWN`: move mindmap down.
 * `LEFT`: move mindmap left.
 * `RIGHT`: move mindmap right.
+
+## Markmap properties
+
+* `mark-map-title=blahblah`，a page property, to change the mindmap center node different from page title.
+* `mark-map-collapsed:: hidden`, a page property, to hide Logseq collapsed blocks on mindmap.
+* `mark-map-display:: hidden`, a block property, to hide the block.
+
 ## Contribution
 
 Issues and PRs are welcome!
