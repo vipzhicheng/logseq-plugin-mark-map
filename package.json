@@ -1,6 +1,6 @@
 {
   "name": "logseq-plugin-mark-map",
-  "version": "0.0.10",
+  "version": "0.1.0",
   "license": "MIT",
   "main": "index.html",
   "description": "Logseq markmap plugin",
