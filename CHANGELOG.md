@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.1
+
+* feat: add a close button on right top corner and hidden by default.
+
 ## 0.1.0
 
 * feat: Custom center node by setting page property `mark-map-title:: blahblah`
