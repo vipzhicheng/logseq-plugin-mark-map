@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.0.11
+## 0.1.0
 
 * feat: Custom center node by setting page property `mark-map-title:: blahblah`
 * feat: Hide any collapsed node by setting page property `mark-map-collapsed:: hidden`
