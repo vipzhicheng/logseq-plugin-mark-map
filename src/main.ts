@@ -11,6 +11,7 @@ import org from 'org';
 import TurndownService from 'turndown';
 import cheerio from 'cheerio';
 import replaceAsync from 'string-replace-async';
+import { filter } from 'cheerio/lib/api/traversing';
 
 function eventFire(el: any, etype: string){
   if (el.fireEvent) {
@@ -92,39 +93,59 @@ async function main() {
 
     const config = await logseq.App.getUserConfigs();
     let blocks = await logseq.Editor.getCurrentPageBlocksTree();
-    const page = await logseq.Editor.getCurrentPage() as any;
+    let page = await logseq.Editor.getCurrentPage() as any;
     const title = page?.properties?.markMapTitle || page?.originalName;
     const collapsed = page?.properties?.markMapCollapsed;
 
     // Build markdown
     currentLevel = -1; // reset level;
 
+    const blockFilter = (it: any) => {
+      const { children, uuid, title, content, properties } = it;
+      if (properties?.markMapDisplay === 'hidden') {
+        return false;
+      }
+      if (!content || content.startsWith('---\n')) {
+        return false;
+      }
+      let contentFiltered = content
+        .split('\n')
+        .filter((line: string) => line.indexOf('::') === -1)
+        .join('\n');
+      const topic = contentFiltered
+        .replace(/^[#\s]+/, '')
+        .trim();
+
+      if (topic.length === 0 && children.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    // const filteredBlocks =
+    const walkTransformBlocksFilter = async blocks => {
+      if (blocks.length > 0) {
+        for (let it of blocks) {
+          let { children, uuid, title, content, properties } = it;
+          children = await children;
+          if (children) {
+            it.children = await walkTransformBlocksFilter(children);
+          }
+        }
+      }
+
+      return blocks.filter(blockFilter);
+    };
+
+    const filteredBlocks = await walkTransformBlocksFilter(blocks);
+
+
     // iterate blocks
     const walkTransformBlocks = async (blocks: any, depth = 0, config = {}): Promise<string[]> => {
       currentLevel = Math.min(5, Math.max(currentLevel, depth));
       totalLevel = Math.min(5, Math.max(currentLevel, depth));
-      blocks = blocks.filter((it: any) => {
-        const { children, uuid, title, content, properties } = it;
-        if (properties?.markMapDisplay === 'hidden') {
-          return false;
-        }
-        if (!content || content.startsWith('---\n')) {
-          return false;
-        }
-        let contentFiltered = content
-          .split('\n')
-          .filter((line: string) => line.indexOf('::') === -1)
-          .join('\n');
-        const topic = contentFiltered
-          .replace(/^[#\s]+/, '')
-          .trim();
-
-        if (topic.length === 0 && children.length === 0) {
-          return false;
-        } else {
-          return true;
-        }
-      });
+      // blocks = blocks.filter(blockFilter);
 
       let newBlocks = [];
       for (let it of blocks) {
@@ -243,7 +264,7 @@ async function main() {
       return newBlocks;
     };
 
-    const md = '# ' + title + '\n\n' + (await walkTransformBlocks(blocks, 0, config)).join('\n');
+    const md = '# ' + title + '\n\n' + (await walkTransformBlocks(filteredBlocks, 0, config)).join('\n');
 
     const defaultLinkRender = transformer.md.renderer.rules.link_open;
     transformer.md.inline.ruler.enable([ 'mark' ]);
@@ -273,7 +294,32 @@ async function main() {
 
       return result;
     };
+
+
     let { root, features } = transformer.transform(md);
+
+    // @ts-ignore
+    root.properties = page.properties || {};
+
+    const walkTransformRoot = (parent, blocks) => {
+      if (parent.c) {
+
+        for (let i in parent.c) {
+          parent.c[i].properties = blocks[i]?.properties || {};
+
+          // @ts-ignore
+          if (root?.properties?.markMapCollapsed === 'collapsed' && parent.c[i]?.properties?.collapsed) {
+            parent.c[i].p = {
+              ...parent.c[i].p,
+              f: true,
+            };
+          }
+
+          walkTransformRoot(parent?.c[i], blocks[i]?.children || []);
+        }
+      }
+    };
+    walkTransformRoot(root, filteredBlocks);
 
     originalRoot = root;
     originalTotalLevel = totalLevel;
@@ -300,10 +346,18 @@ async function main() {
 
     // 显示所有子节点
     const showAll = (target: INode) => {
-      target.p = {
-        ...target.p,
-        f: false,
-      };
+      // @ts-ignore
+      if (page?.properties?.markMapCollapsed === 'collapsed' && target?.properties?.collapsed) {
+        target.p = {
+          ...target.p,
+          f: true,
+        };
+      } else {
+        target.p = {
+          ...target.p,
+          f: false,
+        };
+      }
 
       target.c?.forEach(t => {
         showAll(t);
