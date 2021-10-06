@@ -308,7 +308,7 @@ async function main() {
           parent.c[i].properties = blocks[i]?.properties || {};
 
           // @ts-ignore
-          if (root?.properties?.markMapCollapsed === 'collapsed' && parent.c[i]?.properties?.collapsed) {
+          if (root?.properties?.markMapCollapsed !== 'extend' && parent.c[i]?.properties?.collapsed) {
             parent.c[i].p = {
               ...parent.c[i].p,
               f: true,
@@ -345,13 +345,15 @@ async function main() {
     };
 
     // 显示所有子节点
-    const showAll = (target: INode) => {
+    const showAll = (target: INode, depth = 0) => {
+      depth++;
       // @ts-ignore
-      if (page?.properties?.markMapCollapsed === 'collapsed' && target?.properties?.collapsed) {
+      if (page?.properties?.markMapCollapsed !== 'extend' && target?.properties?.collapsed) {
         target.p = {
           ...target.p,
           f: true,
         };
+        currentLevel = depth;
       } else {
         target.p = {
           ...target.p,
@@ -360,7 +362,7 @@ async function main() {
       }
 
       target.c?.forEach(t => {
-        showAll(t);
+        showAll(t, depth);
       });
     };
 
@@ -556,14 +558,14 @@ async function main() {
               await mm?.fit();
               break;
             case '0': // 0
-              hideAll(root);
               currentLevel = 0;
+              hideAll(root);
               mm.setData(root);
 
               break;
             case '9': // 9
-              showAll(root);
               currentLevel = totalLevel;
+              showAll(root);
               mm.setData(root);
 
               break;
@@ -698,9 +700,11 @@ async function main() {
 
     if (mm) {
       // reuse instance, update data
+      showAll(root);
       mm.setData(root);
     } else {
       // initialize instance
+      showAll(root);
       mm = Markmap.create(
         '#markmap',
         {
