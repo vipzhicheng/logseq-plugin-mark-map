@@ -345,7 +345,7 @@ async function main() {
     };
 
     // 显示所有子节点
-    const showAll = (target: INode, depth = 0) => {
+    const showAll = (target: INode, depth = -1) => {
       depth++;
       // @ts-ignore
       if (page?.properties?.markMapCollapsed !== 'extend' && target?.properties?.collapsed) {
