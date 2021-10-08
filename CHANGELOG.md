@@ -3,6 +3,7 @@
 ## 0.1.1
 
 * feat: Add a close button on right top corner and hidden by default.
+* feat: Add a block property `mark-map-cut:: 30` to cut text length.
 * feat: Add page property `mark-map-collapsed:: extend` to show all nodes, and ignore collapsed state.
 * feat: Make mindmap show collapsed state the same with Logseq blocks by default.
 

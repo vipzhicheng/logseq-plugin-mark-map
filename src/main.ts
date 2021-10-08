@@ -11,7 +11,7 @@ import org from 'org';
 import TurndownService from 'turndown';
 import cheerio from 'cheerio';
 import replaceAsync from 'string-replace-async';
-import { filter } from 'cheerio/lib/api/traversing';
+import ellipsis from 'text-ellipsis';
 
 function eventFire(el: any, etype: string){
   if (el.fireEvent) {
@@ -245,6 +245,10 @@ async function main() {
 
         topic = topic.replace(regexUrl, '<$1>'); // add <> to all links that followed by blank, means not markdown link
         topic = topic.replace(regexUrlMatchStartEnd, '<$1>'); // add <> to all pure link block
+
+        if (properties?.markMapCut) {
+          topic = ellipsis(topic, parseInt(properties?.markMapCut));
+        }
 
         // Optimize code block
         if (topic.indexOf('```') === 0 || topic.indexOf('- ') === 0) {

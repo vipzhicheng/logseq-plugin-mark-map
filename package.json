@@ -44,6 +44,7 @@
     "markmap-view": "^0.2.6",
     "org": "^0.2.0",
     "string-replace-async": "^3.0.2",
+    "text-ellipsis": "^1.0.3",
     "turndown": "^7.1.1"
   }
 }
