@@ -247,7 +247,9 @@ async function main() {
         topic = topic.replace(regexUrlMatchStartEnd, '<$1>'); // add <> to all pure link block
 
         if (properties?.markMapCut) {
+          const orgTopic = topic;
           topic = ellipsis(topic, parseInt(properties?.markMapCut));
+          topic = `<div style="cursor:pointer" title="${orgTopic}">${topic}</div>`;
         }
 
         // Optimize code block
