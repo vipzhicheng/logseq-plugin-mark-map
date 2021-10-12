@@ -292,7 +292,7 @@ async function main() {
       const alt = $('img').attr('alt') || $('a').attr('title') || '';
 
       // For now just support MacOS/Linux，Need to test and fix on Windows.
-      if (src.indexOf('http') !== 0 && src.indexOf('/') !== 0) {
+      if (src.indexOf('http') !== 0 && src.indexOf('..') === 0) {
         src = config.currentGraph.substring(13) + '/' + src.replace(/\.\.\//g, '');
       }
 
