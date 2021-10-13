@@ -12,6 +12,7 @@ import TurndownService from 'turndown';
 import cheerio from 'cheerio';
 import replaceAsync from 'string-replace-async';
 import ellipsis from 'text-ellipsis';
+import { append } from 'domutils';
 
 function eventFire(el: any, etype: string){
   if (el.fireEvent) {
@@ -123,7 +124,6 @@ async function main() {
       }
     };
 
-    // const filteredBlocks =
     const walkTransformBlocksFilter = async blocks => {
       if (blocks.length > 0) {
         for (let it of blocks) {
@@ -138,7 +138,48 @@ async function main() {
       return blocks.filter(blockFilter);
     };
 
-    const filteredBlocks = await walkTransformBlocksFilter(blocks);
+    let filteredBlocks = await walkTransformBlocksFilter(blocks);
+    if (page?.properties?.markMapLimitAll && filteredBlocks.length > page?.properties?.markMapLimitAll) {
+      const limitBlocks = filteredBlocks.splice(0, page?.properties?.markMapLimitAll);
+      filteredBlocks = limitBlocks.concat({
+        content: '...',
+        properties: { collapsed: true },
+        children: filteredBlocks
+      });
+    } else if (page?.properties?.markMapLimit && filteredBlocks.length > page?.properties?.markMapLimit) {
+      const limitBlocks = filteredBlocks.splice(0, page?.properties?.markMapLimit);
+      filteredBlocks = limitBlocks.concat({
+        content: '...',
+        properties: { collapsed: true },
+        children: filteredBlocks
+      });
+    }
+
+    const walkTransformBlocksLimit = (blocks:any, limit = 0) => {
+      if (limit && blocks.length > limit) {
+        const limitBlocks = blocks.splice(0, limit);
+        blocks = limitBlocks.concat({
+          content: '...',
+          properties: { collapsed: true },
+          children: blocks
+        });
+      }
+
+      if (blocks.length > 0) {
+        for (let it of blocks) {
+          let { children, content, properties } = it;
+          if (children) {
+            it.children = walkTransformBlocksLimit(children, page?.properties?.markMapLimitAll || properties?.markMapLimit);
+          }
+        }
+      }
+
+      return blocks;
+
+
+    };
+
+    filteredBlocks = walkTransformBlocksLimit(filteredBlocks);
 
 
     // iterate blocks

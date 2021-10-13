@@ -90,13 +90,20 @@ Most of features come from `Markmap` project.
 
 ## Markmap properties
 
-* `mark-map-title=blahblah`，a page property, to change the mindmap center node different from page title.
+### Page properties
+
+* `mark-map-title:: blahblah`, to change the mindmap center node different from page title.
 * `mark-map-collapsed`, a page property.
   * Without this property, mindmap will follow Logseq blocks collapsed state by default.
   * `mark-map-collapsed:: hidden`, to hide Logseq collapsed blocks on mindmap.
   * `mark-map-collapsed:: extend`, ignore Logseq blocks collapsed state, extend all nodes on mindmap.
+* `mark-map-limit:: N`, to limit first level block list items.
+* `mark-map-limit-all:: N`, to limit all block list items.
+### Block properties
+
 * `mark-map-display:: hidden`, a block property, to hide the block.
 * `mark-map-cut:: 30`, a block property, to limit mindmap node text length.
+* `mark-map-limit:: N`, to limit block next level block list items.
 
 ## Contribution
 

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.2
+
+* feat: Add a block property `mark-map-limit:: N` to limit block next level block list items.
+* feat: Add a page property `mark-map-limit:: N` to limit first level block list items.
+* feat: Add a page property `mark-map-limit-all:: N` to limit all block list items.
+
 ## 0.1.1
 
 * feat: Add a close button on right top corner and hidden by default.
