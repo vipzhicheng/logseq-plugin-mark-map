@@ -1,5 +1,7 @@
 # Logseq Markmap Plugin
 
+[![Github All Releases](https://img.shields.io/github/downloads/vipzhicheng/logseq-plugin-mark-map/total.svg)](https://github.com/vipzhicheng/logseq-plugin-mark-map/releases)
+
 ***Basic shortcuts***
 
 ![Screencast1](./screencast1.gif)
