@@ -209,6 +209,23 @@ async function main() {
         // Theme workflow tag
         topic = themeWorkflowTag(topic);
 
+        // process link block reference
+        let regexLinkBlockRef = /\[(.*?)\]\(\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\)/ig;
+        if (regexLinkBlockRef.test(topic)) {
+          topic = await replaceAsync(topic, regexLinkBlockRef, async (match, p1, p2) => {
+            const block = await logseq.Editor.getBlock(p2);
+            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI();">${p1}</a>`;
+          });
+        }
+
+        // process link page reference
+        let regexLinkPageRef = /\[(.*?)\]\(\[\[(.*?)\]\]\)/ig;
+        if (regexLinkPageRef.test(topic)) {
+          topic = await replaceAsync(topic, regexLinkPageRef, async (match, p1, p2) => {
+            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p2}' }); logseq.hideMainUI();">${p1}</a>`;
+          });
+        }
+
         // Process block reference
         let regexBlockRef = /\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)/ig;
         let regexEmbedBlockRef = /\{\{embed\s+\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\}\}/ig;
@@ -216,7 +233,7 @@ async function main() {
           topic = await replaceAsync(topic, regexEmbedBlockRef, async (match, p1) => {
             const block = await logseq.Editor.getBlock(p1);
             if (block) {
-              return themeWorkflowTag(block.content);
+              return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI();">${themeWorkflowTag(block.content)}</a>`;
             }
             return '[MISSING BLOCK]';
           });
@@ -226,7 +243,7 @@ async function main() {
           topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
             const block = await logseq.Editor.getBlock(p1);
             if (block) {
-              return themeWorkflowTag(block.content);
+              return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI();">${themeWorkflowTag(block.content)}</a>`;
             }
             return '[MISSING BLOCK]';
           });

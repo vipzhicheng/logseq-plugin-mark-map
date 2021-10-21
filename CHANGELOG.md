@@ -5,6 +5,7 @@
 * feat: Add a block property `mark-map-limit:: N` to limit block next level block list items.
 * feat: Add a page property `mark-map-limit:: N` to limit first level block list items.
 * feat: Add a page property `mark-map-limit-all:: N` to limit all block list items.
+* feat: Support parse block ref link and page ref link, eg. `[]((()))` and `[]([[]])`
 
 ## 0.1.1
 
