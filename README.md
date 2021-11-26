@@ -90,6 +90,10 @@ Most of features come from `Markmap` project.
 * `LEFT`: move mindmap left.
 * `RIGHT`: move mindmap right.
 
+## Logseq Key-binding to trigger markmap
+
+It is key-binded with Logseq with `m m`, means pressing two times `M` on your keyboard.
+
 ## Markmap properties
 
 ### Page properties
