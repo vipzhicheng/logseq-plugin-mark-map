@@ -53,6 +53,17 @@ async function main() {
     zIndex: 12,
   });
 
+  logseq.App.registerCommandPalette({
+    key: 'mark-map-open',
+    label: 'Open Markmap',
+    keybinding: {
+      mode: 'non-editing',
+      binding: 'm m'
+    }
+  }, () => {
+    createModel().openMindMap();
+  });
+
   // Register icon ui
   logseq.App.registerUIItem('pagebar', {
     key: 'logseq-mark-map',

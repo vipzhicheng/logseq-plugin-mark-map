@@ -8,7 +8,6 @@ module.exports = {
   entry: {
     main: './src/main.ts',
     style: './src/style.scss',
-    polyfills: './src/polyfills.ts',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -69,7 +68,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './src/index.html',
-      chunks: ['polyfills', 'style', 'main'],
+      chunks: ['style', 'main'],
       chunksSortMode: 'manual',
     }),
     new CopyWebpackPlugin({

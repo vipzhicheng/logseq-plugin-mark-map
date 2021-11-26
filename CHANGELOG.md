@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.3
+
+* feat: Add a keybinding for me, try to trigger `m m` on non-editing mode.
+
 ## 0.1.2
 
 * feat: Add a block property `mark-map-limit:: N` to limit block next level block list items.
