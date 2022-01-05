@@ -92,10 +92,11 @@ Most of features come from `Markmap` project.
 
 ## Markmap trigger
 
-* `m m`: trigger Markmap for non-editing mode.
-* `ctrl+m ctrl+m`: trigger Markmap for editing mode.
+* `m m`: trigger Markmap for non-editing mode, show currennt block and children when editing or highlighting, otherwise show all page blocks.
+* `ctrl+m ctrl+m`: trigger Markmap for editing mode, show current block and children.
 * `/Markmap` slash command: to trigger markmap for current block and children.
 * `Markmap` contextual menu item: to trigger markmap for current block and children.
+* Icon Button: to trigger markmap for current page.
 
 ## Markmap properties
 

@@ -7,6 +7,7 @@ feat: `ctrl+m ctrl+m`, Trigger Markmap for editing mode.
 feat: `Markmap` slash command.
 feat: `Markmap` contextual menu.
 feat: Editing block or highlighting block will be the central node of the Markmap, otherwise it will use the whole page blocks.
+fix: Local images can not popup after changing graph.
 
 ## 0.1.2
 

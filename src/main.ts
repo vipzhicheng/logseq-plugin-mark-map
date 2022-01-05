@@ -156,12 +156,19 @@ async function main() {
   let originalRoot: INode;
   let originalTotalLevel: number;
 
+  let config = await logseq.App.getUserConfigs();
+
+  // reload config if graph change
+  logseq.App.onCurrentGraphChanged(async () => {
+    config = await logseq.App.getUserConfigs();
+  });
+
   logseq.on('ui:visible:changed', async ({ visible }) => {
     if (!visible) {
       return;
     }
 
-    const config = await logseq.App.getUserConfigs();
+
     let blocks = await logseq.Editor.getCurrentPageBlocksTree();
     let page = await logseq.Editor.getCurrentPage() as any;
 
