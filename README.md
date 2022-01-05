@@ -90,9 +90,12 @@ Most of features come from `Markmap` project.
 * `LEFT`: move mindmap left.
 * `RIGHT`: move mindmap right.
 
-## Logseq Key-binding to trigger markmap
+## Markmap trigger
 
-It is key-binded with Logseq with `m m`, means pressing two times `M` on your keyboard.
+* `m m`: trigger Markmap for non-editing mode.
+* `ctrl+m ctrl+m`: trigger Markmap for editing mode.
+* `/Markmap` slash command: to trigger markmap for current block and children.
+* `Markmap` contextual menu item: to trigger markmap for current block and children.
 
 ## Markmap properties
 

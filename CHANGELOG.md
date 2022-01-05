@@ -2,7 +2,11 @@
 
 ## 0.1.3
 
-* feat: Add a keybinding for me, try to trigger `m m` on non-editing mode.
+feat: `m m`, Trigger Markmap for non-editing mode.
+feat: `ctrl+m ctrl+m`, Trigger Markmap for editing mode.
+feat: `Markmap` slash command.
+feat: `Markmap` contextual menu.
+feat: Editing block or highlighting block will be the central node of the Markmap, otherwise it will use the whole page blocks.
 
 ## 0.1.2
 

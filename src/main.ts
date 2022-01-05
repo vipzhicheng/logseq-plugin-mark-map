@@ -12,7 +12,7 @@ import TurndownService from 'turndown';
 import cheerio from 'cheerio';
 import replaceAsync from 'string-replace-async';
 import ellipsis from 'text-ellipsis';
-import { append } from 'domutils';
+import { BlockEntity, BlockUUIDTuple } from '@logseq/libs/dist/LSPlugin';
 
 function eventFire(el: any, etype: string){
   if (el.fireEvent) {
@@ -24,24 +24,36 @@ function eventFire(el: any, etype: string){
   }
 }
 
+let renderAsBlock = false;
+let editingBlockUUID = '';
+
 /**
  * User model
  */
 function createModel() {
   return {
-    openMindMap() {
+    openMindMap(blockMode = false) {
       // @ts-ignore
       Alpine.store('showHelp').close();
 
       const closeButton = document.getElementById('close-button');
       const listener = () => {
-        logseq.hideMainUI();
+        logseq.hideMainUI({
+          restoreEditingCursor: true
+        });
       };
 
       closeButton.removeEventListener('click', listener);
       closeButton.addEventListener('click', listener);
 
-      logseq.showMainUI();
+      if (blockMode === true || blockMode === false) {
+        renderAsBlock = blockMode;
+      } else {
+        renderAsBlock = false;
+      }
+      logseq.showMainUI({
+        autoFocus: true
+      });
     },
   };
 }
@@ -53,6 +65,31 @@ async function main() {
     zIndex: 12,
   });
 
+  const triggerMarkmap = async ({ uuid }) => {
+    const blocks = await logseq.Editor.getSelectedBlocks();
+    const editing = await logseq.Editor.checkEditing();
+
+    if (editing || blocks && blocks.length > 0) {
+      editingBlockUUID = uuid;
+      createModel().openMindMap(true);
+    } else {
+      createModel().openMindMap(false);
+    }
+  };
+
+  const triggerMarkmapForceBlock = async ({ uuid }) => {
+    editingBlockUUID = uuid;
+    createModel().openMindMap(true);
+  };
+
+  logseq.App.registerCommandPalette({
+    key: 'mark-map-open-editing',
+    label: 'Open Markmap in editing',
+    keybinding: {
+      mode: 'global',
+      binding: 'ctrl+m ctrl+m'
+    }
+  }, triggerMarkmap);
   logseq.App.registerCommandPalette({
     key: 'mark-map-open',
     label: 'Open Markmap',
@@ -60,9 +97,9 @@ async function main() {
       mode: 'non-editing',
       binding: 'm m'
     }
-  }, () => {
-    createModel().openMindMap();
-  });
+  }, triggerMarkmap);
+  logseq.Editor.registerSlashCommand('Markmap', triggerMarkmapForceBlock);
+  logseq.Editor.registerBlockContextMenuItem(`Markmap`, triggerMarkmapForceBlock);
 
   // Register icon ui
   logseq.App.registerUIItem('pagebar', {
@@ -91,6 +128,27 @@ async function main() {
     });
   };
 
+  const convertFlatBlocksToTree = async (blocks: (BlockUUIDTuple | BlockEntity)[]): Promise<BlockEntity[]> => {
+    const children = [];
+    if (blocks && blocks.length > 0) {
+
+      for (let item of blocks) {
+        if (Array.isArray(item)) {
+          const block = await logseq.Editor.getBlock(item[1]);
+          if (block.children.length > 0) {
+            block.children = await convertFlatBlocksToTree(block.children as BlockUUIDTuple[]);
+          }
+          children.push(block);
+        } else {
+          children.push(item);
+        }
+
+      }
+    }
+
+    return children;
+  };
+
 
   let mm: Markmap;
   let currentLevel: number;
@@ -106,7 +164,35 @@ async function main() {
     const config = await logseq.App.getUserConfigs();
     let blocks = await logseq.Editor.getCurrentPageBlocksTree();
     let page = await logseq.Editor.getCurrentPage() as any;
-    const title = page?.properties?.markMapTitle || page?.originalName;
+
+    let title;
+    if (renderAsBlock) {
+      let currentBlock;
+      if (editingBlockUUID) {
+        currentBlock = await logseq.Editor.getBlock(editingBlockUUID);
+      } else {
+        currentBlock = await logseq.Editor.getCurrentBlock();
+      }
+
+      if (currentBlock) {
+        let content = currentBlock.content;
+        content = content ? content.split('\n')
+          .filter((line: string) => line.indexOf('::') === -1)
+          .join('\n')
+          .replace(/^[#\s]+/, '')
+          .trim() : '';
+        title = content;
+        blocks = await convertFlatBlocksToTree(currentBlock?.children);
+      }
+
+    } else {
+      title = page?.properties?.markMapTitle || page?.originalName;
+    }
+
+
+
+
+
     const collapsed = page?.properties?.markMapCollapsed;
 
     // Build markdown
@@ -136,7 +222,7 @@ async function main() {
     };
 
     const walkTransformBlocksFilter = async blocks => {
-      if (blocks.length > 0) {
+      if (blocks && blocks.length > 0) {
         for (let it of blocks) {
           let { children, uuid, title, content, properties } = it;
           children = await children;
@@ -627,7 +713,9 @@ async function main() {
                   lightbox.end();
                 }
               }
-              logseq.hideMainUI();
+              logseq.hideMainUI({
+                restoreEditingCursor: true
+              });
               break;
             case 'space': // space
               await mm?.fit();
