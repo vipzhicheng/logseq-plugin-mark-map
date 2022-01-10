@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.4
+
+feat: support open next page markmap in markmap.
+
 ## 0.1.3
 
 feat: `m m`, Trigger Markmap for non-editing mode.

@@ -358,13 +358,13 @@ async function main() {
         let regexEmbedPageRef = /\{\{embed\s+\[\[([^\[\]]*?)\]\]\}\}/ig;
         if (regexEmbedPageRef.test(topic)) {
           topic = topic.replace(regexEmbedPageRef, (match, p1) => {
-            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">${p1}</a>`;
+            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`;
           });
         }
 
         if (regexPageRef.test(topic)) {
           topic = topic.replace(regexPageRef, (match, p1) => {
-            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">${p1}</a>`;
+            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`;
           });
         }
 
