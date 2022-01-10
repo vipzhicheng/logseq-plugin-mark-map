@@ -2,7 +2,9 @@
 
 ## 0.1.4
 
-feat: support open next page markmap in markmap.
+feat: support open page or block markmap in markmap.
+feat: support block page markmap trigger by shortcut.
+
 
 ## 0.1.3
 

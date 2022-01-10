@@ -172,6 +172,9 @@ async function main() {
     let blocks = await logseq.Editor.getCurrentPageBlocksTree();
     let page = await logseq.Editor.getCurrentPage() as any;
 
+    console.log('page', page);
+    console.log('blocks', blocks);
+
     let title;
     if (renderAsBlock) {
       let currentBlock;
@@ -193,7 +196,19 @@ async function main() {
       }
 
     } else {
-      title = page?.properties?.markMapTitle || page?.originalName;
+      title = page?.properties?.markMapTitle || page?.originalName || page?.name;
+    }
+
+    // For block page
+    if (!page?.originalName && page.content) {
+      let content = page.content;
+      content = content ? content.split('\n')
+          .filter((line: string) => line.indexOf('::') === -1)
+          .join('\n')
+          .replace(/^[#\s]+/, '')
+          .trim() : '';
+      title = content;
+      blocks = await convertFlatBlocksToTree(page?.children);
     }
 
 
@@ -306,7 +321,7 @@ async function main() {
         let regexPageTag = /#([^#\s]+)/ig;
         if (regexPageTag.test(topic)) {
           topic = topic.replace(regexPageTag, (match, p1) => {
-            return `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI();">#${p1}</a>`;
+            return `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">#${p1}</a>`;
           });
         }
 
@@ -318,7 +333,7 @@ async function main() {
         if (regexLinkBlockRef.test(topic)) {
           topic = await replaceAsync(topic, regexLinkBlockRef, async (match, p1, p2) => {
             const block = await logseq.Editor.getBlock(p2);
-            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI();">${p1}</a>`;
+            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`;
           });
         }
 
@@ -326,7 +341,7 @@ async function main() {
         let regexLinkPageRef = /\[(.*?)\]\(\[\[(.*?)\]\]\)/ig;
         if (regexLinkPageRef.test(topic)) {
           topic = await replaceAsync(topic, regexLinkPageRef, async (match, p1, p2) => {
-            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p2}' }); logseq.hideMainUI();">${p1}</a>`;
+            return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p2}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`;
           });
         }
 
@@ -337,7 +352,7 @@ async function main() {
           topic = await replaceAsync(topic, regexEmbedBlockRef, async (match, p1) => {
             const block = await logseq.Editor.getBlock(p1);
             if (block) {
-              return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI();">${themeWorkflowTag(block.content)}</a>`;
+              return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI(); logseq.showMainUI();">${themeWorkflowTag(block.content)}</a>`;
             }
             return '[MISSING BLOCK]';
           });
@@ -347,7 +362,7 @@ async function main() {
           topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
             const block = await logseq.Editor.getBlock(p1);
             if (block) {
-              return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI();">${themeWorkflowTag(block.content)}</a>`;
+              return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI(); logseq.showMainUI();">${themeWorkflowTag(block.content)}</a>`;
             }
             return '[MISSING BLOCK]';
           });
