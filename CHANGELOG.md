@@ -3,6 +3,7 @@
 ## 0.1.4
 
 feat: support open page or block markmap in markmap.
+feat: support trigger backward on markmap.
 feat: support block page markmap trigger by shortcut.
 
 

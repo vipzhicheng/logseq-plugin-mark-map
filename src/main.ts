@@ -27,6 +27,41 @@ function eventFire(el: any, etype: string){
 let renderAsBlock = false;
 let editingBlockUUID = '';
 
+const triggerMarkmap = async ({ uuid }) => {
+  const blocks = await logseq.Editor.getSelectedBlocks();
+  const editing = await logseq.Editor.checkEditing();
+
+  if (uuid && (editing || blocks && blocks.length > 0)) {
+    editingBlockUUID = uuid;
+    createModel().openMindMap(true);
+  } else {
+    createModel().openMindMap(false);
+  }
+};
+
+const triggerMarkmapForceBlock = async ({ uuid }) => {
+  editingBlockUUID = uuid;
+  createModel().openMindMap(true);
+};
+
+const closeButtonHandler = () => {
+  logseq.hideMainUI({
+    restoreEditingCursor: true
+  });
+};
+
+const goBackButtonHandler = async () => {
+  // @ts-ignore
+  await logseq.App.invokeExternalCommand('logseq.go/backward');
+  logseq.hideMainUI();
+  setTimeout(() => {
+    logseq.showMainUI({
+      autoFocus: true
+    });
+  }, 10);
+
+};
+
 /**
  * User model
  */
@@ -37,14 +72,12 @@ function createModel() {
       Alpine.store('showHelp').close();
 
       const closeButton = document.getElementById('close-button');
-      const listener = () => {
-        logseq.hideMainUI({
-          restoreEditingCursor: true
-        });
-      };
+      closeButton.removeEventListener('click', closeButtonHandler, false);
+      closeButton.addEventListener('click', closeButtonHandler, false);
 
-      closeButton.removeEventListener('click', listener);
-      closeButton.addEventListener('click', listener);
+      const goBackButton = document.getElementById('go-back-button');
+      goBackButton.removeEventListener('click', goBackButtonHandler, false);
+      goBackButton.addEventListener('click', goBackButtonHandler, false);
 
       if (blockMode === true || blockMode === false) {
         renderAsBlock = blockMode;
@@ -64,23 +97,6 @@ async function main() {
     position: 'fixed',
     zIndex: 12,
   });
-
-  const triggerMarkmap = async ({ uuid }) => {
-    const blocks = await logseq.Editor.getSelectedBlocks();
-    const editing = await logseq.Editor.checkEditing();
-
-    if (editing || blocks && blocks.length > 0) {
-      editingBlockUUID = uuid;
-      createModel().openMindMap(true);
-    } else {
-      createModel().openMindMap(false);
-    }
-  };
-
-  const triggerMarkmapForceBlock = async ({ uuid }) => {
-    editingBlockUUID = uuid;
-    createModel().openMindMap(true);
-  };
 
   logseq.App.registerCommandPalette({
     key: 'mark-map-open-editing',
@@ -172,9 +188,6 @@ async function main() {
     let blocks = await logseq.Editor.getCurrentPageBlocksTree();
     let page = await logseq.Editor.getCurrentPage() as any;
 
-    console.log('page', page);
-    console.log('blocks', blocks);
-
     let title;
     if (renderAsBlock) {
       let currentBlock;
@@ -200,7 +213,7 @@ async function main() {
     }
 
     // For block page
-    if (!page?.originalName && page.content) {
+    if (page && !page.originalName && page.content) {
       let content = page.content;
       content = content ? content.split('\n')
           .filter((line: string) => line.indexOf('::') === -1)
@@ -236,7 +249,7 @@ async function main() {
         .replace(/^[#\s]+/, '')
         .trim();
 
-      if (topic.length === 0 && children.length === 0) {
+      if (topic.length === 0 && (!children || children.length === 0)) {
         return false;
       } else {
         return true;
@@ -252,9 +265,9 @@ async function main() {
             it.children = await walkTransformBlocksFilter(children);
           }
         }
+        return blocks.filter(blockFilter);
       }
 
-      return blocks.filter(blockFilter);
     };
 
     let filteredBlocks = await walkTransformBlocksFilter(blocks);
@@ -275,7 +288,7 @@ async function main() {
     }
 
     const walkTransformBlocksLimit = (blocks:any, limit = 0) => {
-      if (limit && blocks.length > limit) {
+      if (limit && blocks && blocks.length > limit) {
         const limitBlocks = blocks.splice(0, limit);
         blocks = limitBlocks.concat({
           content: '...',
@@ -284,7 +297,7 @@ async function main() {
         });
       }
 
-      if (blocks.length > 0) {
+      if (blocks && blocks.length > 0) {
         for (let it of blocks) {
           let { children, content, properties } = it;
           if (children) {
@@ -306,6 +319,10 @@ async function main() {
       currentLevel = Math.min(5, Math.max(currentLevel, depth));
       totalLevel = Math.min(5, Math.max(currentLevel, depth));
       // blocks = blocks.filter(blockFilter);
+
+      if (!blocks) {
+        return [];
+      }
 
       let newBlocks = [];
       for (let it of blocks) {
@@ -482,7 +499,7 @@ async function main() {
     let { root, features } = transformer.transform(md);
 
     // @ts-ignore
-    root.properties = page.properties || {};
+    root.properties = page && page.properties ? page.properties : {};
 
     const walkTransformRoot = (parent, blocks) => {
       if (parent.c) {
