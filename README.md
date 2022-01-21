@@ -37,7 +37,7 @@ Load unpack plugin from `dist` directory
 
 Most of features come from `Markmap` project.
 
-* Colorful mindmap items.
+* Colorful markmap items.
 * Markmap toolbar included.
 * Support inline code and code block.
 * Support inline text styles.
@@ -51,6 +51,8 @@ Most of features come from `Markmap` project.
 * Workflow tags are Colorized.
 * Image partly supported, will be converted to image link.
 * Mainly support `Markdown` mode, `Org` mode partly supported.
+* Support trigger markmap in block page.
+* Support open next markmap in markmap.
 
 ## Notes
 
@@ -59,7 +61,7 @@ Most of features come from `Markmap` project.
 * Text length is unlimited.
 * `#` head markdown syntax is ignored, use hierarchical blocks instead.
 * Hiccup not supported.
-* Tested on Logseq `v0.4.0`.
+* Tested on Logseq `v0.5.9`.
 
 ## Shortcuts
 
@@ -118,6 +120,10 @@ Most of features come from `Markmap` project.
 ## Contribution
 
 Issues and PRs are welcome!
+
+## Buy me a coffee
+
+If my plugin solve your situation a little bit and you will, you can choose to buy me a coffee via [this](https://www.buymeacoffee.com/vipzhicheng) and [这里](https://afdian.net/@vipzhicheng).
 
 ## Licence
 

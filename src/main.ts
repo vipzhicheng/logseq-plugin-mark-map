@@ -54,12 +54,18 @@ const goBackButtonHandler = async () => {
   // @ts-ignore
   await logseq.App.invokeExternalCommand('logseq.go/backward');
   logseq.hideMainUI();
-  setTimeout(() => {
-    logseq.showMainUI({
-      autoFocus: true
-    });
-  }, 10);
+  logseq.showMainUI({
+    autoFocus: true
+  });
+};
 
+const goForwardButtonHandler = async () => {
+  // @ts-ignore
+  await logseq.App.invokeExternalCommand('logseq.go/forward');
+  logseq.hideMainUI();
+  logseq.showMainUI({
+    autoFocus: true
+  });
 };
 
 /**
@@ -78,6 +84,10 @@ function createModel() {
       const goBackButton = document.getElementById('go-back-button');
       goBackButton.removeEventListener('click', goBackButtonHandler, false);
       goBackButton.addEventListener('click', goBackButtonHandler, false);
+
+      const goForwardButton = document.getElementById('go-forward-button');
+      goForwardButton.removeEventListener('click', goForwardButtonHandler, false);
+      goForwardButton.addEventListener('click', goForwardButtonHandler, false);
 
       if (blockMode === true || blockMode === false) {
         renderAsBlock = blockMode;
@@ -174,17 +184,17 @@ async function main() {
 
   let config = await logseq.App.getUserConfigs();
 
+
   // reload config if graph change
   logseq.App.onCurrentGraphChanged(async () => {
     config = await logseq.App.getUserConfigs();
   });
 
-  logseq.on('ui:visible:changed', async ({ visible }) => {
-    if (!visible) {
-      return;
-    }
+  logseq.App.onRouteChanged(async () => {
+    await renderMarkmap();
+  });
 
-
+  let renderMarkmap = async () => {
     let blocks = await logseq.Editor.getCurrentPageBlocksTree();
     let page = await logseq.Editor.getCurrentPage() as any;
 
@@ -223,10 +233,6 @@ async function main() {
       title = content;
       blocks = await convertFlatBlocksToTree(page?.children);
     }
-
-
-
-
 
     const collapsed = page?.properties?.markMapCollapsed;
 
@@ -960,6 +966,14 @@ async function main() {
       el.style.right = '0.5rem';
       document.getElementById('markmap-toolbar')?.append(el);
     };
+  };
+
+  logseq.on('ui:visible:changed', async ({ visible }) => {
+    if (!visible) {
+      return;
+    }
+
+    await renderMarkmap();
   });
 }
 logseq.ready(createModel(), main).catch(e => console.error);
