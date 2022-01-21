@@ -5,7 +5,7 @@
 feat: support open page or block markmap in markmap.
 feat: support trigger backward on markmap.
 feat: support block page markmap trigger by shortcut.
-
+feat: add `cmd+[` and `cmd+]` shortcuts on markmap to traverse.
 
 ## 0.1.3
 

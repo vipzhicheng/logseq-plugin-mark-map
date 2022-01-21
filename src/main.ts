@@ -190,9 +190,13 @@ async function main() {
     config = await logseq.App.getUserConfigs();
   });
 
+  let uiVisible = false;
   logseq.App.onRouteChanged(async () => {
-    await renderMarkmap();
+    if (uiVisible) {
+      await renderMarkmap();
+    }
   });
+
 
   let renderMarkmap = async () => {
     let blocks = await logseq.Editor.getCurrentPageBlocksTree();
@@ -231,6 +235,7 @@ async function main() {
           .replace(/^[#\s]+/, '')
           .trim() : '';
       title = content;
+      console.log('page', page);
       blocks = await convertFlatBlocksToTree(page?.children);
     }
 
@@ -711,6 +716,16 @@ async function main() {
           focusReset();
           return false;
         });
+        hotkeys('cmd+[', async function() {
+          // @ts-ignore
+          await logseq.App.invokeExternalCommand('logseq.go/backward');
+          return false;
+        });
+        hotkeys('cmd+]', async function() {
+          // @ts-ignore
+          await logseq.App.invokeExternalCommand('logseq.go/forward');
+          return false;
+        });
         hotkeys('up,down,left,right,esc,space,z,r,h,j,k,l,n,p,b,q,-,=,0,9,1,2,3,4,5,/', async function (event, handler) {
           // @ts-ignore
           const showHelp = Alpine.store('showHelp').get();
@@ -851,10 +866,12 @@ async function main() {
               if (svgNode) {
                 // @ts-ignore
                 const transform = d3.zoomTransform(mm.svg.node());
-                // @ts-ignore
-                transform.y = transform.y - 100;
-                // @ts-ignore
-                mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+                if (transform.x && transform.y && transform.k) {
+                  // @ts-ignore
+                  transform.y = transform.y - 100;
+                  // @ts-ignore
+                  mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+                }
               }
             break;
             case 'down':
@@ -862,10 +879,13 @@ async function main() {
               if (svgNode) {
                 // @ts-ignore
                 const transform = d3.zoomTransform(mm.svg.node());
-                // @ts-ignore
-                transform.y = transform.y + 100;
-                // @ts-ignore
-                mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+                if (transform.x && transform.y && transform.k) {
+
+                  // @ts-ignore
+                  transform.y = transform.y + 100;
+                  // @ts-ignore
+                  mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+                }
               }
             break;
 
@@ -874,10 +894,13 @@ async function main() {
               if (svgNode) {
                 // @ts-ignore
                 const transform = d3.zoomTransform(mm.svg.node());
-                // @ts-ignore
-                transform.x = transform.x - 100;
-                // @ts-ignore
-                mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+                if (transform.x && transform.y && transform.k) {
+
+                  // @ts-ignore
+                  transform.x = transform.x - 100;
+                  // @ts-ignore
+                  mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+                }
               }
             break;
             case 'right':
@@ -885,10 +908,13 @@ async function main() {
               if (svgNode) {
                 // @ts-ignore
                 const transform = d3.zoomTransform(mm.svg.node());
-                // @ts-ignore
-                transform.x = transform.x + 100;
-                // @ts-ignore
-                mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+                if (transform.x && transform.y && transform.k) {
+                  // @ts-ignore
+                  transform.x = transform.x + 100;
+                  // @ts-ignore
+                  mm.transition(mm.g).attr('transform', `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`);
+
+                }
               }
             break;
 
@@ -969,6 +995,7 @@ async function main() {
   };
 
   logseq.on('ui:visible:changed', async ({ visible }) => {
+    uiVisible = visible;
     if (!visible) {
       return;
     }

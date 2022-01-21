@@ -91,7 +91,9 @@ Most of features come from `Markmap` project.
 * `DOWN`: move mindmap down.
 * `LEFT`: move mindmap left.
 * `RIGHT`: move mindmap right.
-
+* `cmd+[`: go backward.
+* `cmd+]`: go forward.
+* `/`: popup keybindings help model.
 ## Markmap trigger
 
 * `m m`: trigger Markmap for non-editing mode, show currennt block and children when editing or highlighting, otherwise show all page blocks.
