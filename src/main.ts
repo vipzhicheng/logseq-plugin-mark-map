@@ -235,7 +235,6 @@ async function main() {
           .replace(/^[#\s]+/, '')
           .trim() : '';
       title = content;
-      console.log('page', page);
       blocks = await convertFlatBlocksToTree(page?.children);
     }
 
