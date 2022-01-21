@@ -125,7 +125,7 @@ Issues and PRs are welcome!
 
 ## Buy me a coffee
 
-If my plugin solve your situation a little bit and you will, you can choose to buy me a coffee via [this](https://www.buymeacoffee.com/vipzhicheng) and [这里](https://afdian.net/@vipzhicheng).
+If my plugin solve your situation a little bit and you will, you can choose to buy me a coffee via [this](https://www.buymeacoffee.com/vipzhicheng) and [this](https://afdian.net/@vipzhicheng).
 
 ## Licence
 
