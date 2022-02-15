@@ -14,6 +14,39 @@ import replaceAsync from 'string-replace-async';
 import ellipsis from 'text-ellipsis';
 import { BlockEntity, BlockUUIDTuple } from '@logseq/libs/dist/LSPlugin';
 
+
+const settingsVersion = 'v1';
+export const defaultSettings = {
+  keyBindings: {
+    openMarkmap: 'ctrl+m ctrl+m'
+  },
+  settingsVersion,
+  disabled: false,
+};
+
+export type DefaultSettingsType = typeof defaultSettings;
+
+const initSettings = () => {
+  let settings = logseq.settings;
+
+  const shouldUpdateSettings = !settings || settings.settingsVersion != defaultSettings.settingsVersion;
+
+  if (shouldUpdateSettings) {
+    settings = defaultSettings;
+    logseq.updateSettings(settings);
+  }
+};
+
+const getSettings = (key: string | undefined, defaultValue: any = undefined) => {
+  let settings = logseq.settings;
+  const merged = Object.assign(defaultSettings, settings);
+  return key
+    ? merged[key]
+      ? merged[key]
+      : defaultValue
+    : merged;
+};
+
 function eventFire(el: any, etype: string){
   if (el.fireEvent) {
     el.fireEvent('on' + etype);
@@ -102,6 +135,9 @@ function createModel() {
 }
 
 async function main() {
+  initSettings();
+  const keyBindings = getSettings('keyBindings');
+
   // Set Model Style
   logseq.setMainUIInlineStyle({
     position: 'fixed',
@@ -109,19 +145,11 @@ async function main() {
   });
 
   logseq.App.registerCommandPalette({
-    key: 'mark-map-open-editing',
-    label: 'Open Markmap in editing',
-    keybinding: {
-      mode: 'global',
-      binding: 'ctrl+m ctrl+m'
-    }
-  }, triggerMarkmap);
-  logseq.App.registerCommandPalette({
     key: 'mark-map-open',
     label: 'Open Markmap',
     keybinding: {
-      mode: 'non-editing',
-      binding: 'm m'
+      mode: 'global',
+      binding: keyBindings.openMarkmap,
     }
   }, triggerMarkmap);
   logseq.Editor.registerSlashCommand('Markmap', triggerMarkmapForceBlock);

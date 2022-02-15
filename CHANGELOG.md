@@ -1,20 +1,25 @@
 # CHANGELOG
 
+## 0.1.5
+
+* fix: remove shortcut `m m` but keep `ctrl+m ctrl+m`.
+* feat: make the shortcut configurable.
+
 ## 0.1.4
 
-feat: support open page or block markmap in markmap.
-feat: support trigger backward on markmap.
-feat: support block page markmap trigger by shortcut.
-feat: add `cmd+[` and `cmd+]` shortcuts on markmap to traverse.
+* feat: support open page or block markmap in markmap.
+* feat: support trigger backward on markmap.
+* feat: support block page markmap trigger by shortcut.
+* feat: add `cmd+[` and `cmd+]` shortcuts on markmap to traverse.
 
 ## 0.1.3
 
-feat: `m m`, Trigger Markmap for non-editing mode.
-feat: `ctrl+m ctrl+m`, Trigger Markmap for editing mode.
-feat: `Markmap` slash command.
-feat: `Markmap` contextual menu.
-feat: Editing block or highlighting block will be the central node of the Markmap, otherwise it will use the whole page blocks.
-fix: Local images can not popup after changing graph.
+* feat: `m m`, Trigger Markmap for non-editing mode.
+* feat: `ctrl+m ctrl+m`, Trigger Markmap for editing mode.
+* feat: `Markmap` slash command.
+* feat: `Markmap` contextual menu.
+* feat: Editing block or highlighting block will be the central node of the Markmap, otherwise it will use the whole page blocks.
+* fix: Local images can not popup after changing graph.
 
 ## 0.1.2
 
