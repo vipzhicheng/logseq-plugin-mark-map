@@ -5,7 +5,9 @@
   "main": "index.html",
   "description": "Logseq markmap plugin",
   "logseq": {
-    "icon": "./icon.png"
+    "icon": "./icon.png",
+    "id": "logseq-plugin-mark-map",
+    "title": "Logseq Markmap"
   },
   "scripts": {
     "start": "webpack serve --config=webpack.config.js --devtool=source-map --mode=development --port=3001",
@@ -37,7 +39,7 @@
     "@typescript-eslint/parser": "^4.33.0",
     "cheerio": "^1.0.0-rc.10",
     "eslint": "^7.32.0",
-    "html2canvas": "^1.3.3",
+    "html2canvas": "^1.4.1",
     "markmap-lib": "^0.11.6",
     "markmap-toolbar": "^0.1.6",
     "markmap-view": "^0.2.6",

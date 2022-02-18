@@ -987,17 +987,26 @@ async function main() {
         content:
           '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>',
         onClick: async () => {
-          let el = document.getElementById('markmap-container');
+          let g = document.querySelector('#markmap g').getBoundingClientRect();
+          let el = document.querySelector('#markmap-container') as HTMLElement;
+          let rect = el.getBoundingClientRect();
+          let oldHeight = el.style.height;
+          el.style.height = `${Math.ceil(g.height * rect.width / g.width)}px`;
           const page = await logseq.Editor.getCurrentPage();
           if (el) {
-            html2canvas(el).then(function (canvas) {
+            html2canvas(el, {
+            }).then(async function (canvas:HTMLCanvasElement) {
               const title = page?.originalName;
               let url = canvas.toDataURL('image/png');
               var oA = document.createElement('a');
               oA.download = title || '';
               oA.href = url;
               document.body.appendChild(oA);
+
               oA.click();
+              el.style.height = oldHeight;
+              await mm.fit();
+
               oA.remove();
             });
           }
