@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.6
+
+* feat: support exporting high resolution png.
+
 ## 0.1.5
 
 * fix: remove shortcut `m m` but keep `ctrl+m ctrl+m`.

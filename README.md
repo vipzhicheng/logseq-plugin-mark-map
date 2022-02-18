@@ -119,6 +119,17 @@ Most of features come from `Markmap` project.
 * `mark-map-cut:: 30`, a block property, to limit mindmap node text length.
 * `mark-map-limit:: N`, to limit block next level block list items.
 
+## FAQs
+
+<details>
+<summary>1. How to export high resolution image.</summary>
+Once your markmap has huge blocks, the markmap will become so big and the default exported png become pixelated. And now it can export high resolution png but needs some special steps.
+
+1. Click `+` to zoom in your markmap to maximum but not overflow.
+2. Depend on your markmap's shape, if it looks like a landscape you need to move the markmap to left edge and if it looks like a portrait you need to move the markmap to top edge using arrow keys.
+3. Click export button, the exported one will be high resolution, and the markmap will fit the window again.
+</details>
+
 ## Contribution
 
 Issues and PRs are welcome!

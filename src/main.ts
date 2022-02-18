@@ -991,7 +991,12 @@ async function main() {
           let el = document.querySelector('#markmap-container') as HTMLElement;
           let rect = el.getBoundingClientRect();
           let oldHeight = el.style.height;
-          el.style.height = `${Math.ceil(g.height * rect.width / g.width)}px`;
+          let oldWidth = el.style.width;
+          if (g.height > g.width) {
+            el.style.height = `${Math.ceil(g.height * rect.width / g.width)}px`;
+          } else {
+            el.style.width = `${Math.ceil(g.width * rect.height / g.height)}px`;
+          }
           const page = await logseq.Editor.getCurrentPage();
           if (el) {
             html2canvas(el, {
@@ -1005,6 +1010,7 @@ async function main() {
 
               oA.click();
               el.style.height = oldHeight;
+              el.style.width = oldWidth;
               await mm.fit();
 
               oA.remove();
