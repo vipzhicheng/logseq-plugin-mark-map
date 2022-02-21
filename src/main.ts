@@ -528,7 +528,12 @@ async function main() {
         src = config.currentGraph.substring(13) + '/' + src.replace(/\.\.\//g, '');
       }
 
-      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${src}">${alt} 🖼　</a>`;
+      if (['pdf'].includes(src.substring(src.lastIndexOf('.') + 1))) {
+        result = `📄 ${alt}`;
+      } else {
+        result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${src}">${alt} 🖼　</a>`;
+      }
+
 
       return result;
     };

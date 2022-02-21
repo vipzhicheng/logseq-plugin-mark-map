@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.8
+
+* fix: pdf asset wrongly parsed as image on markmap
+
 ## 0.1.7
 
 * fix: parse tag issue, should not parse url anchor
