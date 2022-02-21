@@ -373,10 +373,10 @@ async function main() {
         let topic = contentFiltered;
 
         // Process page tag
-        let regexPageTag = /#([^#\s]+)/ig;
+        let regexPageTag = /\s+#([^#\s\(\)]+)/ig;
         if (regexPageTag.test(topic)) {
           topic = topic.replace(regexPageTag, (match, p1) => {
-            return `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">#${p1}</a>`;
+            return ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">#${p1}</a>`;
           });
         }
 
