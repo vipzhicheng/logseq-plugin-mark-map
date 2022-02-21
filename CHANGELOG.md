@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.7
+
+* fix: parse tag issue, should not parse url anchor
+
 ## 0.1.6
 
 * feat: support exporting high resolution png.
