@@ -14,11 +14,10 @@ const transformer = new Transformer();
 import * as d3 from 'd3';
 import org from 'org';
 import TurndownService from 'turndown';
-import cheerio from 'cheerio';
 import replaceAsync from 'string-replace-async';
 import ellipsis from 'text-ellipsis';
 import { BlockEntity, BlockUUIDTuple } from '@logseq/libs/dist/LSPlugin';
-
+import hotkeys from 'hotkeys-js'
 
 const settingsVersion = 'v1';
 export const defaultSettings = {
@@ -524,12 +523,26 @@ async function main() {
       return result;
     };
 
+    const matchAttr = (s: string) => {
+      let r = /\b(\w+)\s*=\s*"(.*?)"/g;
+      let d: any = {};
+
+      // ...  this loop will run indefinitely!
+      let m = r.exec(s);
+      while (m) {
+          d[m[1]] = m[2];
+          m = r.exec(s);
+      }
+
+      return d
+    }
+
     const defaultImageRender = transformer.md.renderer.rules.image;
     transformer.md.renderer.rules.image = function (tokens, idx: number, ...args: []) {
       let result = defaultImageRender(tokens, idx, ...args);
-      const $ = cheerio.load(result);
-      let src = $('img').attr('src') || $('a').attr('href');
-      const alt = $('img').attr('alt') || $('a').attr('title') || '';
+      const attr = matchAttr(result);
+      let src = attr.src || attr.href;
+      const alt = attr.alt || attr.title || '';
 
       // For now just support MacOS/Linux，Need to test and fix on Windows.
       if (src.indexOf('http') !== 0 && src.indexOf('..') === 0) {
@@ -744,7 +757,6 @@ async function main() {
 
     let svgNode;
 
-    const hotkeys = (window as any)?.hotkeys;
     const bindKeys = async function() {
       if (hotkeys) {
         hotkeys('.', function() {
@@ -757,16 +769,19 @@ async function main() {
           focusReset();
           return false;
         });
+        // @ts-ignore
         hotkeys('cmd+[', async function() {
           // @ts-ignore
           await logseq.App.invokeExternalCommand('logseq.go/backward');
           return false;
         });
+        // @ts-ignore
         hotkeys('cmd+]', async function() {
           // @ts-ignore
           await logseq.App.invokeExternalCommand('logseq.go/forward');
           return false;
         });
+        // @ts-ignore
         hotkeys('up,down,left,right,esc,space,z,r,h,j,k,l,n,p,b,q,-,=,0,9,1,2,3,4,5,/', async function (event, handler) {
           // @ts-ignore
           const showHelp = Alpine.store('showHelp').get();

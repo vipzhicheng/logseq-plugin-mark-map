@@ -17,6 +17,7 @@
     "@logseq/libs": "^0.0.1-alpha.35",
     "cheerio": "^1.0.0-rc.10",
     "d3": "^7.3.0",
+    "hotkeys-js": "^3.8.7",
     "html2canvas": "^1.4.1",
     "markmap-common": "^0.1.6",
     "markmap-lib": "^0.12.0",

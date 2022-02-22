@@ -4,6 +4,7 @@
 
 * fix: pdf asset wrongly parsed as image on markmap.
 * fix: optimize image parse, remove image properties.
+* infra: change from webpack to vite
 
 ## 0.1.7
 

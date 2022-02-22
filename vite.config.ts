@@ -7,7 +7,16 @@ export default defineConfig({
   mode: 'development',
   build: {
     target: 'esnext',
-    minify: false
+    minify: 'esbuild',
+    chunkSizeWarningLimit: 1024,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          markmap: ['markmap-view', 'markmap-lib', 'markmap-common', 'markmap-toolbar']
+        }
+
+      }
+    }
   },
   plugins: [vue()]
 })

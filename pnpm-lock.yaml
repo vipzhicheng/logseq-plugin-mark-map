@@ -6,6 +6,7 @@ specifiers:
   autoprefixer: ^10.4.2
   cheerio: ^1.0.0-rc.10
   d3: ^7.3.0
+  hotkeys-js: ^3.8.7
   html2canvas: ^1.4.1
   markmap-common: ^0.1.6
   markmap-lib: ^0.12.0
@@ -27,6 +28,7 @@ dependencies:
   '@logseq/libs': 0.0.1-alpha.35
   cheerio: 1.0.0-rc.10
   d3: 7.3.0
+  hotkeys-js: 3.8.7
   html2canvas: 1.4.1
   markmap-common: 0.1.6
   markmap-lib: 0.12.0
@@ -1678,6 +1680,10 @@ packages:
     dependencies:
       function-bind: 1.1.1
     dev: true
+
+  /hotkeys-js/3.8.7:
+    resolution: {integrity: sha512-ckAx3EkUr5XjDwjEHDorHxRO2Kb7z6Z2Sxul4MbBkN8Nho7XDslQsgMJT+CiJ5Z4TgRxxvKHEpuLE3imzqy4Lg==}
+    dev: false
 
   /html2canvas/1.4.1:
     resolution: {integrity: sha512-fPU6BHNpsyIhr8yyMpTLLxAbkaK8ArIBcmZIRiBLiDhjeqvXolaEmDGmELFuX9I4xDcaKKcJl+TKZLqruBbmWA==}
