@@ -1,5 +1,10 @@
+import { createApp } from 'vue';
+import App from './App.vue';
+
+import './style.css';
+
 import '@logseq/libs';
-import { Transformer } from 'markmap-lib';
+import { Transformer } from 'markmap-lib/dist/browser';
 import * as markmap from 'markmap-view';
 import { Markmap } from 'markmap-view';
 import { Toolbar } from 'markmap-toolbar';
@@ -572,6 +577,7 @@ async function main() {
     // @ts-ignore
     window.root = root;
     const { styles, scripts } = transformer.getUsedAssets(features);
+    console.log('scripts', scripts)
     const { Markmap, loadCSS, loadJS } = markmap;
     if (styles) loadCSS(styles);
     if (scripts) await loadJS(scripts, {
@@ -992,8 +998,7 @@ async function main() {
       toolbar.register({
         id: 'save',
         title: 'Save as png',
-        content:
-          '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>',
+        content: Toolbar.icon('M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z'),
         onClick: async () => {
           let g = document.querySelector('#markmap g').getBoundingClientRect();
           let el = document.querySelector('#markmap-container') as HTMLElement;
@@ -1029,14 +1034,14 @@ async function main() {
       toolbar.register({
         id: 'help',
         title: 'Show shortcuts description',
-        content: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /> </svg>',
+        content: Toolbar.icon('M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'),
         onClick: async () => {
           // @ts-ignore
           Alpine.store('showHelp').toggle();
         }
       });
       toolbar.attach(mm);
-      const el = toolbar.render();
+      const el = toolbar.render() as HTMLElement;
       el.style.position = 'absolute';
       el.style.bottom = '0.5rem';
       el.style.right = '0.5rem';
@@ -1052,5 +1057,7 @@ async function main() {
 
     await renderMarkmap();
   });
+
+  createApp(App).mount('#app')
 }
 logseq.ready(createModel(), main).catch(e => console.error);

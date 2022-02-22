@@ -1,9 +1,8 @@
 module.exports = {
-  mode: 'jit',
-  darkMode: 'class',
-  purge: [
-    'src/index.html'
+  content: [
+    'index.html', 'src/**/*.vue'
   ],
+  darkMode: 'class',
   theme: {
     extend: {},
   },
