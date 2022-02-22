@@ -502,7 +502,10 @@ async function main() {
       return newBlocks;
     };
 
-    const md = '# ' + title + '\n\n' + (await walkTransformBlocks(filteredBlocks, 0, config)).join('\n');
+    let md = '# ' + title + '\n\n' + (await walkTransformBlocks(filteredBlocks, 0, config)).join('\n');
+    md = md.replace(/(!\[.*?\]\(.*?\))\{(:[a-z0-9 ]+(, )?)+\}/ig, (match, p1) => {
+      return p1;
+    }); // remove image size
 
     const defaultLinkRender = transformer.md.renderer.rules.link_open;
     transformer.md.inline.ruler.enable([ 'mark' ]);
@@ -531,7 +534,7 @@ async function main() {
       if (['pdf'].includes(src.substring(src.lastIndexOf('.') + 1))) {
         result = `📄 ${alt}`;
       } else {
-        result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${src}">${alt} 🖼　</a>`;
+        result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${src}">🖼 ${alt}</a>`;
       }
 
 

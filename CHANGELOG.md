@@ -2,7 +2,8 @@
 
 ## 0.1.8
 
-* fix: pdf asset wrongly parsed as image on markmap
+* fix: pdf asset wrongly parsed as image on markmap.
+* fix: optimize image parse, remove image properties.
 
 ## 0.1.7
 
