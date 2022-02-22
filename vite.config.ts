@@ -12,6 +12,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          logseq: ['@logseq/libs'],
           markmap: ['markmap-view', 'markmap-lib', 'markmap-common', 'markmap-toolbar']
         }
 
