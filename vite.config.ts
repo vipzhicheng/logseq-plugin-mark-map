@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 // import cdnExternals from 'vite-plugin-cdn-externals'
 
@@ -13,11 +13,15 @@ export default defineConfig({
       output: {
         manualChunks: {
           logseq: ['@logseq/libs'],
-          markmap: ['markmap-view', 'markmap-lib', 'markmap-common', 'markmap-toolbar']
-        }
-
-      }
-    }
+          markmap: [
+            'markmap-view',
+            'markmap-lib',
+            'markmap-common',
+            'markmap-toolbar',
+          ],
+        },
+      },
+    },
   },
-  plugins: [vue()]
+  plugins: [vue()],
 })

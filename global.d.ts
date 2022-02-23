@@ -1,4 +1,4 @@
 declare module 'org' {
-  const Parser: any;
-  const ConverterHTML: any;
+  const Parser: any
+  const ConverterHTML: any
 }

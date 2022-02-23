@@ -1,0 +1,7 @@
+node_modules
+dist
+
+tailwind.config.js
+vue.d.ts
+postcss.config.js
+global.d.ts

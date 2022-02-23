@@ -4,7 +4,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - "*" # Push events to matching any tag format, i.e. 1.0, 20.15.10
+      - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
 
 env:
   PLUGIN_NAME: logseq-plugin-mark-map
@@ -18,7 +18,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "16.x" # You might need to adjust this value to your own version
+          node-version: '16.x' # You might need to adjust this value to your own version
       - name: Build
         id: build
         run: |
