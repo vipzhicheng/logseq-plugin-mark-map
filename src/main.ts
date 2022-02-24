@@ -213,8 +213,13 @@ async function main() {
     if (blocks && blocks.length > 0) {
       for (const item of blocks) {
         if (Array.isArray(item)) {
-          const block = await logseq.Editor.getBlock(item[1])
-          if (block.children.length > 0) {
+          if (!item[1]) {
+            continue
+          }
+          const block = await logseq.Editor.getBlock(item[1], {
+            includeChildren: true,
+          })
+          if (block && block.children && block.children.length > 0) {
             block.children = await convertFlatBlocksToTree(
               block.children as BlockUUIDTuple[]
             )
@@ -242,6 +247,61 @@ async function main() {
     config = await logseq.App.getUserConfigs()
   })
 
+  const defaultLinkRender = transformer.md.renderer.rules.link_open
+  transformer.md.inline.ruler.enable(['mark'])
+  transformer.md.renderer.rules.link_open = function (
+    tokens,
+    idx: number,
+    ...args: []
+  ) {
+    let result = defaultLinkRender(tokens, idx, ...args)
+
+    if (tokens[idx] && tokens[idx].href) {
+      result = result.replace('>', ' target="_blank">')
+    }
+
+    return result
+  }
+
+  const matchAttr = (s: string) => {
+    const r = /\b(\w+)\s*=\s*"(.*?)"/g
+    const d: any = {}
+
+    // ...  this loop will run indefinitely!
+    let m = r.exec(s)
+    while (m) {
+      d[m[1]] = m[2]
+      m = r.exec(s)
+    }
+
+    return d
+  }
+
+  const defaultImageRender = transformer.md.renderer.rules.image
+  transformer.md.renderer.rules.image = function (
+    tokens,
+    idx: number,
+    ...args: []
+  ) {
+    let result = defaultImageRender(tokens, idx, ...args)
+    const attr = matchAttr(result)
+    let src = attr.src || attr.href
+    const alt = attr.alt || attr.title || ''
+
+    // For now just support MacOS/Linux，Need to test and fix on Windows.
+    if (src.indexOf('http') !== 0 && src.indexOf('..') === 0) {
+      src = config.currentGraph.substring(13) + '/' + src.replace(/\.\.\//g, '')
+    }
+
+    if (['pdf'].includes(src.substring(src.lastIndexOf('.') + 1))) {
+      result = `📄 ${alt}`
+    } else {
+      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${src}">🖼 ${alt}</a>`
+    }
+
+    return result
+  }
+
   let uiVisible = false
   logseq.App.onRouteChanged(async () => {
     if (uiVisible) {
@@ -257,7 +317,9 @@ async function main() {
     if (renderAsBlock) {
       let currentBlock
       if (editingBlockUUID) {
-        currentBlock = await logseq.Editor.getBlock(editingBlockUUID)
+        currentBlock = await logseq.Editor.getBlock(editingBlockUUID, {
+          includeChildren: true,
+        })
       } else {
         currentBlock = await logseq.Editor.getCurrentBlock()
       }
@@ -300,6 +362,7 @@ async function main() {
     currentLevel = -1 // reset level;
 
     const blockFilter = (it: any) => {
+      if (!it) return false
       //uuid, title
       const { children, content, properties } = it
       if (properties?.markMapDisplay === 'hidden') {
@@ -425,8 +488,10 @@ async function main() {
           })
         }
 
-        // Theme workflow tag
-        topic = themeWorkflowTag(topic)
+        if (topic) {
+          // Theme workflow tag
+          topic = themeWorkflowTag(topic)
+        }
 
         // process link block reference
         const regexLinkBlockRef =
@@ -469,7 +534,7 @@ async function main() {
                 return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${
                   block.uuid
                 }' }); logseq.hideMainUI(); logseq.showMainUI();">${themeWorkflowTag(
-                  block.content
+                  block.content || '[MISSING BLOCK]'
                 )}</a>`
               }
               return '[MISSING BLOCK]'
@@ -487,7 +552,7 @@ async function main() {
                 return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${
                   block.uuid
                 }' }); logseq.hideMainUI(); logseq.showMainUI();">${themeWorkflowTag(
-                  block.content
+                  block.content || '[MISSING BLOCK]'
                 )}</a>`
               }
               return '[MISSING BLOCK]'
@@ -591,62 +656,6 @@ async function main() {
       }
     ) // remove image size
 
-    const defaultLinkRender = transformer.md.renderer.rules.link_open
-    transformer.md.inline.ruler.enable(['mark'])
-    transformer.md.renderer.rules.link_open = function (
-      tokens,
-      idx: number,
-      ...args: []
-    ) {
-      let result = defaultLinkRender(tokens, idx, ...args)
-
-      if (tokens[idx] && tokens[idx].href) {
-        result = result.replace('>', ' target="_blank">')
-      }
-
-      return result
-    }
-
-    const matchAttr = (s: string) => {
-      const r = /\b(\w+)\s*=\s*"(.*?)"/g
-      const d: any = {}
-
-      // ...  this loop will run indefinitely!
-      let m = r.exec(s)
-      while (m) {
-        d[m[1]] = m[2]
-        m = r.exec(s)
-      }
-
-      return d
-    }
-
-    const defaultImageRender = transformer.md.renderer.rules.image
-    transformer.md.renderer.rules.image = function (
-      tokens,
-      idx: number,
-      ...args: []
-    ) {
-      let result = defaultImageRender(tokens, idx, ...args)
-      const attr = matchAttr(result)
-      let src = attr.src || attr.href
-      const alt = attr.alt || attr.title || ''
-
-      // For now just support MacOS/Linux，Need to test and fix on Windows.
-      if (src.indexOf('http') !== 0 && src.indexOf('..') === 0) {
-        src =
-          config.currentGraph.substring(13) + '/' + src.replace(/\.\.\//g, '')
-      }
-
-      if (['pdf'].includes(src.substring(src.lastIndexOf('.') + 1))) {
-        result = `📄 ${alt}`
-      } else {
-        result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${src}">🖼 ${alt}</a>`
-      }
-
-      return result
-    }
-
     // eslint-disable-next-line prefer-const
     let { root, features } = transformer.transform(md)
 
@@ -680,7 +689,6 @@ async function main() {
     // @ts-ignore
     window.root = root
     const { styles, scripts } = transformer.getUsedAssets(features)
-    console.log('scripts', scripts)
     const { Markmap, loadCSS, loadJS } = markmap
     if (styles) loadCSS(styles)
     if (scripts)
