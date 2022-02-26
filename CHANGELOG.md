@@ -4,7 +4,9 @@
 
 - fix: pdf asset wrongly parsed as image on markmap.
 - fix: optimize image parse, remove image properties.
+- fix: can not load children blocks in recent Logseq release.
 - infra: change from webpack to vite
+- infra: upgrade deps
 
 ## 0.1.7
 
