@@ -311,7 +311,6 @@ async function main() {
 
   const renderMarkmap = async () => {
     let blocks = await logseq.Editor.getCurrentPageBlocksTree()
-    console.log('blocks', blocks)
     const page = (await logseq.Editor.getCurrentPage()) as any
 
     let title
