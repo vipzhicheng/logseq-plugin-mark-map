@@ -311,6 +311,7 @@ async function main() {
 
   const renderMarkmap = async () => {
     let blocks = await logseq.Editor.getCurrentPageBlocksTree()
+    console.log('blocks', blocks)
     const page = (await logseq.Editor.getCurrentPage()) as any
 
     let title
@@ -618,7 +619,33 @@ async function main() {
         if (properties?.markMapCut) {
           const orgTopic = topic
           topic = ellipsis(topic, parseInt(properties?.markMapCut))
-          topic = `<div style="cursor:pointer" title="${orgTopic}">${topic}</div>`
+          topic = `<span style="cursor:pointer" title="${orgTopic}">${topic}</span>`
+        }
+
+        const hexToRgb = function (hex): number[] {
+          const hexCode = hex.charAt(0) === '#' ? hex.substr(1, 6) : hex
+
+          const hexR = parseInt(hexCode.substr(0, 2), 16)
+          const hexG = parseInt(hexCode.substr(2, 2), 16)
+          const hexB = parseInt(hexCode.substr(4, 2), 16)
+          return [hexR, hexG, hexB]
+        }
+        const pickTextColorBasedOnBgColorSimple = function (
+          rgb: number[],
+          lightColor,
+          darkColor
+        ) {
+          const [r, g, b] = rgb
+          return r * 0.299 + g * 0.587 + b * 0.114 > 186
+            ? darkColor
+            : lightColor
+        }
+        if (properties?.backgroundColor) {
+          topic = `<span style="padding: 2px 6px; color: ${pickTextColorBasedOnBgColorSimple(
+            hexToRgb(properties.backgroundColor),
+            '#fff',
+            '#000'
+          )}; background-color:${properties.backgroundColor};">${topic}</span>`
         }
 
         // Optimize code block

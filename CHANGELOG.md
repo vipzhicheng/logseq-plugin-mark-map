@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.9
+
+- feat: support block background color on markmap
+
 ## 0.1.8
 
 - fix: pdf asset wrongly parsed as image on markmap.
