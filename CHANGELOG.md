@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.0
+
+- feat: support export as svg
+
 ## 0.1.9
 
 - feat: support block background color on markmap
