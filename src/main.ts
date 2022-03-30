@@ -1152,15 +1152,43 @@ async function main() {
       // Only bind once
       bindKeys()
 
+      const getSVGContent = (svg: SVGElement): string => {
+        const xmlVersion = '1.1'
+        const svgVersion = '1.1'
+        const svgBaseProfile = 'full'
+        const svgXmlns = 'http://www.w3.org/2000/svg'
+        const svgXmlnsXlink = 'http://www.w3.org/1999/xlink'
+        const svgXmlnsEv = 'http://www.w3.org/2001/xml-events'
+
+        let svgContent = `<?xml version="${xmlVersion}"?>
+        <svg version="${svgVersion}"
+        baseProfile="${svgBaseProfile}"
+        xmlns="${svgXmlns}"
+        xmlns:xlink="${svgXmlnsXlink}"
+        xmlns:ev="${svgXmlnsEv}">
+        ${svg.innerHTML}
+        </svg>`
+
+        svgContent = svgContent.replace(/<br>/g, '<br/>')
+        return svgContent
+      }
+
       // Customize toolbar
       const toolbar = new Toolbar()
-      toolbar.setItems(['zoomIn', 'zoomOut', 'fit', 'save', 'help'])
+      toolbar.setItems([
+        'zoomIn',
+        'zoomOut',
+        'fit',
+        'save-png',
+        'save-svg',
+        'help',
+      ])
       toolbar.setBrand(false)
       toolbar.register({
-        id: 'save',
+        id: 'save-png',
         title: 'Save as png',
         content: Toolbar.icon(
-          'M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z'
+          'M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z'
         ),
         onClick: async () => {
           const g = document.querySelector('#markmap g').getBoundingClientRect()
@@ -1197,6 +1225,36 @@ async function main() {
               oA.remove()
             })
           }
+        },
+      })
+      toolbar.register({
+        id: 'save-svg',
+        title: 'Save as svg',
+        content: Toolbar.icon(
+          'M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z'
+        ),
+        onClick: async () => {
+          const svg = document.querySelector('#markmap') as SVGElement
+          const content = getSVGContent(svg)
+
+          const mime_type = 'image/svg+xml'
+
+          const blob = new Blob([content], { type: mime_type })
+
+          const page = await logseq.Editor.getCurrentPage()
+          const title = page?.originalName || 'markmap'
+          const dlink = document.createElement('a')
+          dlink.download = `${title}.svg`
+          dlink.href = window.URL.createObjectURL(blob)
+          dlink.onclick = function (e) {
+            // revokeObjectURL needs a delay to work properly
+            setTimeout(function () {
+              window.URL.revokeObjectURL(dlink.href)
+            }, 1500)
+          }
+
+          dlink.click()
+          dlink.remove()
         },
       })
       toolbar.register({
