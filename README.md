@@ -53,6 +53,7 @@ Most of features come from `Markmap` project.
 - Mainly support `Markdown` mode, `Org` mode partly supported.
 - Support trigger markmap in block page.
 - Support open next markmap in markmap.
+- Support export as PNG and SVG.
 
 ## Notes
 
@@ -61,7 +62,7 @@ Most of features come from `Markmap` project.
 - Text length is unlimited.
 - `#` head markdown syntax is ignored, use hierarchical blocks instead.
 - Hiccup not supported.
-- Tested on Logseq `v0.5.9`.
+- Tested on Logseq `v0.6.5`.
 
 ## Shortcuts
 
