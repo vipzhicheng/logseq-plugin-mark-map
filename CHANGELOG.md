@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.1
+
+- feat: ignore `---` lines
+- feat: replace rendererl ines
+
 ## 0.2.0
 
 - feat: support export as svg

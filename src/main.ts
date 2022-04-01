@@ -371,6 +371,9 @@ async function main() {
       if (!content || content.startsWith('---\n')) {
         return false
       }
+      if (/---+/.test(content.trim())) {
+        return false
+      }
       const contentFiltered = content
         .split('\n')
         .filter((line: string) => line.indexOf('::') === -1)
@@ -479,6 +482,9 @@ async function main() {
           .filter((line: string) => line.indexOf('::') === -1)
           .join('\n')
         let topic = contentFiltered
+
+        // transform renderer to specials style
+        topic = topic.replace(/{{renderer.*?}}/g, `✨ Renderer`)
 
         // Process page tag
         const regexPageTag = /\s+#([^#\s()]+)/gi
