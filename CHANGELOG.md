@@ -1,9 +1,14 @@
 # CHANGELOG
 
+## 0.2.2
+
+- feat: support auto wrap for long block.
+- infra: upgrade deps.
+
 ## 0.2.1
 
 - feat: ignore `---` lines
-- feat: replace rendererl ines
+- feat: replace renderer lines
 
 ## 0.2.0
 

@@ -730,12 +730,12 @@ async function main() {
 
     // 隐藏所有子节点
     const hideAll = (target: INode) => {
-      target.p = {
-        ...target.p,
-        f: true,
+      target.payload = {
+        ...target.payload,
+        fold: true,
       }
 
-      target.c?.forEach((t) => {
+      target.children?.forEach((t) => {
         hideAll(t)
       })
     }
@@ -748,19 +748,19 @@ async function main() {
         // @ts-ignore
         target?.properties?.collapsed
       ) {
-        target.p = {
-          ...target.p,
-          f: true,
+        target.payload = {
+          ...target.payload,
+          fold: true,
         }
         currentLevel = depth
       } else {
-        target.p = {
-          ...target.p,
-          f: false,
+        target.payload = {
+          ...target.payload,
+          fold: false,
         }
       }
 
-      target.c?.forEach((t) => {
+      target.children?.forEach((t) => {
         showAll(t, depth)
       })
     }
@@ -768,12 +768,12 @@ async function main() {
     // 逐级展开
     const expandStepByStep = (target: INode): boolean => {
       let find = false
-      if (target.p?.f && target.c) {
-        target.p.f = false
+      if (target.payload?.fold && target.children) {
+        target.payload.fold = false
         find = true
       }
-      if (!find && target.c) {
-        for (const t of target.c) {
+      if (!find && target.children) {
+        for (const t of target.children) {
           find = expandStepByStep(t)
           if (find) {
             return find
@@ -787,10 +787,10 @@ async function main() {
     const collapseStepByStep = (target: INode): boolean => {
       let find = false
 
-      if (target.c) {
-        const length = target.c.length
+      if (target.children) {
+        const length = target.children.length
         for (let i = length - 1; i >= 0; i--) {
-          const t = target.c[i]
+          const t = target.children[i]
           find = collapseStepByStep(t)
           if (find) {
             return find
@@ -798,8 +798,8 @@ async function main() {
         }
       }
 
-      if (!target.p?.f && target.c) {
-        target.p.f = true
+      if (!target.payload?.fold && target.children) {
+        target.payload.fold = true
         find = true
       }
       return find
@@ -812,12 +812,12 @@ async function main() {
       }
       level--
 
-      target.p = {
-        ...target.p,
-        f: false,
+      target.payload = {
+        ...target.payload,
+        fold: false,
       }
 
-      target.c?.forEach((t) => {
+      target.children?.forEach((t) => {
         expandLevel(t, level)
       })
     }
@@ -827,11 +827,11 @@ async function main() {
     let pointer: number
 
     const focusIn = (root: INode) => {
-      if (root.c) {
+      if (root.children) {
         pointerStack.push(pointer)
         pointer = 0
         stack.push(root)
-        root = root.c[pointer]
+        root = root.children[pointer]
         // @ts-ignore
         window.root = root
         showAll(root)
@@ -858,8 +858,8 @@ async function main() {
 
     const focusNext = () => {
       const top = stack[stack.length - 1]
-      if (top && top.c && pointer + 1 <= top.c.length - 1) {
-        root = top.c[++pointer]
+      if (top && top.children && pointer + 1 <= top.children.length - 1) {
+        root = top.children[++pointer]
         // @ts-ignore
         window.root = root
         mm.setData(root)
@@ -868,8 +868,8 @@ async function main() {
 
     const focusPrevious = () => {
       const top = stack[stack.length - 1]
-      if (top && top.c && pointer - 1 >= 0) {
-        root = top.c[--pointer]
+      if (top && top.children && pointer - 1 >= 0) {
+        root = top.children[--pointer]
         // @ts-ignore
         window.root = root
         mm.setData(root)
@@ -1151,6 +1151,8 @@ async function main() {
         '#markmap',
         {
           autoFit: true,
+          maxWidth: 400,
+          spacingVertical: 20,
         },
         root
       )
