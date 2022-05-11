@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.3
+
+- fix: ref block cut issue
+- chore: refactor some code
+
 ## 0.2.2
 
 - feat: support auto wrap for long block.
