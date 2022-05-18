@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.4
+
+- infra: upgrade deps
+- feat: support Logseq hash syntax
+
 ## 0.2.3
 
 - fix: ref block cut issue

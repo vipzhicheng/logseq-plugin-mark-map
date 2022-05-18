@@ -246,7 +246,7 @@ async function main() {
         content = content
           ? content
               .split('\n')
-              .filter((line: string) => line.indexOf('::') === -1)
+              .filter((line: string) => line.indexOf(':: ') === -1)
               .join('\n')
               .replace(/^[#\s]+/, '')
               .trim()
@@ -358,6 +358,25 @@ async function main() {
           .filter((line: string) => line.indexOf(':: ') === -1)
           .join('\n')
         let topic = contentFiltered
+
+        // Process #+BEGIN_WARNING, #+BEGIN_NOTE, #+BEGIN_TIP
+
+        const regexHashWarning = /#\+BEGIN_WARNING([\s\S]*?)#\+END_WARNING/im
+        const regexHashNote = /#\+BEGIN_NOTE([\s\S]*?)#\+END_NOTE/im
+        const regexHashTip = /#\+BEGIN_TIP([\s\S]*?)#\+END_TIP/im
+        if (regexHashWarning.test(topic)) {
+          topic = topic.replace(regexHashWarning, (match, p1) => {
+            return `⚠️ ${p1.trim()}`
+          })
+        } else if (regexHashNote.test(topic)) {
+          topic = topic.replace(regexHashNote, (match, p1) => {
+            return `ℹ️ ${p1.trim()}`
+          })
+        } else if (regexHashTip.test(topic)) {
+          topic = topic.replace(regexHashTip, (match, p1) => {
+            return `💡 ${p1.trim()}`
+          })
+        }
 
         // transform renderer to specials style
         topic = topic.replace(/{{renderer.*?}}/g, `✨ Renderer`)
