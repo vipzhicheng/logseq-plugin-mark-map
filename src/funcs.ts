@@ -1,6 +1,10 @@
 import '@logseq/libs'
 import { Toolbar } from 'markmap-toolbar'
 import html2canvas from 'html2canvas'
+import org from 'org'
+import replaceAsync from 'string-replace-async'
+import ellipsis from 'text-ellipsis'
+import TurndownService from 'turndown'
 
 const settingsVersion = 'v1'
 export const defaultSettings = {
@@ -231,6 +235,224 @@ const blockFilter = (it: any) => {
   } else {
     return true
   }
+}
+
+export const parseBlockContent = async (
+  content: string,
+  properties: any = {},
+  config: any = {}
+) => {
+  const contentFiltered = content
+    .split('\n')
+    .filter((line: string) => line.indexOf(':: ') === -1)
+    .join('\n')
+  let topic = contentFiltered
+
+  // Process #+BEGIN_WARNING, #+BEGIN_NOTE, #+BEGIN_TIP, #+BEGIN_CAUTION, #+BEGIN_PINNED, #+BEGIN_IMPORTANT, #+BEGIN_QUOTE, #+BEGIN_CENTER
+
+  const regexHashWarning = /#\+BEGIN_WARNING([\s\S]*?)#\+END_WARNING/im
+  const regexHashNote = /#\+BEGIN_NOTE([\s\S]*?)#\+END_NOTE/im
+  const regexHashTip = /#\+BEGIN_TIP([\s\S]*?)#\+END_TIP/im
+  const regexHashCaution = /#\+BEGIN_CAUTION([\s\S]*?)#\+END_CAUTION/im
+  const regexHashPinned = /#\+BEGIN_PINNED([\s\S]*?)#\+END_PINNED/im
+  const regexHashImportant = /#\+BEGIN_IMPORTANT([\s\S]*?)#\+END_IMPORTANT/im
+  const regexHashQuote = /#\+BEGIN_QUOTE([\s\S]*?)#\+END_QUOTE/im
+  const regexHashCenter = /#\+BEGIN_CENTER([\s\S]*?)#\+END_CENTER/im
+  if (regexHashWarning.test(topic)) {
+    topic = topic.replace(regexHashWarning, (match, p1) => {
+      return `⚠️ ${p1.trim()}`
+    })
+  } else if (regexHashNote.test(topic)) {
+    topic = topic.replace(regexHashNote, (match, p1) => {
+      return `ℹ️ ${p1.trim()}`
+    })
+  } else if (regexHashTip.test(topic)) {
+    topic = topic.replace(regexHashTip, (match, p1) => {
+      return `💡 ${p1.trim()}`
+    })
+  } else if (regexHashCaution.test(topic)) {
+    topic = topic.replace(regexHashCaution, (match, p1) => {
+      return `☢️ ${p1.trim()}`
+    })
+  } else if (regexHashPinned.test(topic)) {
+    topic = topic.replace(regexHashPinned, (match, p1) => {
+      return `📌 ${p1.trim()}`
+    })
+  } else if (regexHashImportant.test(topic)) {
+    topic = topic.replace(regexHashImportant, (match, p1) => {
+      return `🔥 ${p1.trim()}`
+    })
+  } else if (regexHashQuote.test(topic)) {
+    topic = topic.replace(regexHashQuote, (match, p1) => {
+      return `📝 ${p1.trim()}`
+    })
+  } else if (regexHashCenter.test(topic)) {
+    topic = topic.replace(regexHashCenter, (match, p1) => {
+      return `${p1.trim()}`
+    })
+  }
+
+  // transform renderer to specials style
+  topic = topic.replace(/{{renderer.*?}}/g, `✨ Renderer`)
+
+  // Process page tag
+  const regexPageTag = /\s+#([^#\s()]+)/gi
+  if (regexPageTag.test(topic)) {
+    topic = topic.replace(regexPageTag, (match, p1) => {
+      return ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">#${p1}</a>`
+    })
+  }
+
+  if (topic) {
+    // Theme workflow tag
+    topic = themeWorkflowTag(topic)
+  }
+
+  // process link block reference
+  const regexLinkBlockRef =
+    /\[(.*?)\]\(\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\)/gi
+  if (regexLinkBlockRef.test(topic)) {
+    topic = await replaceAsync(
+      topic,
+      regexLinkBlockRef,
+      async (match, p1, p2) => {
+        const block = await logseq.Editor.getBlock(p2)
+        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`
+      }
+    )
+  }
+
+  // process link page reference
+  const regexLinkPageRef = /\[(.*?)\]\(\[\[(.*?)\]\]\)/gi
+  if (regexLinkPageRef.test(topic)) {
+    topic = await replaceAsync(
+      topic,
+      regexLinkPageRef,
+      async (match, p1, p2) => {
+        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p2}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`
+      }
+    )
+  }
+
+  // Process block reference
+  const regexBlockRef =
+    /\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)/gi
+  const regexEmbedBlockRef =
+    /\{\{embed\s+\(\(([0-9A-F]{8}-[0-9A-F]{4}-[1-5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})\)\)\}\}/gi
+  if (regexEmbedBlockRef.test(topic)) {
+    topic = await replaceAsync(topic, regexEmbedBlockRef, async (match, p1) => {
+      const block = await logseq.Editor.getBlock(p1)
+      if (block) {
+        const content = block.content
+        const contentFiltered = content
+          .split('\n')
+          .filter((line: string) => line.indexOf(':: ') === -1)
+          .join('\n')
+
+        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${
+          block.uuid
+        }' }); logseq.hideMainUI(); logseq.showMainUI();">${themeWorkflowTag(
+          contentFiltered || '[MISSING BLOCK]'
+        )}</a>`
+      }
+      return '[MISSING BLOCK]'
+    })
+  }
+
+  if (regexBlockRef.test(topic)) {
+    topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
+      const block = await logseq.Editor.getBlock(p1)
+      if (block) {
+        const content = block.content
+        const contentFiltered = content
+          .split('\n')
+          .filter((line: string) => line.indexOf(':: ') === -1)
+          .join('\n')
+        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${
+          block.uuid
+        }' }); logseq.hideMainUI(); logseq.showMainUI();">${themeWorkflowTag(
+          contentFiltered || '[MISSING BLOCK]'
+        )}</a>`
+      }
+      return '[MISSING BLOCK]'
+    })
+  }
+
+  // Process page reference
+  const regexPageRef = /\[\[([^[\]]*?)\]\]/gi
+  const regexEmbedPageRef = /\{\{embed\s+\[\[([^[\]]*?)\]\]\}\}/gi
+  if (regexEmbedPageRef.test(topic)) {
+    topic = topic.replace(regexEmbedPageRef, (match, p1) => {
+      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`
+    })
+  }
+
+  if (regexPageRef.test(topic)) {
+    topic = topic.replace(regexPageRef, (match, p1) => {
+      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`
+    })
+  }
+
+  // Process org mode
+  // @ts-ignore
+  if (config.preferredFormat === 'org') {
+    const turndownService = new TurndownService({
+      headingStyle: 'atx',
+      codeBlockStyle: 'fenced',
+    })
+
+    turndownService.addRule('strikethrough', {
+      filter: ['del', 's', 'strike'],
+      replacement: function (content) {
+        return '~~' + content + '~~'
+      },
+    })
+
+    const parser = new org.Parser()
+    const orgDocument = parser.parse(topic)
+    const orgHTMLDocument = orgDocument.convert(org.ConverterHTML, {
+      headerOffset: 1,
+      exportFromLineNumber: false,
+      suppressSubScriptHandling: false,
+      suppressAutoLink: false,
+    })
+    topic = orgHTMLDocument.toString() // to html
+    topic = turndownService.turndown(topic) // to markdown
+    topic = topic.replace(/\^\^/g, '==') // try marked syntax
+  }
+
+  // Remove leading heading syntax
+  topic = topic.replace(/^[#\s]+/, '').trim()
+
+  // Process link parse
+  const regexUrl =
+    /(https?:\/\/[-a-zA-Z0-9@:%_+.~#?&/=]{2,256}\.[a-z]{2,4}(\/[-a-zA-Z0-9@:%_+.~#?&/=]*)?)(?=\s)/gi
+  const regexUrlMatchStartEnd =
+    /^(https?:\/\/[-a-zA-Z0-9@:%_+.~#?&/=]{2,256}\.[a-z]{2,4}(\/[-a-zA-Z0-9@:%_+.~#?&/=]*)?)$/gi
+
+  topic = topic.replace(regexUrl, '<$1>') // add <> to all links that followed by blank, means not markdown link
+  topic = topic.replace(regexUrlMatchStartEnd, '<$1>') // add <> to all pure link block
+
+  if (properties?.markMapCut) {
+    const orgTopic = topic
+    topic = ellipsis(topic, parseInt(properties?.markMapCut))
+    topic = `<span style="cursor:pointer" title="${orgTopic}">${topic}</span>`
+  }
+
+  if (properties?.backgroundColor) {
+    topic = `<span style="padding: 2px 6px; color: ${pickTextColorBasedOnBgColorSimple(
+      hexToRgb(properties.backgroundColor),
+      '#fff',
+      '#000'
+    )}; background-color:${properties.backgroundColor};">${topic}</span>`
+  }
+
+  // Optimize code block
+  if (topic.indexOf('```') === 0 || topic.indexOf('- ') === 0) {
+    topic = '\n' + topic
+  }
+
+  return topic
 }
 
 export const walkTransformBlocksFilter = async (blocks) => {
