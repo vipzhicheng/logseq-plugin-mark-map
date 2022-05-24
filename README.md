@@ -1,3 +1,4 @@
+[:coffee: Get me a coffee](https://www.buymeacoffee.com/vipzhicheng) if you like this plugin!
 # Logseq Markmap Plugin
 
 [![Github All Releases](https://img.shields.io/github/downloads/vipzhicheng/logseq-plugin-mark-map/total.svg)](https://github.com/vipzhicheng/logseq-plugin-mark-map/releases)
