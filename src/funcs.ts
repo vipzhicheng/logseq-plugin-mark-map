@@ -173,7 +173,7 @@ export function addToolbar(mm) {
     ),
     onClick: async () => {
       // @ts-ignore
-      Alpine.store('showHelp').toggle()
+      Alpine.store('markmap').toggleHelp()
     },
   })
   toolbar.attach(mm)

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.5
+
+- infra: upgrade deps
+- feat: set default theme according Logseq theme
+
 ## 0.2.4
 
 - infra: upgrade deps

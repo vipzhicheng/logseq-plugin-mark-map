@@ -54,7 +54,7 @@ function createModel() {
   return {
     openMindMap(blockMode = false) {
       // @ts-ignore
-      Alpine.store('showHelp').close()
+      Alpine.store('markmap').closeHelp()
 
       const closeButton = document.getElementById('close-button')
       closeButton.removeEventListener('click', closeButtonHandler, false)
@@ -225,6 +225,8 @@ async function main() {
   })
 
   const renderMarkmap = async () => {
+    // @ts-ignore
+    Alpine.store('markmap').resetTheme()
     let blocks = await logseq.Editor.getCurrentPageBlocksTree()
     const page = (await logseq.Editor.getCurrentPage()) as any
 
@@ -603,9 +605,9 @@ async function main() {
           // @ts-ignore
           async function (event, handler) {
             // @ts-ignore
-            const showHelp = Alpine.store('showHelp').get()
+            const $store = Alpine.store('markmap').getHelp()
 
-            if (showHelp && !['/', 'q', 'esc'].includes(handler.key)) {
+            if ($store && !['/', 'q', 'esc'].includes(handler.key)) {
               return
             }
 
@@ -813,7 +815,7 @@ async function main() {
 
               case '/':
                 // @ts-ignore
-                Alpine.store('showHelp').toggle()
+                Alpine.store('markmap').toggleHelp()
                 break
               default:
                 // console.log(handler.key);
