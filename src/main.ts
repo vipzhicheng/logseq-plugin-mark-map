@@ -6,6 +6,7 @@ import { INode } from 'markmap-common'
 import { Transformer } from 'markmap-lib/dist/browser'
 import * as markmap from 'markmap-view'
 import { Markmap } from 'markmap-view'
+import Alpine from 'alpinejs'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -85,6 +86,10 @@ function createModel() {
 }
 
 async function main() {
+  /** @ts-ignore */
+  window.Alpine = Alpine
+  Alpine.start()
+
   initSettings()
   const keyBindings = getSettings('keyBindings')
 

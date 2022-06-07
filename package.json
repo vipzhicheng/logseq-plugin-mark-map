@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@logseq/libs": "^0.0.6",
+    "alpinejs": "^3.10.2",
     "cheerio": "^1.0.0-rc.11",
     "d3": "^7.4.4",
     "hotkeys-js": "^3.9.4",
