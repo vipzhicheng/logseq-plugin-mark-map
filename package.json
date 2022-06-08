@@ -25,6 +25,8 @@
     "d3": "^7.4.4",
     "hotkeys-js": "^3.9.4",
     "html2canvas": "^1.4.1",
+    "jquery": "^3.6.0",
+    "lightbox2": "^2.11.3",
     "markmap-common": "^0.13.3",
     "markmap-lib": "^0.13.3",
     "markmap-toolbar": "^0.13.3",

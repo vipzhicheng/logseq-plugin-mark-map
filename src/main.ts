@@ -7,6 +7,9 @@ import { Transformer } from 'markmap-lib/dist/browser'
 import * as markmap from 'markmap-view'
 import { Markmap } from 'markmap-view'
 import Alpine from 'alpinejs'
+import jQuery from 'jquery'
+import lightbox from 'lightbox2'
+import 'lightbox2/dist/css/lightbox.min.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -89,6 +92,11 @@ async function main() {
   /** @ts-ignore */
   window.Alpine = Alpine
   Alpine.start()
+
+  lightbox.option({
+    disableScrolling: true,
+    wrapAround: true,
+  })
 
   initSettings()
   const keyBindings = getSettings('keyBindings')
@@ -617,7 +625,7 @@ async function main() {
             }
 
             // @ts-ignore
-            const jQuery = window?.jQuery
+            // const jQuery = window?.jQuery
             if (jQuery) {
               if (
                 jQuery('#lightboxOverlay').css('display') === 'block' &&
@@ -649,10 +657,10 @@ async function main() {
               case 'q': // q
                 // @ts-ignore
                 // eslint-disable-next-line no-case-declarations
-                const jQuery = window?.jQuery
+                // const jQuery = window?.jQuery
                 // @ts-ignore
                 // eslint-disable-next-line no-case-declarations
-                const lightbox = window?.lightbox
+                // const lightbox = window?.lightbox
 
                 if (jQuery) {
                   if (jQuery('#lightboxOverlay').css('display') === 'block') {

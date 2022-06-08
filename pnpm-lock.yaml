@@ -13,6 +13,8 @@ specifiers:
   eslint-config-prettier: ^8.5.0
   hotkeys-js: ^3.9.4
   html2canvas: ^1.4.1
+  jquery: ^3.6.0
+  lightbox2: ^2.11.3
   markmap-common: ^0.13.3
   markmap-lib: ^0.13.3
   markmap-toolbar: ^0.13.3
@@ -37,6 +39,8 @@ dependencies:
   d3: 7.4.4
   hotkeys-js: 3.9.4
   html2canvas: 1.4.1
+  jquery: 3.6.0
+  lightbox2: 2.11.3
   markmap-common: 0.13.3
   markmap-lib: 0.13.3
   markmap-toolbar: 0.13.3
@@ -2064,6 +2068,10 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
 
+  /jquery/3.6.0:
+    resolution: {integrity: sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==}
+    dev: false
+
   /js-yaml/4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
@@ -2092,6 +2100,10 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
     dev: true
+
+  /lightbox2/2.11.3:
+    resolution: {integrity: sha512-Q4v6il/OK9ttgEkAxSok/jrI/LUbqTrePFchqP2x/59qaDIZgJjEEc5Xf7peSMc/55Zo5PAgmX6EiN/BeEeUBQ==}
+    dev: false
 
   /lilconfig/2.0.5:
     resolution: {integrity: sha512-xaYmXZtTHPAw5m+xLN8ab9C+3a8YmV3asNSPOATITbtwrfbwaLJj8h66H1WMIpALCkqsIzK3h7oQ+PdX+LQ9Eg==}
