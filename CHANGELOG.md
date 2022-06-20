@@ -3,6 +3,7 @@
 ## 0.2.6
 
 - feat: serve alpinejs locally
+- fix: `^^` highlight not supported
 
 ## 0.2.5
 

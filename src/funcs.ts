@@ -418,10 +418,10 @@ export const parseBlockContent = async (
     })
     topic = orgHTMLDocument.toString() // to html
     topic = turndownService.turndown(topic) // to markdown
-    topic = topic.replace(/\^\^/g, '==') // try marked syntax
   }
 
   // Remove leading heading syntax
+  topic = topic.replace(/\^\^/g, '==') // try marked syntax
   topic = topic.replace(/^[#\s]+/, '').trim()
 
   // Process link parse
