@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.7
+
+- feat: change trigger icon.
+- fix: zindex to over the system puzzle icon.
+
 ## 0.2.6
 
 - feat: serve alpinejs locally
