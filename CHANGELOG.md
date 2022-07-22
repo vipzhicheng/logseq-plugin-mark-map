@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.8
+
+- infra: upgrade deps.
+
 ## 0.2.7
 
 - feat: change trigger icon.

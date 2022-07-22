@@ -3,7 +3,7 @@ import { BlockEntity, BlockUUIDTuple } from '@logseq/libs/dist/LSPlugin'
 import * as d3 from 'd3'
 import hotkeys from 'hotkeys-js'
 import { INode } from 'markmap-common'
-import { Transformer } from 'markmap-lib/dist/browser'
+import { Transformer } from 'markmap-lib'
 import * as markmap from 'markmap-view'
 import { Markmap } from 'markmap-view'
 import Alpine from 'alpinejs'
@@ -407,14 +407,14 @@ async function main() {
         for (const i in parent.children) {
           parent.children[i].properties = blocks[i]?.properties || {}
 
-          // @ts-ignore
           if (
+            // @ts-ignore
             root?.properties?.markMapCollapsed !== 'extend' &&
             parent.children[i]?.properties?.collapsed
           ) {
             parent.children[i].payload = {
               ...parent.children[i].payload,
-              fold: true,
+              fold: 1,
             }
           }
 
@@ -440,7 +440,7 @@ async function main() {
     const hideAll = (target: INode) => {
       target.payload = {
         ...target.payload,
-        fold: true,
+        fold: 1,
       }
 
       target.children?.forEach((t) => {
@@ -458,13 +458,13 @@ async function main() {
       ) {
         target.payload = {
           ...target.payload,
-          fold: true,
+          fold: 1,
         }
         currentLevel = depth
       } else {
         target.payload = {
           ...target.payload,
-          fold: false,
+          fold: 0,
         }
       }
 
@@ -477,7 +477,7 @@ async function main() {
     const expandStepByStep = (target: INode): boolean => {
       let find = false
       if (target.payload?.fold && target.children) {
-        target.payload.fold = false
+        target.payload.fold = 0
         find = true
       }
       if (!find && target.children) {
@@ -507,7 +507,7 @@ async function main() {
       }
 
       if (!target.payload?.fold && target.children) {
-        target.payload.fold = true
+        target.payload.fold = 1
         find = true
       }
       return find
@@ -522,7 +522,7 @@ async function main() {
 
       target.payload = {
         ...target.payload,
-        fold: false,
+        fold: 0,
       }
 
       target.children?.forEach((t) => {
