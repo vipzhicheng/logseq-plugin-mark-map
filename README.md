@@ -104,6 +104,7 @@ Most of features come from `Markmap` project.
 - `/Markmap` slash command: to trigger markmap for current block and children.
 - `Markmap` contextual menu item: to trigger markmap for current block and children.
 - Icon Button: to trigger markmap for current page.
+- ·ctrl+shift+m ctrl+shift+m`: to trigger markmap for current page, like the icon.
 
 ## Markmap properties
 
@@ -122,6 +123,10 @@ Most of features come from `Markmap` project.
 - `mark-map-display:: hidden`, a block property, to hide the block.
 - `mark-map-cut:: 30`, a block property, to limit mindmap node text length.
 - `mark-map-limit:: N`, to limit block next level block list items.
+
+## Markmap settings
+
+- `theme`: to select your favorite theme, if you choose auto, then it will decide to use dark or light by Logseq's theme.
 
 ## FAQs
 
