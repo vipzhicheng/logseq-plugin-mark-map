@@ -6,10 +6,11 @@ import replaceAsync from 'string-replace-async'
 import ellipsis from 'text-ellipsis'
 import TurndownService from 'turndown'
 
-const settingsVersion = 'v1'
+const settingsVersion = 'v2'
 export const defaultSettings = {
   keyBindings: {
     openMarkmap: 'ctrl+m ctrl+m',
+    openMarkmapFull: 'ctrl+shift+m ctrl+shift+m',
   },
   settingsVersion,
   disabled: false,

@@ -1,5 +1,5 @@
 import '@logseq/libs'
-import { BlockEntity, BlockUUIDTuple } from '@logseq/libs/dist/LSPlugin'
+import { BlockEntity, BlockUUIDTuple, SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin'
 import * as d3 from 'd3'
 import hotkeys from 'hotkeys-js'
 import { INode } from 'markmap-common'
@@ -29,6 +29,68 @@ import {
 } from './funcs'
 import './style.css'
 
+const themeMapping = {
+  'light-gray': 'bg-gray-100',
+  'light-red': 'bg-red-100',
+  'light-blue': 'bg-blue-100',
+  'light-green': 'bg-green-100',
+  'light-yellow': 'bg-yellow-100',
+  'light-purple': 'bg-purple-100',
+  'light-pink': 'bg-pink-100',
+  'light-indigo': 'bg-indigo-100',
+  'dark-indigo': 'bg-indigo-900',
+  'dark-pink': 'bg-pink-900',
+  'dark-purple': 'bg-purple-900',
+  'dark-yellow': 'bg-yellow-900',
+  'dark-green': 'bg-green-900',
+  'dark-blue': 'bg-blue-900',
+  'dark-red': 'bg-red-900',
+  'dark-gray': 'bg-gray-900',
+}
+
+const defineSettings: SettingSchemaDesc[] = [
+  {
+    title: 'Theme',
+    key: 'theme',
+    description: 'Set theme',
+    type: 'enum',
+    enumPicker: 'select',
+    enumChoices: [
+      'auto',
+      'light-gray',
+      'light-red',
+      'light-blue',
+      'light-green',
+      'light-yellow',
+      'light-purple',
+      'light-pink',
+      'light-indigo',
+      'dark-indigo',
+      'dark-pink',
+      'dark-purple',
+      'dark-yellow',
+      'dark-green',
+      'dark-blue',
+      'dark-red',
+      'dark-gray',
+    ],
+    default: 'auto'
+  }
+]
+logseq.useSettingsSchema(defineSettings)
+
+logseq.onSettingsChanged(() => {
+  // @ts-ignore
+  Alpine.store('markmap').resetTheme()
+
+  if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
+    if (themeMapping[logseq.settings.theme]) {
+      Alpine.store('markmap').setTheme(themeMapping[logseq.settings.theme])
+    }
+  }
+})
+
+
 const transformer = new Transformer()
 
 let renderAsBlock = false
@@ -49,6 +111,9 @@ const triggerMarkmap = async ({ uuid }) => {
 const triggerMarkmapForceBlock = async ({ uuid }) => {
   editingBlockUUID = uuid
   createModel().openMindMap(true)
+}
+const triggerMarkmapForceFull = async () => {
+  createModel().openMindMap(false)
 }
 
 /**
@@ -117,6 +182,17 @@ async function main() {
       },
     },
     triggerMarkmap
+  )
+  logseq.App.registerCommandPalette(
+    {
+      key: 'mark-map-open-full',
+      label: 'Open Full Markmap',
+      keybinding: {
+        mode: 'global',
+        binding: keyBindings.openMarkmapFull,
+      },
+    },
+    triggerMarkmapForceFull
   )
   logseq.Editor.registerSlashCommand('Markmap', triggerMarkmapForceBlock)
   logseq.Editor.registerBlockContextMenuItem(
@@ -248,6 +324,13 @@ async function main() {
   const renderMarkmap = async () => {
     // @ts-ignore
     Alpine.store('markmap').resetTheme()
+
+    if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
+      if (themeMapping[logseq.settings.theme]) {
+        Alpine.store('markmap').setTheme(themeMapping[logseq.settings.theme])
+      }
+    }
+
     let blocks = await logseq.Editor.getCurrentPageBlocksTree()
     const page = (await logseq.Editor.getCurrentPage()) as any
 

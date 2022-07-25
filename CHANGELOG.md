@@ -2,6 +2,8 @@
 
 ## 0.2.8
 
+- feat: add theme setting, so you can keep your favorite theme permanently..
+- feat: add `ctrl+shift+m ctrl+shift+m` to trigger mindmap for all
 - infra: upgrade deps.
 
 ## 0.2.7
