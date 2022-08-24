@@ -294,7 +294,9 @@ export const parseBlockContent = async (
   }
 
   // transform renderer to specials style
-  topic = topic.replace(/{{renderer.*?}}/g, `✨ Renderer`)
+  topic = topic.replace(/(?<!`){{renderer.*?}}(?!`)/g, `✨ Renderer`)
+  // transform cloze to it's answer
+  topic = topic.replace(/(?<!`){{cloze\s+(.*?)\s*}}(?!`)/g, '$1')
 
   // Process page tag
   const regexPageTag = /\s+#([^#\s()]+)/gi

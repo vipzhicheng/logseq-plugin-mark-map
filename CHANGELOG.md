@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.9
+
+- infra: upgrade deps
+- feat: optimize for `{{cloze}}`
+
 ## 0.2.8
 
 - feat: add theme setting, so you can keep your favorite theme permanently..
