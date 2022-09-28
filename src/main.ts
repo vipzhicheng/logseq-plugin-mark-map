@@ -430,13 +430,14 @@ async function main() {
     filteredBlocks = walkTransformBlocksLimit(filteredBlocks)
 
     // iterate blocks
+    const MAX_LEVEL = Infinity
     const walkTransformBlocks = async (
       blocks: any,
       depth = 0,
       config = {}
     ): Promise<string[]> => {
-      currentLevel = Math.min(5, Math.max(currentLevel, depth))
-      totalLevel = Math.min(5, Math.max(currentLevel, depth))
+      currentLevel = Math.min(MAX_LEVEL, Math.max(currentLevel, depth))
+      totalLevel = Math.min(MAX_LEVEL, Math.max(currentLevel, depth))
 
       if (!blocks) {
         return []
@@ -450,7 +451,14 @@ async function main() {
         const topic = await parseBlockContent(content, properties, config)
 
         // Add leading syntax according to depth.
-        let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic
+        let ret =
+          (depth < MAX_LEVEL
+            ? // for valid markdown, it can have at most 5# (#####)
+              (depth < 5
+                ? '#'.repeat(depth + 2)
+                : // 超过第6层用 - 来进行处理
+                  `${' '.repeat((depth - 5) * 2)} -`) + ' '
+            : '') + topic
 
         if (
           children &&
