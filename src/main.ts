@@ -453,10 +453,10 @@ async function main() {
         // Add leading syntax according to depth.
         let ret =
           (depth < MAX_LEVEL
-            ? // for valid markdown, it can have at most 5# (#####)
+            ? // for valid markdown, it can have at most head#6 (######)
               (depth < 5
                 ? '#'.repeat(depth + 2)
-                : // 超过第6层用 - 来进行处理
+                : // use nested list to create branches more than 6 levels.
                   `${' '.repeat((depth - 5) * 2)} -`) + ' '
             : '') + topic
 
