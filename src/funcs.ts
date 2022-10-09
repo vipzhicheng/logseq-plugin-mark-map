@@ -116,6 +116,9 @@ export function addToolbar(mm) {
       } else {
         el.style.width = `${Math.ceil((g.width * rect.height) / g.height)}px`
       }
+
+      // after container resize, fit once manually
+      await mm.fit()
       const page = await logseq.Editor.getCurrentPage()
       if (el) {
         html2canvas(el, {}).then(async function (canvas: HTMLCanvasElement) {
