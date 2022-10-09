@@ -437,8 +437,8 @@ async function main() {
       depth = 0,
       config = {}
     ): Promise<string[]> => {
-      currentLevel = Math.min(5, Math.max(currentLevel, depth))
-      totalLevel = Math.min(5, Math.max(currentLevel, depth))
+      currentLevel =  Math.max(currentLevel, depth)
+      totalLevel = Math.max(currentLevel, depth)
 
       if (!blocks) {
         return []
@@ -452,7 +452,14 @@ async function main() {
         const topic = await parseBlockContent(content, properties, config)
 
         // Add leading syntax according to depth.
-        let ret = (depth < 5 ? '#'.repeat(depth + 2) + ' ' : '') + topic
+        let ret =
+          // for valid markdown, it can have at most head#6 (######)
+          (depth < 5
+            ? '#'.repeat(depth + 2)
+            : // use nested list to create branches more than 6 levels.
+              `${' '.repeat((depth - 5) * 2)} -`) +
+          ' ' +
+          topic
 
         if (
           children &&
