@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.10
+
+- infra: upgrade deps
+- fix: png not loading #25
+
 ## 0.2.9
 
 - infra: upgrade deps

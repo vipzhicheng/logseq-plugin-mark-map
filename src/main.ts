@@ -1,5 +1,9 @@
 import '@logseq/libs'
-import { BlockEntity, BlockUUIDTuple, SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin'
+import {
+  BlockEntity,
+  BlockUUIDTuple,
+  SettingSchemaDesc,
+} from '@logseq/libs/dist/LSPlugin'
 import * as d3 from 'd3'
 import hotkeys from 'hotkeys-js'
 import { INode } from 'markmap-common'
@@ -74,8 +78,8 @@ const defineSettings: SettingSchemaDesc[] = [
       'dark-red',
       'dark-gray',
     ],
-    default: 'auto'
-  }
+    default: 'auto',
+  },
 ]
 logseq.useSettingsSchema(defineSettings)
 
@@ -89,7 +93,6 @@ logseq.onSettingsChanged(() => {
     }
   }
 })
-
 
 const transformer = new Transformer()
 
@@ -300,7 +303,6 @@ async function main() {
     let src = attr.src || attr.href
     const alt = attr.alt || attr.title || ''
 
-    // For now just support MacOS/Linux，Need to test and fix on Windows.
     if (src.indexOf('http') !== 0 && src.indexOf('..') === 0) {
       src = config.currentGraph.substring(13) + '/' + src.replace(/\.\.\//g, '')
     }
@@ -308,7 +310,7 @@ async function main() {
     if (['pdf'].includes(src.substring(src.lastIndexOf('.') + 1))) {
       result = `📄 ${alt}`
     } else {
-      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${src}">🖼 ${alt}</a>`
+      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="assets://${src}">🖼 ${alt}</a>`
     }
 
     return result
