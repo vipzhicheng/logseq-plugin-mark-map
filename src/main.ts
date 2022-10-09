@@ -437,7 +437,7 @@ async function main() {
       depth = 0,
       config = {}
     ): Promise<string[]> => {
-      currentLevel =  Math.max(currentLevel, depth)
+      currentLevel = Math.max(currentLevel, depth)
       totalLevel = Math.max(currentLevel, depth)
 
       if (!blocks) {
@@ -459,7 +459,7 @@ async function main() {
             : // use nested list to create branches more than 6 levels.
               `${' '.repeat((depth - 5) * 2)} -`) +
           ' ' +
-          topic
+          (depth >= 5 && topic.startsWith('\n- ') ? topic.substring(3) : topic)
 
         if (
           children &&

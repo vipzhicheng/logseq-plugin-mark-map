@@ -4,6 +4,8 @@
 
 - infra: upgrade deps
 - fix: png not loading #25
+- fix: content is a little bit small in saved png #43
+- fix: can only render at most level 6 #44
 
 ## 0.2.9
 
