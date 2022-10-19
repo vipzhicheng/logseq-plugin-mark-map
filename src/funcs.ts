@@ -42,10 +42,6 @@ export const getSettings = (
 export const goForwardButtonHandler = async () => {
   // @ts-ignore
   await logseq.App.invokeExternalCommand('logseq.go/forward')
-  logseq.hideMainUI()
-  logseq.showMainUI({
-    autoFocus: true,
-  })
 }
 
 export const closeButtonHandler = () => {
@@ -57,10 +53,6 @@ export const closeButtonHandler = () => {
 export const goBackButtonHandler = async () => {
   // @ts-ignore
   await logseq.App.invokeExternalCommand('logseq.go/backward')
-  logseq.hideMainUI()
-  logseq.showMainUI({
-    autoFocus: true,
-  })
 }
 
 export function eventFire(el: any, etype: string) {
@@ -305,7 +297,7 @@ export const parseBlockContent = async (
   const regexPageTag = /\s+#([^#\s()]+)/gi
   if (regexPageTag.test(topic)) {
     topic = topic.replace(regexPageTag, (match, p1) => {
-      return ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">#${p1}</a>`
+      return ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' });">#${p1}</a>`
     })
   }
 
@@ -323,7 +315,7 @@ export const parseBlockContent = async (
       regexLinkBlockRef,
       async (match, p1, p2) => {
         const block = await logseq.Editor.getBlock(p2)
-        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`
+        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${block.uuid}' });">${p1}</a>`
       }
     )
   }
@@ -335,7 +327,7 @@ export const parseBlockContent = async (
       topic,
       regexLinkPageRef,
       async (match, p1, p2) => {
-        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p2}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`
+        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p2}' });">${p1}</a>`
       }
     )
   }
@@ -357,9 +349,7 @@ export const parseBlockContent = async (
 
         return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${
           block.uuid
-        }' }); logseq.hideMainUI(); logseq.showMainUI();">${themeWorkflowTag(
-          contentFiltered || '[MISSING BLOCK]'
-        )}</a>`
+        }' });">${themeWorkflowTag(contentFiltered || '[MISSING BLOCK]')}</a>`
       }
       return '[MISSING BLOCK]'
     })
@@ -376,9 +366,7 @@ export const parseBlockContent = async (
           .join('\n')
         return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${
           block.uuid
-        }' }); logseq.hideMainUI(); logseq.showMainUI();">${themeWorkflowTag(
-          contentFiltered || '[MISSING BLOCK]'
-        )}</a>`
+        }' });">${themeWorkflowTag(contentFiltered || '[MISSING BLOCK]')}</a>`
       }
       return '[MISSING BLOCK]'
     })
@@ -389,13 +377,13 @@ export const parseBlockContent = async (
   const regexEmbedPageRef = /\{\{embed\s+\[\[([^[\]]*?)\]\]\}\}/gi
   if (regexEmbedPageRef.test(topic)) {
     topic = topic.replace(regexEmbedPageRef, (match, p1) => {
-      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`
+      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' });">${p1}</a>`
     })
   }
 
   if (regexPageRef.test(topic)) {
     topic = topic.replace(regexPageRef, (match, p1) => {
-      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' }); logseq.hideMainUI(); logseq.showMainUI();">${p1}</a>`
+      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' });">${p1}</a>`
     })
   }
 

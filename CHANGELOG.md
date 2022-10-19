@@ -1,5 +1,10 @@
 # CHANGELOG
 
+
+## 0.2.11
+
+- feat: support node anchor then you can pick any sub tree as the new markmap.
+
 ## 0.2.10
 
 - infra: upgrade deps

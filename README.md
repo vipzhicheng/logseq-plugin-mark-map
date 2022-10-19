@@ -54,6 +54,7 @@ Most of features come from `Markmap` project.
 - Mainly support `Markdown` mode, `Org` mode partly supported.
 - Support trigger markmap in block page.
 - Support open next markmap in markmap.
+- Support node anchor to pick sub tree as the next markmap.
 - Support export as PNG and SVG.
 
 ## Notes

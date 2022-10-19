@@ -14,7 +14,7 @@ import Alpine from 'alpinejs'
 import jQuery from 'jquery'
 import lightbox from 'lightbox2'
 import 'lightbox2/dist/css/lightbox.min.css'
-
+import isUUID from 'is-uuid'
 import { createApp } from 'vue'
 import App from './App.vue'
 import {
@@ -79,6 +79,14 @@ const defineSettings: SettingSchemaDesc[] = [
       'dark-gray',
     ],
     default: 'auto',
+  },
+  {
+    title: 'Enable Node Anchor',
+    key: 'nodeAnchorEnabled',
+    description:
+      'Node anchor can give you the ability to pick any sub tree as a new markmap',
+    type: 'boolean',
+    default: false,
   },
 ]
 logseq.useSettingsSchema(defineSettings)
@@ -317,13 +325,13 @@ async function main() {
   }
 
   let uiVisible = false
-  logseq.App.onRouteChanged(async () => {
+  logseq.App.onRouteChanged(async (e) => {
     if (uiVisible) {
-      await renderMarkmap()
+      await renderMarkmap(e.path)
     }
   })
 
-  const renderMarkmap = async () => {
+  const renderMarkmap = async (route = null) => {
     // @ts-ignore
     Alpine.store('markmap').resetTheme()
 
@@ -334,8 +342,36 @@ async function main() {
     }
 
     let blocks = await logseq.Editor.getCurrentPageBlocksTree()
-    const page = (await logseq.Editor.getCurrentPage()) as any
+    let page = (await logseq.Editor.getCurrentPage()) as any
 
+    // Make it compatible with block page trigger from markmap
+    // When traverse on markmap, hook will pass the route to this function
+    if (route && route.startsWith('/page/')) {
+      if (isUUID.anyNonNil(route.substring(6))) {
+        renderAsBlock = true
+        editingBlockUUID = route.substring(6)
+        if (page && page.page) {
+          page = await logseq.Editor.getPage(page.page.id)
+        }
+      } else {
+        renderAsBlock = false
+        page = await logseq.Editor.getPage(route.substring(6))
+        blocks = await logseq.Editor.getPageBlocksTree(route.substring(6))
+      }
+    } else if (
+      // trigger from shortcuts and slash command will not trigger route change
+      !renderAsBlock &&
+      page &&
+      page.page &&
+      blocks[0] &&
+      !blocks[0].uuid
+    ) {
+      renderAsBlock = true
+      editingBlockUUID = page.uuid
+      page = await logseq.Editor.getPage(page.page.id)
+    }
+
+    // Parse the proper title and blocks
     let title
     if (renderAsBlock) {
       let currentBlock
@@ -359,14 +395,6 @@ async function main() {
       }
     } else {
       title = page?.properties?.markMapTitle || page?.originalName || page?.name
-    }
-
-    // For block page
-    if (page && !page.originalName && page.content) {
-      let content = page.content
-      content = await parseBlockContent(content, page?.properties, config)
-      title = content
-      blocks = await convertFlatBlocksToTree(page?.children)
     }
 
     const collapsed = page?.properties?.markMapCollapsed
@@ -447,7 +475,7 @@ async function main() {
       const newBlocks = []
       for (const it of blocks) {
         // uuid, title,
-        const { children, content, properties } = it
+        const { children, content, properties, uuid } = it
 
         const topic = await parseBlockContent(content, properties, config)
 
@@ -458,7 +486,9 @@ async function main() {
             ? '#'.repeat(depth + 2)
             : // use nested list to create branches more than 6 levels.
               `${' '.repeat((depth - 5) * 2)} -`) +
-          ' ' +
+          (logseq.settings?.nodeAnchorEnabled
+            ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">🟢</a> `
+            : ' ') +
           (depth >= 5 && topic.startsWith('\n- ') ? topic.substring(3) : topic)
 
         if (
@@ -478,6 +508,9 @@ async function main() {
 
     let md =
       '# ' +
+      (renderAsBlock && logseq.settings.nodeAnchorEnabled
+        ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
+        : '') +
       title +
       '\n\n' +
       (await walkTransformBlocks(filteredBlocks, 0, config)).join('\n')
@@ -954,7 +987,6 @@ async function main() {
           maxWidth: 400,
           // spacingVertical: 20,
           style(id) {
-            console.log(id)
             return id
           },
         },
