@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## 0.2.22
+## 0.2.12
 
 - fix: node anchor back and forth not work on namespace page.
 - fix: always show top right cornor buttons.
