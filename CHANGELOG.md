@@ -1,6 +1,12 @@
 # CHANGELOG
 
 
+## 0.2.22
+
+- fix: node anchor back and forth not work on namespace page.
+- fix: always show top right cornor buttons.
+- infra: upgrade deps.
+
 ## 0.2.11
 
 - feat: support node anchor then you can pick any sub tree as the new markmap.

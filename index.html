@@ -146,13 +146,13 @@
 
     <div
       title="Close"
-      class="absolute right-4 top-4 cursor-pointer dark:text-gray-50 opacity-0 hover:opacity-100"
+      class="absolute right-4 top-4 cursor-pointer dark:text-gray-50"
       :class="$store.markmap.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'"
     >
       <svg
         id="close-button"
         xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5"
+        class="h-5 w-5 cursor-pointer"
         viewBox="0 0 20 20"
         fill="currentColor"
       >
@@ -165,7 +165,7 @@
     </div>
     <div
       title="Go Forward"
-      class="absolute right-8 top-4 cursor-pointer dark:text-gray-50 opacity-0 hover:opacity-100"
+      class="absolute right-10 top-4 cursor-pointer dark:text-gray-50"
       :class="$store.markmap.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'"
     >
       <svg
@@ -184,7 +184,7 @@
     </div>
     <div
       title="Go Back"
-      class="absolute right-12 top-4 cursor-pointer dark:text-gray-50 opacity-0 hover:opacity-100"
+      class="absolute right-16 top-4 cursor-pointer dark:text-gray-50"
       :class="$store.markmap.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'"
     >
       <svg

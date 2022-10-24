@@ -347,16 +347,18 @@ async function main() {
     // Make it compatible with block page trigger from markmap
     // When traverse on markmap, hook will pass the route to this function
     if (route && route.startsWith('/page/')) {
-      if (isUUID.anyNonNil(route.substring(6))) {
+      const pageName = decodeURIComponent(route.substring(6))
+      if (isUUID.anyNonNil(pageName)) {
         renderAsBlock = true
-        editingBlockUUID = route.substring(6)
+        editingBlockUUID = pageName
         if (page && page.page) {
           page = await logseq.Editor.getPage(page.page.id)
         }
       } else {
         renderAsBlock = false
-        page = await logseq.Editor.getPage(route.substring(6))
-        blocks = await logseq.Editor.getPageBlocksTree(route.substring(6))
+
+        page = await logseq.Editor.getPage(pageName)
+        blocks = await logseq.Editor.getPageBlocksTree(pageName)
       }
     } else if (
       // trigger from shortcuts and slash command will not trigger route change
