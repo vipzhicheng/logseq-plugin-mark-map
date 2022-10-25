@@ -1,10 +1,15 @@
 # CHANGELOG
 
 
+## 0.2.13
+
+- fix: support image popup for org format
+- fix: http image not popup
+
 ## 0.2.12
 
 - fix: node anchor back and forth not work on namespace page.
-- fix: always show top right cornor buttons.
+- fix: always show top right corner buttons.
 - infra: upgrade deps.
 
 ## 0.2.11

@@ -318,7 +318,9 @@ async function main() {
     if (['pdf'].includes(src.substring(src.lastIndexOf('.') + 1))) {
       result = `📄 ${alt}`
     } else {
-      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="assets://${src}">🖼 ${alt}</a>`
+      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${
+        src.indexOf('http') !== 0 ? 'assets://' : ''
+      }${src}">🖼 ${alt}</a>`
     }
 
     return result

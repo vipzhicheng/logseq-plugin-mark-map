@@ -372,21 +372,6 @@ export const parseBlockContent = async (
     })
   }
 
-  // Process page reference
-  const regexPageRef = /\[\[([^[\]]*?)\]\]/gi
-  const regexEmbedPageRef = /\{\{embed\s+\[\[([^[\]]*?)\]\]\}\}/gi
-  if (regexEmbedPageRef.test(topic)) {
-    topic = topic.replace(regexEmbedPageRef, (match, p1) => {
-      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' });">${p1}</a>`
-    })
-  }
-
-  if (regexPageRef.test(topic)) {
-    topic = topic.replace(regexPageRef, (match, p1) => {
-      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' });">${p1}</a>`
-    })
-  }
-
   // Process org mode
   // @ts-ignore
   if (config.preferredFormat === 'org') {
@@ -417,6 +402,30 @@ export const parseBlockContent = async (
   // Remove leading heading syntax
   topic = topic.replace(/\^\^/g, '==') // try marked syntax
   topic = topic.replace(/^[#\s]+/, '').trim()
+
+  // Process page reference
+  const regexPageRef = /\[\[([^[\]]*?)\]\]/gi
+  const regexEmbedPageRef = /\{\{embed\s+\[\[([^[\]]*?)\]\]\}\}/gi
+  if (regexEmbedPageRef.test(topic)) {
+    topic = topic.replace(regexEmbedPageRef, (match, p1) => {
+      return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' });">${p1}</a>`
+    })
+  }
+
+  if (regexPageRef.test(topic)) {
+    topic = topic.replace(regexPageRef, (match, p1) => {
+      if (p1.indexOf('../assets/') === 0) {
+        let src = p1
+        if (src.indexOf('http') !== 0 && src.indexOf('..') === 0) {
+          src =
+            config.currentGraph.substring(13) + '/' + src.replace(/\.\.\//g, '')
+        }
+        return `<a target="_blank" title="${p1}"  data-lightbox="gallery" href="assets://${src}">🖼 ${p1}</a>`
+      } else {
+        return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${p1}' });">${p1}</a>`
+      }
+    })
+  }
 
   // Process link parse
   const regexUrl =
