@@ -9,6 +9,7 @@ specifiers:
   autoprefixer: ^10.4.12
   cheerio: ^1.0.0-rc.12
   d3: ^7.6.1
+  date-fns: ^2.29.3
   eslint: ^8.26.0
   eslint-config-prettier: ^8.5.0
   hotkeys-js: ^3.10.0
@@ -37,6 +38,7 @@ dependencies:
   alpinejs: 3.10.4
   cheerio: 1.0.0-rc.12
   d3: 7.6.1
+  date-fns: 2.29.3
   hotkeys-js: 3.10.0
   html2canvas: 1.4.1
   is-uuid: 1.0.2
@@ -1372,6 +1374,11 @@ packages:
       d3-timer: 3.0.1
       d3-transition: 3.0.1_d3-selection@3.0.0
       d3-zoom: 3.0.0
+    dev: false
+
+  /date-fns/2.29.3:
+    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
+    engines: {node: '>=0.11'}
     dev: false
 
   /debug/4.3.4:

@@ -23,6 +23,7 @@
     "alpinejs": "^3.10.4",
     "cheerio": "^1.0.0-rc.12",
     "d3": "^7.6.1",
+    "date-fns": "^2.29.3",
     "hotkeys-js": "^3.10.0",
     "html2canvas": "^1.4.1",
     "is-uuid": "^1.0.2",

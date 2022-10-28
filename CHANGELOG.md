@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.2.14
+
+- feat: journal home page mark map
 
 ## 0.2.13
 

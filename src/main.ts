@@ -16,6 +16,7 @@ import lightbox from 'lightbox2'
 import 'lightbox2/dist/css/lightbox.min.css'
 import isUUID from 'is-uuid'
 import { createApp } from 'vue'
+import { format, subDays } from 'date-fns'
 import App from './App.vue'
 import {
   addToolbar,
@@ -398,7 +399,40 @@ async function main() {
         blocks = await convertFlatBlocksToTree(currentBlock?.children)
       }
     } else {
-      title = page?.properties?.markMapTitle || page?.originalName || page?.name
+      if (page) {
+        title =
+          page?.properties?.markMapTitle || page?.originalName || page?.name
+      } else {
+        // if page is null, that would be on journal home page, then we use default customized blocks.
+        const currentGraph = await logseq.App.getCurrentGraph()
+        title = currentGraph.name
+
+        const config = await logseq.App.getUserConfigs()
+
+        blocks = [
+          {
+            content: '[[Contents]]',
+          },
+        ] as BlockEntity[]
+
+        const recentJournals = []
+
+        for (let i = 0; i < 10; i++) {
+          recentJournals.push({
+            content: `[[${format(
+              // new Date(`${year}-${month + 1}-${digit}`),
+              subDays(new Date(), i),
+              config.preferredDateFormat
+            )}]]`,
+          })
+        }
+        if (config.enabledJournals) {
+          blocks.push({
+            content: 'Recent Journals',
+            children: recentJournals,
+          } as BlockEntity)
+        }
+      }
     }
 
     const collapsed = page?.properties?.markMapCollapsed
@@ -490,7 +524,7 @@ async function main() {
             ? '#'.repeat(depth + 2)
             : // use nested list to create branches more than 6 levels.
               `${' '.repeat((depth - 5) * 2)} -`) +
-          (logseq.settings?.nodeAnchorEnabled
+          (logseq.settings?.nodeAnchorEnabled && page
             ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">🟢</a> `
             : ' ') +
           (depth >= 5 && topic.startsWith('\n- ') ? topic.substring(3) : topic)
