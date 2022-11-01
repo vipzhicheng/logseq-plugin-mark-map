@@ -10,7 +10,6 @@ import { INode } from 'markmap-common'
 import { Transformer } from 'markmap-lib'
 import * as markmap from 'markmap-view'
 import { Markmap } from 'markmap-view'
-import Alpine from 'alpinejs'
 import jQuery from 'jquery'
 import lightbox from 'lightbox2'
 import 'lightbox2/dist/css/lightbox.min.css'
@@ -33,25 +32,9 @@ import {
   walkTransformBlocksFilter,
 } from './funcs'
 import './style.css'
-
-const themeMapping = {
-  'light-gray': 'bg-gray-100',
-  'light-red': 'bg-red-100',
-  'light-blue': 'bg-blue-100',
-  'light-green': 'bg-green-100',
-  'light-yellow': 'bg-yellow-100',
-  'light-purple': 'bg-purple-100',
-  'light-pink': 'bg-pink-100',
-  'light-indigo': 'bg-indigo-100',
-  'dark-indigo': 'bg-indigo-900',
-  'dark-pink': 'bg-pink-900',
-  'dark-purple': 'bg-purple-900',
-  'dark-yellow': 'bg-yellow-900',
-  'dark-green': 'bg-green-900',
-  'dark-blue': 'bg-blue-900',
-  'dark-red': 'bg-red-900',
-  'dark-gray': 'bg-gray-900',
-}
+import { createPinia } from 'pinia'
+import { useMarkmap } from '@/stores/markmap'
+import { useHelp } from '@/stores/help'
 
 const defineSettings: SettingSchemaDesc[] = [
   {
@@ -93,12 +76,11 @@ const defineSettings: SettingSchemaDesc[] = [
 logseq.useSettingsSchema(defineSettings)
 
 logseq.onSettingsChanged(() => {
-  // @ts-ignore
-  Alpine.store('markmap').resetTheme()
-
+  const markmapStore = useMarkmap()
+  markmapStore.resetTheme()
   if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
-    if (themeMapping[logseq.settings.theme]) {
-      Alpine.store('markmap').setTheme(themeMapping[logseq.settings.theme])
+    if (markmapStore.themeMapping[logseq.settings.theme]) {
+      markmapStore.setTheme(markmapStore.themeMapping[logseq.settings.theme])
     }
   }
 })
@@ -134,8 +116,8 @@ const triggerMarkmapForceFull = async () => {
 function createModel() {
   return {
     openMindMap(blockMode = false) {
-      // @ts-ignore
-      Alpine.store('markmap').closeHelp()
+      const helpStore = useHelp()
+      helpStore.closeHelp()
 
       const closeButton = document.getElementById('close-button')
       closeButton.removeEventListener('click', closeButtonHandler, false)
@@ -166,10 +148,6 @@ function createModel() {
 }
 
 async function main() {
-  /** @ts-ignore */
-  window.Alpine = Alpine
-  Alpine.start()
-
   lightbox.option({
     disableScrolling: true,
     wrapAround: true,
@@ -335,12 +313,12 @@ async function main() {
   })
 
   const renderMarkmap = async (route = null) => {
-    // @ts-ignore
-    Alpine.store('markmap').resetTheme()
+    const markmapStore = useMarkmap()
+    markmapStore.resetTheme()
 
     if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
-      if (themeMapping[logseq.settings.theme]) {
-        Alpine.store('markmap').setTheme(themeMapping[logseq.settings.theme])
+      if (markmapStore.themeMapping[logseq.settings.theme]) {
+        markmapStore.setTheme(markmapStore.themeMapping[logseq.settings.theme])
       }
     }
 
@@ -789,13 +767,6 @@ async function main() {
           // @ts-ignore
           async function (event, handler) {
             // @ts-ignore
-            const $store = Alpine.store('markmap').getHelp()
-
-            if ($store && !['/', 'q', 'esc'].includes(handler.key)) {
-              return
-            }
-
-            // @ts-ignore
             // const jQuery = window?.jQuery
             if (jQuery) {
               if (
@@ -997,10 +968,11 @@ async function main() {
                 }
                 break
 
-              case '/':
-                // @ts-ignore
-                Alpine.store('markmap').toggleHelp()
+              case '/': {
+                const helpStore = useHelp()
+                helpStore.toggleHelp()
                 break
+              }
               default:
                 // console.log(handler.key);
                 break
@@ -1047,6 +1019,8 @@ async function main() {
     await renderMarkmap()
   })
 
-  createApp(App).mount('#app')
+  const app = createApp(App)
+  app.use(createPinia())
+  app.mount('#app')
 }
 logseq.ready(createModel(), main).catch(() => console.error)

@@ -3,6 +3,7 @@
 ## 0.2.14
 
 - feat: journal home page mark map
+- refactor: remove Alpine dependency.
 
 ## 0.2.13
 

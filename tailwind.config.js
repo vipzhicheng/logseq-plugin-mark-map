@@ -1,5 +1,5 @@
 module.exports = {
-  content: ['index.html', 'src/**/*.vue'],
+  content: ['index.html', 'src/**/*.vue', 'src/stores/*.ts'],
   darkMode: 'class',
   theme: {
     extend: {},

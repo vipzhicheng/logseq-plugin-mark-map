@@ -1,12 +1,16 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 // import cdnExternals from 'vite-plugin-cdn-externals'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import path from 'path'
 
 export default defineConfig({
   base: './',
   mode: 'development',
   build: {
     target: 'esnext',
+    // sourcemap: true,
     minify: 'esbuild',
     chunkSizeWarningLimit: 1024,
     rollupOptions: {
@@ -23,5 +27,24 @@ export default defineConfig({
       },
     },
   },
-  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  plugins: [
+    vue(),
+    AutoImport({
+      include: [
+        /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
+        /\.vue$/,
+        /\.vue\?vue/, // .vue
+      ],
+      imports: ['vue'],
+      resolvers: [],
+    }),
+    Components({
+      resolvers: [],
+    }),
+  ],
 })

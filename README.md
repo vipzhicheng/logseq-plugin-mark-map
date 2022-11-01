@@ -31,7 +31,7 @@ Load unpack plugin from `dist` directory
 
 - Typescript
 - TailwindCSS
-- Alpine.js
+- Vue
 - Markmap related packages
 
 ## Features
