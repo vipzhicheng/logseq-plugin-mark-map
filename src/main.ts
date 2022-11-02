@@ -5,17 +5,20 @@ import {
   SettingSchemaDesc,
 } from '@logseq/libs/dist/LSPlugin'
 import * as d3 from 'd3'
+import { format, subDays } from 'date-fns'
 import hotkeys from 'hotkeys-js'
+import isUUID from 'is-uuid'
+import jQuery from 'jquery'
+import lightbox from 'lightbox2'
+import 'lightbox2/dist/css/lightbox.min.css'
 import { INode } from 'markmap-common'
 import { Transformer } from 'markmap-lib'
 import * as markmap from 'markmap-view'
 import { Markmap } from 'markmap-view'
-import jQuery from 'jquery'
-import lightbox from 'lightbox2'
-import 'lightbox2/dist/css/lightbox.min.css'
-import isUUID from 'is-uuid'
+import { createPinia } from 'pinia'
+import { useHelp } from '@/stores/help'
+import { useMarkmap } from '@/stores/markmap'
 import { createApp } from 'vue'
-import { format, subDays } from 'date-fns'
 import App from './App.vue'
 import {
   addToolbar,
@@ -24,17 +27,11 @@ import {
   getSettings,
   goBackButtonHandler,
   goForwardButtonHandler,
-  hexToRgb,
   initSettings,
   parseBlockContent,
-  pickTextColorBasedOnBgColorSimple,
-  themeWorkflowTag,
   walkTransformBlocksFilter,
 } from './funcs'
 import './style.css'
-import { createPinia } from 'pinia'
-import { useMarkmap } from '@/stores/markmap'
-import { useHelp } from '@/stores/help'
 
 const defineSettings: SettingSchemaDesc[] = [
   {
@@ -69,6 +66,13 @@ const defineSettings: SettingSchemaDesc[] = [
     key: 'nodeAnchorEnabled',
     description:
       'Node anchor can give you the ability to pick any sub tree as a new markmap',
+    type: 'boolean',
+    default: false,
+  },
+  {
+    title: 'Sync Collapsed State',
+    key: 'syncCollapsedState',
+    description: 'Sync Logseq blocks collapsed state to markmap.',
     type: 'boolean',
     default: false,
   },
@@ -199,14 +203,6 @@ async function main() {
      </a>
     `,
   })
-  // logseq.App.registerUIItem('pagebar', {
-  //   key: 'logseq-mark-map',
-  //   template: `
-  //    <a class="button" data-on-click="openMindMap" title="Open mindmap mode">
-  //     <svg t="1627350023942" class="icon h-5 w-5" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="670"><path d="M840.533333 490.666667l-17.066666-85.333334L554.666667 460.8V170.666667h-85.333334v262.4l-296.533333-192-46.933333 72.533333 324.266666 209.066667L200.533333 849.066667l68.266667 51.2 241.066667-315.733334 179.2 270.933334 72.533333-46.933334-179.2-266.666666z" fill="#CFD8DC" p-id="671"></path><path d="M512 512m-149.333333 0a149.333333 149.333333 0 1 0 298.666666 0 149.333333 149.333333 0 1 0-298.666666 0Z" fill="#C435F3" p-id="672" data-spm-anchor-id="a313x.7781069.0.i0" class=""></path><path d="M512 170.666667m-106.666667 0a106.666667 106.666667 0 1 0 213.333334 0 106.666667 106.666667 0 1 0-213.333334 0Z" fill="#F48233" p-id="673" data-spm-anchor-id="a313x.7781069.0.i4" class="selected"></path><path d="M832 448m-106.666667 0a106.666667 106.666667 0 1 0 213.333334 0 106.666667 106.666667 0 1 0-213.333334 0Z" fill="#F48233" p-id="674" data-spm-anchor-id="a313x.7781069.0.i5" class="selected"></path><path d="M149.333333 277.333333m-106.666666 0a106.666667 106.666667 0 1 0 213.333333 0 106.666667 106.666667 0 1 0-213.333333 0Z" fill="#F48233" p-id="675" data-spm-anchor-id="a313x.7781069.0.i3" class="selected"></path><path d="M234.666667 874.666667m-106.666667 0a106.666667 106.666667 0 1 0 213.333333 0 106.666667 106.666667 0 1 0-213.333333 0Z" fill="#F48233" p-id="676" data-spm-anchor-id="a313x.7781069.0.i7" class="selected"></path><path d="M725.333333 832m-106.666666 0a106.666667 106.666667 0 1 0 213.333333 0 106.666667 106.666667 0 1 0-213.333333 0Z" fill="#F48233" p-id="677" data-spm-anchor-id="a313x.7781069.0.i6" class="selected"></path></svg>
-  //    </a>
-  //   `,
-  // })
 
   const convertFlatBlocksToTree = async (
     blocks: (BlockUUIDTuple | BlockEntity)[]
@@ -312,6 +308,7 @@ async function main() {
     }
   })
 
+  // key function
   const renderMarkmap = async (route = null) => {
     const markmapStore = useMarkmap()
     markmapStore.resetTheme()
@@ -429,7 +426,7 @@ async function main() {
       )
       filteredBlocks = limitBlocks.concat({
         content: '...',
-        properties: { collapsed: true },
+        'collapsed?': true,
         children: filteredBlocks,
       })
     } else if (
@@ -442,7 +439,7 @@ async function main() {
       )
       filteredBlocks = limitBlocks.concat({
         content: '...',
-        properties: { collapsed: true },
+        'collapsed?': true,
         children: filteredBlocks,
       })
     }
@@ -452,7 +449,7 @@ async function main() {
         const limitBlocks = blocks.splice(0, limit)
         blocks = limitBlocks.concat({
           content: '...',
-          properties: { collapsed: true },
+          'collapsed?': true,
           children: blocks,
         })
       }
@@ -507,10 +504,7 @@ async function main() {
             : ' ') +
           (depth >= 5 && topic.startsWith('\n- ') ? topic.substring(3) : topic)
 
-        if (
-          children &&
-          (properties?.collapsed !== true || collapsed !== 'hidden')
-        ) {
+        if (children && (it['collapsed?'] !== true || collapsed !== 'hidden')) {
           ret +=
             '\n' +
             (await walkTransformBlocks(children, depth + 1, config)).join('\n')
@@ -543,15 +537,16 @@ async function main() {
     // @ts-ignore
     root.properties = page && page.properties ? page.properties : {}
 
+    // want to keep syncing collapsed with Logseq
     const walkTransformRoot = (parent, blocks) => {
       if (parent.children) {
         for (const i in parent.children) {
           parent.children[i].properties = blocks[i]?.properties || {}
-
+          parent.children[i]['collapsed?'] = blocks[i]['collapsed?'] || false
           if (
             // @ts-ignore
             root?.properties?.markMapCollapsed !== 'extend' &&
-            parent.children[i]?.properties?.collapsed
+            parent.children[i]['collapsed?']
           ) {
             parent.children[i].payload = {
               ...parent.children[i].payload,
@@ -563,8 +558,9 @@ async function main() {
         }
       }
     }
-    walkTransformRoot(root, filteredBlocks)
-
+    if (logseq.settings?.syncCollapsedState) {
+      walkTransformRoot(root, filteredBlocks)
+    }
     originalRoot = root
     originalTotalLevel = totalLevel
     // @ts-ignore
@@ -577,7 +573,7 @@ async function main() {
         getMarkmap: () => markmap,
       })
 
-    // 隐藏所有子节点
+    // Hide all children
     const hideAll = (target: INode) => {
       target.payload = {
         ...target.payload,
@@ -589,13 +585,24 @@ async function main() {
       })
     }
 
-    // 显示所有子节点
+    // Show all children
     const showAll = (target: INode, depth = -1) => {
+      target.payload = {
+        ...target.payload,
+        fold: 0,
+      }
+
+      target.children?.forEach((t) => {
+        showAll(t, depth)
+      })
+    }
+
+    const showAllWithCollapsed = (target: INode, depth = -1) => {
       depth++
       if (
         page?.properties?.markMapCollapsed !== 'extend' &&
         // @ts-ignore
-        target?.properties?.collapsed
+        target['collapsed?']
       ) {
         target.payload = {
           ...target.payload,
@@ -610,11 +617,11 @@ async function main() {
       }
 
       target.children?.forEach((t) => {
-        showAll(t, depth)
+        showAllWithCollapsed(t, depth)
       })
     }
 
-    // 逐级展开
+    // expand step by step
     const expandStepByStep = (target: INode): boolean => {
       let find = false
       if (target.payload?.fold && target.children) {
@@ -766,6 +773,11 @@ async function main() {
           'up,down,left,right,esc,space,z,r,h,j,k,l,n,p,b,q,-,=,0,9,1,2,3,4,5,/',
           // @ts-ignore
           async function (event, handler) {
+            const helpStore = useHelp()
+            if (helpStore.visible && !['/', 'q', 'esc'].includes(handler.key)) {
+              return
+            }
+
             // @ts-ignore
             // const jQuery = window?.jQuery
             if (jQuery) {
@@ -985,11 +997,11 @@ async function main() {
 
     if (mm) {
       // reuse instance, update data
-      showAll(root)
+      showAllWithCollapsed(root)
       mm.setData(root)
     } else {
       // initialize instance
-      showAll(root)
+      showAllWithCollapsed(root)
       mm = Markmap.create(
         '#markmap',
         {

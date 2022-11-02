@@ -8,11 +8,11 @@ import TurndownService from 'turndown'
 
 import { useHelp } from '@/stores/help'
 
-const settingsVersion = 'v2'
+const settingsVersion = 'v3'
 export const defaultSettings = {
   keyBindings: {
     openMarkmap: 'ctrl+m ctrl+m',
-    openMarkmapFull: 'ctrl+shift+m ctrl+shift+m',
+    openMarkmapFull: 'ctrl+alt+shift+m ctrl+alt+shift+m',
   },
   settingsVersion,
   disabled: false,
@@ -288,6 +288,11 @@ export const parseBlockContent = async (
     topic = topic.replace(regexHashCenter, (match, p1) => {
       return `${p1.trim()}`
     })
+  }
+
+  // Upstream lib do not support markdown quote syntax
+  if (topic.startsWith('> ')) {
+    topic = topic.replace(/^> /, '📝 ')
   }
 
   // transform renderer to specials style

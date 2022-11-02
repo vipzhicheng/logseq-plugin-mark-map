@@ -1,9 +1,11 @@
 # CHANGELOG
 
-## 0.2.14
+## 0.3.0
 
+- feat: sync collapsed state to markmap
+- feat: support markdown quote syntax, `> `
 - feat: journal home page mark map
-- refactor: remove Alpine dependency.
+- refactor: remove Alpine dependency
 
 ## 0.2.13
 
