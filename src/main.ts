@@ -79,16 +79,6 @@ const defineSettings: SettingSchemaDesc[] = [
 ]
 logseq.useSettingsSchema(defineSettings)
 
-logseq.onSettingsChanged(() => {
-  const markmapStore = useMarkmap()
-  markmapStore.resetTheme()
-  if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
-    if (markmapStore.themeMapping[logseq.settings.theme]) {
-      markmapStore.setTheme(markmapStore.themeMapping[logseq.settings.theme])
-    }
-  }
-})
-
 const transformer = new Transformer()
 
 let renderAsBlock = false
@@ -542,7 +532,8 @@ async function main() {
       if (parent.children) {
         for (const i in parent.children) {
           parent.children[i].properties = blocks[i]?.properties || {}
-          parent.children[i]['collapsed?'] = blocks[i]['collapsed?'] || false
+          parent.children[i]['collapsed?'] =
+            (blocks && blocks[i] && blocks[i]['collapsed?']) || false
           if (
             // @ts-ignore
             root?.properties?.markMapCollapsed !== 'extend' &&
@@ -1029,6 +1020,16 @@ async function main() {
     }
 
     await renderMarkmap()
+  })
+
+  logseq.onSettingsChanged(() => {
+    const markmapStore = useMarkmap()
+    markmapStore.resetTheme()
+    if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
+      if (markmapStore.themeMapping[logseq.settings.theme]) {
+        markmapStore.setTheme(markmapStore.themeMapping[logseq.settings.theme])
+      }
+    }
   })
 
   const app = createApp(App)

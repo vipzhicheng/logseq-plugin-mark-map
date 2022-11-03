@@ -282,7 +282,7 @@ export const parseBlockContent = async (
     })
   } else if (regexHashQuote.test(topic)) {
     topic = topic.replace(regexHashQuote, (match, p1) => {
-      return `📝 ${p1.trim()}`
+      return `💬 ${p1.trim()}`
     })
   } else if (regexHashCenter.test(topic)) {
     topic = topic.replace(regexHashCenter, (match, p1) => {
@@ -292,7 +292,7 @@ export const parseBlockContent = async (
 
   // Upstream lib do not support markdown quote syntax
   if (topic.startsWith('> ')) {
-    topic = topic.replace(/^> /, '📝 ')
+    topic = topic.replace(/^> /, '💬 ')
   }
 
   // transform renderer to specials style
