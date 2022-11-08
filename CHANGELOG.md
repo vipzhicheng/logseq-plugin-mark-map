@@ -1,16 +1,22 @@
 # CHANGELOG
 
+## 0.3.1
+
+- fix: error when missing block happens.
+- fix: only show first line on markmap.
+- fix: expand shortcut can not show all nodes.
+
 ## 0.3.0
 
-- feat: sync collapsed state to markmap
-- feat: support markdown quote syntax, `> `
-- feat: journal home page mark map
-- refactor: remove Alpine dependency
+- feat: sync collapsed state to markmap.
+- feat: support markdown quote syntax, `> `.
+- feat: journal home page mark map.
+- refactor: remove Alpine dependency.
 
 ## 0.2.13
 
-- fix: support image popup for org format
-- fix: http image not popup
+- fix: support image popup for org format.
+- fix: http image not popup.
 
 ## 0.2.12
 
@@ -24,19 +30,19 @@
 
 ## 0.2.10
 
-- infra: upgrade deps
-- fix: png not loading #25
-- fix: content is a little bit small in saved png #43
-- fix: can only render at most level 6 #44
+- infra: upgrade deps.
+- fix: png not loading #25.
+- fix: content is a little bit small in saved png #43.
+- fix: can only render at most level 6 #44.
 
 ## 0.2.9
 
-- infra: upgrade deps
-- feat: optimize for `{{cloze}}`
+- infra: upgrade deps.
+- feat: optimize for `{{cloze}}`.
 
 ## 0.2.8
 
-- feat: add theme setting, so you can keep your favorite theme permanently..
+- feat: add theme setting, so you can keep your favorite theme permanently.
 - feat: add `ctrl+shift+m ctrl+shift+m` to trigger mindmap for all
 - infra: upgrade deps.
 
@@ -47,23 +53,23 @@
 
 ## 0.2.6
 
-- feat: serve alpinejs locally
-- fix: `^^` highlight not supported
+- feat: serve alpinejs locally.
+- fix: `^^` highlight not supported.
 
 ## 0.2.5
 
-- infra: upgrade deps
-- feat: set default theme according Logseq theme
+- infra: upgrade deps.
+- feat: set default theme according Logseq theme.
 
 ## 0.2.4
 
-- infra: upgrade deps
-- feat: support Logseq hash syntax
+- infra: upgrade deps.
+- feat: support Logseq hash syntax.
 
 ## 0.2.3
 
-- fix: ref block cut issue
-- chore: refactor some code
+- fix: ref block cut issue.
+- chore: refactor some code.
 
 ## 0.2.2
 
@@ -72,28 +78,28 @@
 
 ## 0.2.1
 
-- feat: ignore `---` lines
-- feat: replace renderer lines
+- feat: ignore `---` lines.
+- feat: replace renderer lines.
 
 ## 0.2.0
 
-- feat: support export as svg
+- feat: support export as svg.
 
 ## 0.1.9
 
-- feat: support block background color on markmap
+- feat: support block background color on markmap.
 
 ## 0.1.8
 
 - fix: pdf asset wrongly parsed as image on markmap.
 - fix: optimize image parse, remove image properties.
 - fix: can not load children blocks in recent Logseq release.
-- infra: change from webpack to vite
-- infra: upgrade deps
+- infra: change from webpack to vite.
+- infra: upgrade deps.
 
 ## 0.1.7
 
-- fix: parse tag issue, should not parse url anchor
+- fix: parse tag issue, should not parse url anchor.
 
 ## 0.1.6
 

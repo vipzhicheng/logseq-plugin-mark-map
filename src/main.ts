@@ -468,8 +468,8 @@ async function main() {
       depth = 0,
       config = {}
     ): Promise<string[]> => {
-      currentLevel = Math.max(currentLevel, depth)
-      totalLevel = Math.max(currentLevel, depth)
+      currentLevel = Math.max(currentLevel, depth + 1)
+      totalLevel = Math.max(currentLevel, depth + 1)
 
       if (!blocks) {
         return []
@@ -485,14 +485,11 @@ async function main() {
         // Add leading syntax according to depth.
         let ret =
           // for valid markdown, it can have at most head#6 (######)
-          (depth < 5
-            ? '#'.repeat(depth + 2)
-            : // use nested list to create branches more than 6 levels.
-              `${' '.repeat((depth - 5) * 2)} -`) +
+          `${' '.repeat((depth + 1) * 2)} -` + // use nested list to create branches more than 6 levels.
           (logseq.settings?.nodeAnchorEnabled && page
             ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">🟢</a> `
             : ' ') +
-          (depth >= 5 && topic.startsWith('\n- ') ? topic.substring(3) : topic)
+          (topic.startsWith('\n- ') ? topic.substring(3) : topic)
 
         if (children && (it['collapsed?'] !== true || collapsed !== 'hidden')) {
           ret +=
@@ -507,7 +504,7 @@ async function main() {
     }
 
     let md =
-      '# ' +
+      '- ' +
       (renderAsBlock && logseq.settings.nodeAnchorEnabled
         ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
         : '') +

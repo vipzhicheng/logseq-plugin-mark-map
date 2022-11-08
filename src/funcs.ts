@@ -347,7 +347,7 @@ export const parseBlockContent = async (
   if (regexEmbedBlockRef.test(topic)) {
     topic = await replaceAsync(topic, regexEmbedBlockRef, async (match, p1) => {
       const block = await logseq.Editor.getBlock(p1)
-      if (block) {
+      if (block && block.content) {
         const content = block.content
         const contentFiltered = content
           .split('\n')
@@ -365,7 +365,7 @@ export const parseBlockContent = async (
   if (regexBlockRef.test(topic)) {
     topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
       const block = await logseq.Editor.getBlock(p1)
-      if (block) {
+      if (block && block.content) {
         const content = block.content
         const contentFiltered = content
           .split('\n')
