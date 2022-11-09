@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.2
+
+- feat: add autofit option, default is enabled, but you can disable it now.
+
 ## 0.3.1
 
 - fix: error when missing block happens.

@@ -70,6 +70,13 @@ const defineSettings: SettingSchemaDesc[] = [
     default: false,
   },
   {
+    title: 'Enable Autofit',
+    key: 'autofitEnabled',
+    description: 'With autofit, markmap always fit to the window.',
+    type: 'boolean',
+    default: true,
+  },
+  {
     title: 'Sync Collapsed State',
     key: 'syncCollapsedState',
     description: 'Sync Logseq blocks collapsed state to markmap.',
@@ -986,16 +993,21 @@ async function main() {
     if (mm) {
       // reuse instance, update data
       showAllWithCollapsed(root)
-      mm.setData(root)
+      mm.setData(root, {
+        autoFit: logseq.settings?.autofitEnabled,
+        maxWidth: 400,
+        style(id) {
+          return id
+        },
+      })
     } else {
       // initialize instance
       showAllWithCollapsed(root)
       mm = Markmap.create(
         '#markmap',
         {
-          autoFit: true,
+          autoFit: logseq.settings?.autofitEnabled,
           maxWidth: 400,
-          // spacingVertical: 20,
           style(id) {
             return id
           },
