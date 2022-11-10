@@ -477,6 +477,15 @@ async function main() {
 
     filteredBlocks = walkTransformBlocksLimit(filteredBlocks)
 
+    const addPrefixToMultipleLinesBlock = (prefix, topic) => {
+      return topic
+        .split('\n')
+        .map((line) => {
+          return prefix + line
+        })
+        .join('\n')
+    }
+
     // iterate blocks
     const walkTransformBlocks = async (
       blocks: any,
@@ -498,13 +507,12 @@ async function main() {
         const topic = await parseBlockContent(content, properties, config)
 
         // Add leading syntax according to depth.
-        let ret =
-          // for valid markdown, it can have at most head#6 (######)
-          `${' '.repeat((depth + 1) * 2)} -` + // use nested list to create branches more than 6 levels.
+        let ret = addPrefixToMultipleLinesBlock(
+          `${' '.repeat((depth + 1) * 2)}`,
           (logseq.settings?.nodeAnchorEnabled && page
-            ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">🟢</a> `
-            : ' ') +
-          (topic.startsWith('\n- ') ? topic.substring(3) : topic)
+            ? `- <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">🟢</a> `
+            : '- ') + topic
+        )
 
         if (children && (it['collapsed?'] !== true || collapsed !== 'hidden')) {
           ret +=
@@ -534,7 +542,11 @@ async function main() {
     ) // remove image size
 
     // eslint-disable-next-line prefer-const
-    let { root, features } = transformer.transform(md)
+    let { root, features } = transformer.transform(md.trim())
+
+    // if (!root.content && title) {
+    //   root.content = title
+    // }
 
     // @ts-ignore
     root.properties = page && page.properties ? page.properties : {}

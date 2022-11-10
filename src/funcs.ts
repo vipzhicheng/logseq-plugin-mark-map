@@ -463,8 +463,13 @@ export const parseBlockContent = async (
   }
 
   // Optimize code block
-  if (topic.indexOf('```') === 0 || topic.indexOf('- ') === 0) {
-    topic = '\n' + topic
+  if (topic.indexOf('```') === 0) {
+    topic =
+      '\n\n  -\n' +
+      topic
+        .split('\n')
+        .map((line) => '    ' + line)
+        .join('\n')
   }
 
   return topic

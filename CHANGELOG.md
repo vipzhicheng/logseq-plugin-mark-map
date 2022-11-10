@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.4
+
+- fix: code block render logic
+
 ## 0.3.3
 
 - feat: add an option to replace complicated math expression for compatability.
