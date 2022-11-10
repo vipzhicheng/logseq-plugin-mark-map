@@ -11,6 +11,7 @@ specifiers:
   cheerio: ^1.0.0-rc.12
   d3: ^7.6.1
   date-fns: ^2.29.3
+  drauu: ^0.3.2
   eslint: ^8.26.0
   eslint-config-prettier: ^8.5.0
   hotkeys-js: ^3.10.0
@@ -25,6 +26,7 @@ specifiers:
   org: ^0.2.0
   pinia: ^2.0.23
   postcss: ^8.4.18
+  postcss-nesting: ^10.2.0
   prettier: ^2.7.1
   string-replace-async: ^3.0.2
   tailwindcss: ^3.2.1
@@ -43,6 +45,7 @@ dependencies:
   cheerio: 1.0.0-rc.12
   d3: 7.6.1
   date-fns: 2.29.3
+  drauu: 0.3.2
   hotkeys-js: 3.10.0
   html2canvas: 1.4.1
   is-uuid: 1.0.2
@@ -68,6 +71,7 @@ devDependencies:
   eslint: 8.26.0
   eslint-config-prettier: 8.5.0_eslint@8.26.0
   postcss: 8.4.18
+  postcss-nesting: 10.2.0_postcss@8.4.18
   prettier: 2.7.1
   tailwindcss: 3.2.1_postcss@8.4.18
   typescript: 4.8.4
@@ -111,6 +115,23 @@ packages:
       '@babel/helper-string-parser': 7.18.10
       '@babel/helper-validator-identifier': 7.18.6
       to-fast-properties: 2.0.0
+
+  /@csstools/selector-specificity/2.0.2_dvkg4kkb622mvceygg47xxdz3a:
+    resolution: {integrity: sha512-IkpVW/ehM1hWKln4fCA3NzJU8KwD+kIOvPZA4cqxoJHtE21CCzjyp+Kxbu0i5I4tBNOlXPL9mjwnWlL0VEG4Fg==}
+    engines: {node: ^12 || ^14 || >=16}
+    peerDependencies:
+      postcss: ^8.2
+      postcss-selector-parser: ^6.0.10
+    dependencies:
+      postcss: 8.4.18
+      postcss-selector-parser: 6.0.10
+    dev: true
+
+  /@drauu/core/0.3.2:
+    resolution: {integrity: sha512-7G3qIuMBkDkrzvZOs6Rm/7rKWuhZOe8iimHooTmy4vpKGsPimaNC1jGCSPSM8ys/johhcIvx+1ZvnMJ5+UAXJA==}
+    dependencies:
+      perfect-freehand: 1.2.0
+    dev: false
 
   /@esbuild/android-arm/0.15.10:
     resolution: {integrity: sha512-FNONeQPy/ox+5NBkcSbYJxoXj9GWu8gVGJTVmUyoOCKQFDTrHVKgNSzChdNt0I8Aj/iKcsDf2r9BFwv+FSNUXg==}
@@ -1528,6 +1549,12 @@ packages:
       tslib: 2.3.1
     dev: false
 
+  /drauu/0.3.2:
+    resolution: {integrity: sha512-NnRQU6uM9uk1zAd33nFZ6FqZGGmT3jiYS/ERdDIDuTUgDsweSgpf1D3X7vYZwRSxCZayOnnt1sKWj9swbR8q4Q==}
+    dependencies:
+      '@drauu/core': 0.3.2
+    dev: false
+
   /electron-to-chromium/1.4.276:
     resolution: {integrity: sha512-EpuHPqu8YhonqLBXHoU6hDJCD98FCe6KDoet3/gY1qsQ6usjJoHqBH2YIVs8FXaAtHwVL8Uqa/fsYao/vq9VWQ==}
     dev: true
@@ -2466,6 +2493,10 @@ packages:
     resolution: {integrity: sha512-6Y6s0vT112P3jD8dGfuS6r+lpa0qqNrLyHPOwvXMnyNTQaYiwgau2DP3aNDsR13xqtGj7rrPo+jFUATpU6/s+g==}
     dev: true
 
+  /perfect-freehand/1.2.0:
+    resolution: {integrity: sha512-h/0ikF1M3phW7CwpZ5MMvKnfpHficWoOEyr//KVNTxV4F6deRK1eYMtHyBKEAKFK0aXIEUK9oBvlF6PNXMDsAw==}
+    dev: false
+
   /picocolors/1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
 
@@ -2558,6 +2589,17 @@ packages:
     peerDependencies:
       postcss: ^8.2.14
     dependencies:
+      postcss: 8.4.18
+      postcss-selector-parser: 6.0.10
+    dev: true
+
+  /postcss-nesting/10.2.0_postcss@8.4.18:
+    resolution: {integrity: sha512-EwMkYchxiDiKUhlJGzWsD9b2zvq/r2SSubcRrgP+jujMXFzqvANLt16lJANC+5uZ6hjI7lpRmI6O8JIl+8l1KA==}
+    engines: {node: ^12 || ^14 || >=16}
+    peerDependencies:
+      postcss: ^8.2
+    dependencies:
+      '@csstools/selector-specificity': 2.0.2_dvkg4kkb622mvceygg47xxdz3a
       postcss: 8.4.18
       postcss-selector-parser: 6.0.10
     dev: true

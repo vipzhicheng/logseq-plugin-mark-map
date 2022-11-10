@@ -18,6 +18,7 @@ import { Markmap } from 'markmap-view'
 import { createPinia } from 'pinia'
 import { useHelp } from '@/stores/help'
 import { useMarkmap } from '@/stores/markmap'
+import { usePen } from '@/stores/pen'
 import { createApp } from 'vue'
 import App from './App.vue'
 import {
@@ -119,6 +120,9 @@ function createModel() {
     openMindMap(blockMode = false) {
       const helpStore = useHelp()
       helpStore.closeHelp()
+
+      const penStore = usePen()
+      penStore.close()
 
       const closeButton = document.getElementById('close-button')
       closeButton.removeEventListener('click', closeButtonHandler, false)
@@ -307,6 +311,9 @@ async function main() {
 
   // key function
   const renderMarkmap = async (route = null) => {
+    const penStore = usePen()
+    penStore.init()
+
     const markmapStore = useMarkmap()
     markmapStore.resetTheme()
 
@@ -742,6 +749,241 @@ async function main() {
 
     const bindKeys = async function () {
       if (hotkeys) {
+        // Pen shortcuts
+        hotkeys(
+          'ctrl+p, command+p, ctrl+z, command+z, ctrl+shift+z, command+shift+z,d,f,s,r,e,o,a,c,ctrl+1,command+1,ctrl+2,command+2,ctrl+3,command+3,ctrl+4,command+4,ctrl+5,command+5,ctrl+6,command+6,ctrl+7,command+7,ctrl+8,command+8,ctrl+9,command+9,ctrl+0,command+0,alt+=,alt+-',
+          function (event, handler) {
+            const penStore = usePen()
+
+            switch (handler.key) {
+              case 'ctrl+p':
+              case 'command+p': {
+                penStore.toggle()
+                return false
+              }
+            }
+
+            if (penStore.visible) {
+              switch (handler.key) {
+                case 'command+1':
+                case 'ctrl+1': {
+                  penStore.drauu.brush.color = '#000000'
+                  penStore.colors.forEach((el) => el.classList.remove('active'))
+                  document
+                    .getElementById('pen-color-black')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'command+2':
+                case 'ctrl+2': {
+                  penStore.drauu.brush.color = '#ed153d'
+                  penStore.colors.forEach((el) => el.classList.remove('active'))
+                  document
+                    .getElementById('pen-color-red')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'command+3':
+                case 'ctrl+3': {
+                  penStore.drauu.brush.color = '#ed9a26'
+                  penStore.colors.forEach((el) => el.classList.remove('active'))
+                  document
+                    .getElementById('pen-color-orange')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'command+4':
+                case 'ctrl+4': {
+                  penStore.drauu.brush.color = '#ede215'
+                  penStore.colors.forEach((el) => el.classList.remove('active'))
+                  document
+                    .getElementById('pen-color-yellow')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'command+5':
+                case 'ctrl+5': {
+                  penStore.drauu.brush.color = '#30bd20'
+                  penStore.colors.forEach((el) => el.classList.remove('active'))
+                  document
+                    .getElementById('pen-color-green')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'command+6':
+                case 'ctrl+6': {
+                  penStore.drauu.brush.color = '#2656bf'
+                  penStore.colors.forEach((el) => el.classList.remove('active'))
+                  document
+                    .getElementById('pen-color-blue')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'command+7':
+                case 'ctrl+7': {
+                  penStore.drauu.brush.color = '#c24aed'
+                  penStore.colors.forEach((el) => el.classList.remove('active'))
+                  document
+                    .getElementById('pen-color-purple')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'command+8':
+                case 'ctrl+8': {
+                  penStore.drauu.brush.color = '#bf6b26'
+                  penStore.colors.forEach((el) => el.classList.remove('active'))
+                  document
+                    .getElementById('pen-color-brown')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'command+9':
+                case 'ctrl+9': {
+                  const penLayerEl = document.getElementById('pen-mode-layer')
+                  penStore.bgColors.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+                  if (penLayerEl?.classList.contains('background-white')) {
+                    penLayerEl.classList.remove('background-white')
+                    penLayerEl.classList.remove('background-black')
+                  } else if (
+                    penLayerEl?.classList.contains('background-black')
+                  ) {
+                    penLayerEl.classList.remove('background-black')
+                    penLayerEl?.classList.add('background-white')
+                    document.getElementById('bg-white')?.classList.add('active')
+                  } else {
+                    penLayerEl?.classList.add('background-white')
+                    document.getElementById('bg-white')?.classList.add('active')
+                  }
+                  return false
+                }
+
+                case 'command+0':
+                case 'ctrl+0': {
+                  const penLayerEl = document.getElementById('pen-mode-layer')
+                  penStore.bgColors.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+
+                  if (penLayerEl?.classList.contains('background-black')) {
+                    penLayerEl.classList.remove('background-white')
+                    penLayerEl.classList.remove('background-black')
+                  } else if (
+                    penLayerEl?.classList.contains('background-white')
+                  ) {
+                    penLayerEl.classList.remove('background-white')
+                    penLayerEl?.classList.add('background-black')
+                    document.getElementById('bg-black')?.classList.add('active')
+                  } else {
+                    penLayerEl?.classList.add('background-black')
+                    document.getElementById('bg-black')?.classList.add('active')
+                  }
+                  return false
+                }
+
+                case 'ctrl+z':
+                case 'command+z': {
+                  penStore.drauu.undo()
+                  return false
+                }
+
+                case 'ctrl+shift+z':
+                case 'command+shift+z': {
+                  penStore.drauu.redo()
+                  return false
+                }
+
+                case 'd': {
+                  penStore.drauu.mode = 'draw'
+                  penStore.modes.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+                  document.getElementById('m-draw')?.classList.add('active')
+                  return false
+                }
+
+                case 's': {
+                  penStore.drauu.mode = 'stylus'
+                  penStore.modes.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+                  document.getElementById('m-stylus')?.classList.add('active')
+                  return false
+                }
+
+                case 'r': {
+                  penStore.drauu.mode = 'rectangle'
+                  penStore.modes.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+                  document
+                    .getElementById('m-rectangle')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'e': {
+                  penStore.drauu.mode = 'eraseLine'
+                  penStore.modes.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+                  document
+                    .getElementById('m-eraseLine')
+                    ?.classList.add('active')
+                  return false
+                }
+
+                case 'o': {
+                  penStore.drauu.mode = 'ellipse'
+                  penStore.modes.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+                  document.getElementById('m-ellipse')?.classList.add('active')
+                  return false
+                }
+
+                case 'a': {
+                  penStore.drauu.mode = 'line'
+                  penStore.modes.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+                  document.getElementById('m-arrow')?.classList.add('active')
+                  return false
+                }
+
+                case 'f': {
+                  penStore.drauu.mode = 'line'
+                  penStore.modes.forEach(({ el }) =>
+                    el.classList.remove('active')
+                  )
+                  document.getElementById('m-line')?.classList.add('active')
+                  return false
+                }
+
+                case 'alt+=': {
+                  //
+                  return false
+                }
+
+                case 'c': {
+                  penStore.drauu.clear()
+                  return false
+                }
+              }
+            }
+          }
+        )
+
+        // markmap shortcuts
         hotkeys('.', function () {
           // @ts-ignore
           const root = window.root
@@ -765,7 +1007,7 @@ async function main() {
           return false
         })
         hotkeys(
-          'up,down,left,right,esc,space,z,r,h,j,k,l,n,p,b,q,-,=,0,9,1,2,3,4,5,/',
+          'up,down,left,right,esc,space,`,r,h,j,k,l,n,p,ctrl+b,command+b,q,-,=,0,9,1,2,3,4,5,/',
           // @ts-ignore
           async function (event, handler) {
             const helpStore = useHelp()
@@ -899,12 +1141,13 @@ async function main() {
               case '-': // -
                 await mm.rescale(0.8)
                 break
-              case 'z':
+              case 'ctrl+b':
+              case 'command+b':
                 // eslint-disable-next-line no-case-declarations
                 const elResetButton = document.getElementById('reset-button')
                 eventFire(elResetButton, 'click')
                 break
-              case 'r':
+              case '`':
                 // eslint-disable-next-line no-case-declarations
                 const elRandomButton = document.getElementById('random-button')
                 eventFire(elRandomButton, 'click')

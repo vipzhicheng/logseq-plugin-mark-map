@@ -9,5 +9,6 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     Help: typeof import('./src/components/Help.vue')['default']
     Markmap: typeof import('./src/components/Markmap.vue')['default']
+    Pen: typeof import('./src/components/Pen.vue')['default']
   }
 }

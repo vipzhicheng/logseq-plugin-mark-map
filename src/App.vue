@@ -10,6 +10,7 @@ const markmapStore = useMarkmap()
   >
     <Markmap />
     <Help />
+    <Pen />
   </div>
 </template>
 

@@ -5,3 +5,23 @@
 .katex-html {
   margin-top: -15px;
 }
+
+.pen-button {
+  @apply !outline-none w-8 h-8;
+
+  &.active {
+    @apply bg-gray-100 rounded;
+  }
+
+  &:hover {
+    @apply bg-gray-100 rounded;
+  }
+}
+
+.background-white {
+  @apply bg-gray-200;
+}
+
+.background-black {
+  @apply bg-gray-700;
+}
