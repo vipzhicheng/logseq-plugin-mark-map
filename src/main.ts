@@ -77,6 +77,14 @@ const defineSettings: SettingSchemaDesc[] = [
     default: true,
   },
   {
+    title: 'Enable replace Latex math expression',
+    key: 'replaceLatexMathExpressionEnabled',
+    description:
+      'Enable replace Latex math expression to make more math expression work on markmap.',
+    type: 'boolean',
+    default: false,
+  },
+  {
     title: 'Sync Collapsed State',
     key: 'syncCollapsedState',
     description: 'Sync Logseq blocks collapsed state to markmap.',

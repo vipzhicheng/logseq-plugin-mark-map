@@ -300,6 +300,11 @@ export const parseBlockContent = async (
   // transform cloze to it's answer
   topic = topic.replace(/(?<!`){{cloze\s+(.*?)\s*}}(?!`)/g, '$1')
 
+  if (logseq.settings?.replaceLatexMathExpressionEnabled) {
+    topic = topic.replace(/\\begin\{equation\}/gm, '$$$$')
+    topic = topic.replace(/\\end\{equation\}/gm, '$$$$')
+  }
+
   // Process page tag
   const regexPageTag = /\s+#([^#\s()]+)/gi
   if (regexPageTag.test(topic)) {
