@@ -518,14 +518,15 @@ async function main() {
       return newBlocks
     }
 
+    console.log('title', title)
     let md =
       '- ' +
       (renderAsBlock && logseq.settings.nodeAnchorEnabled
         ? `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
         : '') +
-      title.trim() +
-      '\n\n' +
-      (await walkTransformBlocks(filteredBlocks, 0, config)).join('\n')
+        title +
+      '\n' +
+      ((await walkTransformBlocks(filteredBlocks, 0, config)).join('\n'))
     md = md.replace(
       /(!\[.*?\]\(.*?\))\{(:[a-z0-9 ]+(, )?)+\}/gi,
       (match, p1) => {
