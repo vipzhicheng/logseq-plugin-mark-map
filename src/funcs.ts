@@ -463,13 +463,17 @@ export const parseBlockContent = async (
   }
 
   // Optimize code block
-  if (topic.indexOf('```') === 0) {
-    topic =
-      '\n\n  -\n' +
-      topic
-        .split('\n')
-        .map((line) => '    ' + line)
-        .join('\n')
+  // case 1, block is all about code, put the code block to next level
+  if (topic.indexOf('```') === 0 && !logseq.settings.nodeAnchorEnabled) {
+    topic = topic
+      .split('\n')
+      .map((line, index) => (index > 0 ? '  ' : '') + line)
+      .join('\n')
+  } else if (topic.indexOf('```') > -1) {
+    topic = topic
+      .split('\n')
+      .map((line, index) => (index > 0 ? '      ' : '') + line)
+      .join('\n')
   }
 
   return topic

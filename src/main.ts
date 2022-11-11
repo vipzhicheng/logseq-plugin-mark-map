@@ -544,9 +544,7 @@ async function main() {
     // eslint-disable-next-line prefer-const
     let { root, features } = transformer.transform(md.trim())
 
-    // if (!root.content && title) {
-    //   root.content = title
-    // }
+    console.log('md', md)
 
     // @ts-ignore
     root.properties = page && page.properties ? page.properties : {}
