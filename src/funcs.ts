@@ -462,18 +462,20 @@ export const parseBlockContent = async (
     )}; background-color:${properties.backgroundColor};">${topic}</span>`
   }
 
-  // Optimize code block
-  // case 1, block is all about code, put the code block to next level
-  if (topic.indexOf('```') === 0 && !logseq.settings.nodeAnchorEnabled) {
-    topic = topic
-      .split('\n')
-      .map((line, index) => (index > 0 ? '  ' : '') + line)
-      .join('\n')
-  } else if (topic.indexOf('```') > -1) {
-    topic = topic
-      .split('\n')
-      .map((line, index) => (index > 0 ? '      ' : '') + line)
-      .join('\n')
+  if (topic.indexOf('```') > -1) {
+    topic =
+      '\n\n' +
+      topic
+        .split(/(```[\d\D]*?```)/gm)
+        .filter((splited) => splited)
+        .map((part) => {
+          if (part.indexOf('```') === 0) {
+            return '  -\n' + addPrefixToMultipleLinesBlock('    ', part.trim())
+          } else {
+            return addPrefixToMultipleLinesBlock('  ', '- ' + part.trim())
+          }
+        })
+        .join('\n')
   }
 
   return topic
@@ -508,4 +510,16 @@ export const pickTextColorBasedOnBgColorSimple = function (
 ) {
   const [r, g, b] = rgb
   return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? darkColor : lightColor
+}
+
+export const addPrefixToMultipleLinesBlock = (
+  prefix: string,
+  topic: string
+) => {
+  return topic
+    .split('\n')
+    .map((line) => {
+      return prefix + line
+    })
+    .join('\n')
 }

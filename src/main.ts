@@ -21,6 +21,7 @@ import { useMarkmap } from '@/stores/markmap'
 import { createApp } from 'vue'
 import App from './App.vue'
 import {
+  addPrefixToMultipleLinesBlock,
   addToolbar,
   closeButtonHandler,
   eventFire,
@@ -477,15 +478,6 @@ async function main() {
 
     filteredBlocks = walkTransformBlocksLimit(filteredBlocks)
 
-    const addPrefixToMultipleLinesBlock = (prefix, topic) => {
-      return topic
-        .split('\n')
-        .map((line) => {
-          return prefix + line
-        })
-        .join('\n')
-    }
-
     // iterate blocks
     const walkTransformBlocks = async (
       blocks: any,
@@ -516,7 +508,7 @@ async function main() {
 
         if (children && (it['collapsed?'] !== true || collapsed !== 'hidden')) {
           ret +=
-            '\n' +
+            '\n\n' +
             (await walkTransformBlocks(children, depth + 1, config)).join('\n')
         }
 
@@ -529,9 +521,9 @@ async function main() {
     let md =
       '- ' +
       (renderAsBlock && logseq.settings.nodeAnchorEnabled
-        ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
+        ? `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
         : '') +
-      title +
+      title.trim() +
       '\n\n' +
       (await walkTransformBlocks(filteredBlocks, 0, config)).join('\n')
     md = md.replace(
@@ -553,7 +545,8 @@ async function main() {
     const walkTransformRoot = (parent, blocks) => {
       if (parent.children) {
         for (const i in parent.children) {
-          parent.children[i].properties = blocks[i]?.properties || {}
+          parent.children[i].properties =
+            (blocks && blocks[i]?.properties) || {}
           parent.children[i]['collapsed?'] =
             (blocks && blocks[i] && blocks[i]['collapsed?']) || false
           if (
@@ -567,7 +560,10 @@ async function main() {
             }
           }
 
-          walkTransformRoot(parent?.children[i], blocks[i]?.children || [])
+          walkTransformRoot(
+            parent?.children[i],
+            (blocks && blocks[i]?.children) || []
+          )
         }
       }
     }
