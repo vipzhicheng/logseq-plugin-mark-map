@@ -518,7 +518,6 @@ async function main() {
       return newBlocks
     }
 
-    console.log('title', title)
     let md =
       '- ' +
       (renderAsBlock && logseq.settings.nodeAnchorEnabled
@@ -536,8 +535,6 @@ async function main() {
 
     // eslint-disable-next-line prefer-const
     let { root, features } = transformer.transform(md.trim())
-
-    console.log('md', md)
 
     // @ts-ignore
     root.properties = page && page.properties ? page.properties : {}
