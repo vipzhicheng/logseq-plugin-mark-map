@@ -523,9 +523,9 @@ async function main() {
       (renderAsBlock && logseq.settings.nodeAnchorEnabled
         ? `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
         : '') +
-        title +
-      '\n' +
-      ((await walkTransformBlocks(filteredBlocks, 0, config)).join('\n'))
+      title +
+      '\n\n' +
+      (await walkTransformBlocks(filteredBlocks, 0, config)).join('\n')
     md = md.replace(
       /(!\[.*?\]\(.*?\))\{(:[a-z0-9 ]+(, )?)+\}/gi,
       (match, p1) => {
