@@ -14,7 +14,7 @@ import 'lightbox2/dist/css/lightbox.min.css'
 import { INode } from 'markmap-common'
 import { Transformer } from 'markmap-lib'
 import * as markmap from 'markmap-view'
-import { Markmap } from 'markmap-view'
+import { Markmap, deriveOptions } from 'markmap-view'
 import { createPinia } from 'pinia'
 import { useHelp } from '@/stores/help'
 import { useMarkmap } from '@/stores/markmap'
@@ -91,6 +91,16 @@ const defineSettings: SettingSchemaDesc[] = [
     description: 'Sync Logseq blocks collapsed state to markmap.',
     type: 'boolean',
     default: false,
+  },
+  {
+    title: 'Color Freeze Level',
+    key: 'colorFreezeLevel',
+    description:
+      'From the level you can freeze branches color, 0 means disabled and each branch has random color.',
+    type: 'enum',
+    enumChoices: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+    enumPicker: 'select',
+    default: '0',
   },
 ]
 logseq.useSettingsSchema(defineSettings)
@@ -1005,25 +1015,34 @@ async function main() {
     if (mm) {
       // reuse instance, update data
       showAllWithCollapsed(root)
-      mm.setData(root, {
-        autoFit: logseq.settings?.autofitEnabled,
-        maxWidth: 400,
-        style(id) {
-          return id
-        },
-      })
+      mm.setData(
+        root,
+        Object.assign(
+          deriveOptions({
+            pan: true,
+            maxWidth: 400,
+            colorFreezeLevel: logseq.settings?.colorFreezeLevel,
+          }),
+          {
+            autoFit: logseq.settings?.autofitEnabled,
+          }
+        )
+      )
     } else {
       // initialize instance
       showAllWithCollapsed(root)
       mm = Markmap.create(
         '#markmap',
-        {
-          autoFit: logseq.settings?.autofitEnabled,
-          maxWidth: 400,
-          style(id) {
-            return id
-          },
-        },
+        Object.assign(
+          deriveOptions({
+            pan: true,
+            maxWidth: 400,
+            colorFreezeLevel: logseq.settings?.colorFreezeLevel,
+          }),
+          {
+            autoFit: logseq.settings?.autofitEnabled,
+          }
+        ),
         root
       )
 

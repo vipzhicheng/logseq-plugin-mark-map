@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.7
+
+- feat: support color freeze level feature.
+
 ## 0.3.6
 
 - fix: continue to optimize code block render logic
