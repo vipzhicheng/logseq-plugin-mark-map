@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.8
+
+- fix: color freeze level default value.
+
 ## 0.3.7
 
 - feat: support color freeze level feature.

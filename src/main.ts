@@ -1021,7 +1021,7 @@ async function main() {
           deriveOptions({
             pan: true,
             maxWidth: 400,
-            colorFreezeLevel: logseq.settings?.colorFreezeLevel,
+            colorFreezeLevel: parseInt(logseq.settings?.colorFreezeLevel),
           }),
           {
             autoFit: logseq.settings?.autofitEnabled,
@@ -1037,7 +1037,7 @@ async function main() {
           deriveOptions({
             pan: true,
             maxWidth: 400,
-            colorFreezeLevel: logseq.settings?.colorFreezeLevel,
+            colorFreezeLevel: parseInt(logseq.settings?.colorFreezeLevel),
           }),
           {
             autoFit: logseq.settings?.autofitEnabled,
