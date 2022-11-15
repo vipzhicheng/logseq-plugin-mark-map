@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## 0.3.8
+
+- fix: color freeze level default value.
+
+## 0.3.7
+
+- feat: support color freeze level feature.
+
+## 0.3.6
+
+- fix: continue to optimize code block render logic
+
+## 0.3.5
+
+- fix: continue to optimize code block render logic
+
+## 0.3.4
+
+- fix: code block render logic
+
+## 0.3.3
+
+- feat: add an option to replace complicated math expression for compatability.
+
 ## 0.3.2
 
 - feat: add autofit option, default is enabled, but you can disable it now.

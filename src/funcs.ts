@@ -300,6 +300,11 @@ export const parseBlockContent = async (
   // transform cloze to it's answer
   topic = topic.replace(/(?<!`){{cloze\s+(.*?)\s*}}(?!`)/g, '$1')
 
+  if (logseq.settings?.replaceLatexMathExpressionEnabled) {
+    topic = topic.replace(/\\begin\{equation\}/gm, '$$$$')
+    topic = topic.replace(/\\end\{equation\}/gm, '$$$$')
+  }
+
   // Process page tag
   const regexPageTag = /\s+#([^#\s()]+)/gi
   if (regexPageTag.test(topic)) {
@@ -457,9 +462,20 @@ export const parseBlockContent = async (
     )}; background-color:${properties.backgroundColor};">${topic}</span>`
   }
 
-  // Optimize code block
-  if (topic.indexOf('```') === 0 || topic.indexOf('- ') === 0) {
-    topic = '\n' + topic
+  if (topic.indexOf('```') > -1) {
+    topic =
+      '\n\n' +
+      topic
+        .split(/(```[\d\D]*?```)/gm)
+        .filter((splited) => splited)
+        .map((part) => {
+          if (part.indexOf('```') === 0) {
+            return '  -\n' + addPrefixToMultipleLinesBlock('    ', part.trim())
+          } else {
+            return addPrefixToMultipleLinesBlock('  ', '- ' + part.trim())
+          }
+        })
+        .join('\n')
   }
 
   return topic
@@ -494,4 +510,16 @@ export const pickTextColorBasedOnBgColorSimple = function (
 ) {
   const [r, g, b] = rgb
   return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? darkColor : lightColor
+}
+
+export const addPrefixToMultipleLinesBlock = (
+  prefix: string,
+  topic: string
+) => {
+  return topic
+    .split('\n')
+    .map((line) => {
+      return prefix + line
+    })
+    .join('\n')
 }

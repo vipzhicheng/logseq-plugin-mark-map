@@ -14,7 +14,7 @@ import 'lightbox2/dist/css/lightbox.min.css'
 import { INode } from 'markmap-common'
 import { Transformer } from 'markmap-lib'
 import * as markmap from 'markmap-view'
-import { Markmap } from 'markmap-view'
+import { Markmap, deriveOptions } from 'markmap-view'
 import { createPinia } from 'pinia'
 import { useHelp } from '@/stores/help'
 import { useMarkmap } from '@/stores/markmap'
@@ -22,6 +22,7 @@ import { usePen } from '@/stores/pen'
 import { createApp } from 'vue'
 import App from './App.vue'
 import {
+  addPrefixToMultipleLinesBlock,
   addToolbar,
   closeButtonHandler,
   eventFire,
@@ -78,11 +79,29 @@ const defineSettings: SettingSchemaDesc[] = [
     default: true,
   },
   {
+    title: 'Enable replace Latex math expression',
+    key: 'replaceLatexMathExpressionEnabled',
+    description:
+      'Enable replace Latex math expression to make more math expression work on markmap.',
+    type: 'boolean',
+    default: false,
+  },
+  {
     title: 'Sync Collapsed State',
     key: 'syncCollapsedState',
     description: 'Sync Logseq blocks collapsed state to markmap.',
     type: 'boolean',
     default: false,
+  },
+  {
+    title: 'Color Freeze Level',
+    key: 'colorFreezeLevel',
+    description:
+      'From the level you can freeze branches color, 0 means disabled and each branch has random color.',
+    type: 'enum',
+    enumChoices: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+    enumPicker: 'select',
+    default: '0',
   },
 ]
 logseq.useSettingsSchema(defineSettings)
@@ -497,17 +516,16 @@ async function main() {
         const topic = await parseBlockContent(content, properties, config)
 
         // Add leading syntax according to depth.
-        let ret =
-          // for valid markdown, it can have at most head#6 (######)
-          `${' '.repeat((depth + 1) * 2)} -` + // use nested list to create branches more than 6 levels.
+        let ret = addPrefixToMultipleLinesBlock(
+          `${' '.repeat((depth + 1) * 2)}`,
           (logseq.settings?.nodeAnchorEnabled && page
-            ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">🟢</a> `
-            : ' ') +
-          (topic.startsWith('\n- ') ? topic.substring(3) : topic)
+            ? `- <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">🟢</a> `
+            : '- ') + topic
+        )
 
         if (children && (it['collapsed?'] !== true || collapsed !== 'hidden')) {
           ret +=
-            '\n' +
+            '\n\n' +
             (await walkTransformBlocks(children, depth + 1, config)).join('\n')
         }
 
@@ -520,7 +538,7 @@ async function main() {
     let md =
       '- ' +
       (renderAsBlock && logseq.settings.nodeAnchorEnabled
-        ? ` <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
+        ? `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
         : '') +
       title +
       '\n\n' +
@@ -533,7 +551,7 @@ async function main() {
     ) // remove image size
 
     // eslint-disable-next-line prefer-const
-    let { root, features } = transformer.transform(md)
+    let { root, features } = transformer.transform(md.trim())
 
     // @ts-ignore
     root.properties = page && page.properties ? page.properties : {}
@@ -542,7 +560,8 @@ async function main() {
     const walkTransformRoot = (parent, blocks) => {
       if (parent.children) {
         for (const i in parent.children) {
-          parent.children[i].properties = blocks[i]?.properties || {}
+          parent.children[i].properties =
+            (blocks && blocks[i]?.properties) || {}
           parent.children[i]['collapsed?'] =
             (blocks && blocks[i] && blocks[i]['collapsed?']) || false
           if (
@@ -556,7 +575,10 @@ async function main() {
             }
           }
 
-          walkTransformRoot(parent?.children[i], blocks[i]?.children || [])
+          walkTransformRoot(
+            parent?.children[i],
+            (blocks && blocks[i]?.children) || []
+          )
         }
       }
     }
@@ -1236,25 +1258,34 @@ async function main() {
     if (mm) {
       // reuse instance, update data
       showAllWithCollapsed(root)
-      mm.setData(root, {
-        autoFit: logseq.settings?.autofitEnabled,
-        maxWidth: 400,
-        style(id) {
-          return id
-        },
-      })
+      mm.setData(
+        root,
+        Object.assign(
+          deriveOptions({
+            pan: true,
+            maxWidth: 400,
+            colorFreezeLevel: parseInt(logseq.settings?.colorFreezeLevel),
+          }),
+          {
+            autoFit: logseq.settings?.autofitEnabled,
+          }
+        )
+      )
     } else {
       // initialize instance
       showAllWithCollapsed(root)
       mm = Markmap.create(
         '#markmap',
-        {
-          autoFit: logseq.settings?.autofitEnabled,
-          maxWidth: 400,
-          style(id) {
-            return id
-          },
-        },
+        Object.assign(
+          deriveOptions({
+            pan: true,
+            maxWidth: 400,
+            colorFreezeLevel: parseInt(logseq.settings?.colorFreezeLevel),
+          }),
+          {
+            autoFit: logseq.settings?.autofitEnabled,
+          }
+        ),
         root
       )
 
