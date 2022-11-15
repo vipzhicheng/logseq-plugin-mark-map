@@ -773,7 +773,10 @@ async function main() {
       if (hotkeys) {
         // Pen shortcuts
         hotkeys(
-          'ctrl+p, command+p, ctrl+z, command+z, ctrl+shift+z, command+shift+z,d,f,s,r,e,o,a,c,ctrl+1,command+1,ctrl+2,command+2,ctrl+3,command+3,ctrl+4,command+4,ctrl+5,command+5,ctrl+6,command+6,ctrl+7,command+7,ctrl+8,command+8,ctrl+9,command+9,ctrl+0,command+0,alt+=,alt+-',
+          `ctrl+p, command+p, ctrl+z, command+z, ctrl+shift+z, command+shift+z,d,f,s,r,e,o,a,c,
+          ctrl+1,command+1,ctrl+2,command+2,ctrl+3,command+3,ctrl+4,command+4,ctrl+5,command+5,ctrl+6,command+6,ctrl+7,command+7,ctrl+8,command+8,ctrl+9,command+9,ctrl+0,command+0,
+          ctrl+alt+1,command+alt+1, ctrl+alt+2,command+alt+2, ctrl+alt+3,command+alt+3,
+          alt+=,alt+-`,
           function (event, handler) {
             const penStore = usePen()
 
@@ -992,7 +995,58 @@ async function main() {
                 }
 
                 case 'alt+=': {
-                  //
+                  const sizeEl = document.getElementById(
+                    'size'
+                  )! as HTMLInputElement
+                  penStore.drauu.brush.size = Math.min(
+                    10,
+                    penStore.drauu.brush.size + 0.5
+                  )
+                  sizeEl.value = `${penStore.drauu.brush.size}`
+                  sizeEl.blur()
+                  return false
+                }
+
+                case 'alt+-': {
+                  const sizeEl = document.getElementById(
+                    'size'
+                  )! as HTMLInputElement
+                  penStore.drauu.brush.size = Math.max(
+                    1,
+                    penStore.drauu.brush.size - 0.5
+                  )
+                  sizeEl.value = `${penStore.drauu.brush.size}`
+                  sizeEl.blur()
+                  return false
+                }
+
+                case 'ctrl+alt+1':
+                case 'command+alt+1': {
+                  penStore.lines.forEach(({ el }) => {
+                    el.classList.remove('active')
+                  })
+                  document.getElementById('l-solid')!.classList.add('active')
+                  penStore.drauu.brush.dasharray = undefined
+                  return false
+                }
+
+                case 'ctrl+alt+2':
+                case 'command+alt+2': {
+                  penStore.lines.forEach(({ el }) => {
+                    el.classList.remove('active')
+                  })
+                  document.getElementById('l-dashed')!.classList.add('active')
+                  penStore.drauu.brush.dasharray = '4'
+                  return false
+                }
+
+                case 'ctrl+alt+3':
+                case 'command+alt+3': {
+                  penStore.lines.forEach(({ el }) => {
+                    el.classList.remove('active')
+                  })
+                  document.getElementById('l-dotted')!.classList.add('active')
+                  penStore.drauu.brush.dasharray = '1 7'
                   return false
                 }
 
