@@ -25,6 +25,7 @@
     "d3": "^7.6.1",
     "date-fns": "^2.29.3",
     "drauu": "^0.3.2",
+    "element-plus": "^2.2.21",
     "hotkeys-js": "^3.10.0",
     "html2canvas": "^1.4.1",
     "is-uuid": "^1.0.2",

@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 // import cdnExternals from 'vite-plugin-cdn-externals'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import path from 'path'
 
 export default defineConfig({
@@ -41,10 +42,10 @@ export default defineConfig({
         /\.vue\?vue/, // .vue
       ],
       imports: ['vue'],
-      resolvers: [],
+      resolvers: [ElementPlusResolver()],
     }),
     Components({
-      resolvers: [],
+      resolvers: [ElementPlusResolver()],
     }),
   ],
 })
