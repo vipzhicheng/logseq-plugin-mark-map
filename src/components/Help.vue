@@ -2,6 +2,10 @@
 import { useHelp } from '@/stores/help'
 const helpStore = useHelp()
 let dialogVisible = true
+
+const handleClose = () => {
+  helpStore.visible = false
+}
 </script>
 <template>
   <div
@@ -15,23 +19,31 @@ let dialogVisible = true
 
     <el-dialog
       v-model="helpStore.visible"
-      title="Tips"
-      width="30%"
+      title="Key bindings"
+      width="70%"
       :before-close="handleClose"
     >
       <span>This is a message</span>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="helpStore.visible = false">Cancel</el-button>
-          <el-button
-            class="bg-blue-500"
-            type="primary"
-            @click="helpStore.visible = false"
-          >
-            Confirm
-          </el-button>
-        </span>
-      </template>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex flex-col bg-blue-200">
+          <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+          </ul>
+        </div>
+        <div class="flex flex-col bg-blue-200">
+          <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+          </ul>
+        </div>
+      </div>
     </el-dialog>
   </div>
 </template>
