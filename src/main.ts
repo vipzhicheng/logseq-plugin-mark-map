@@ -773,7 +773,7 @@ async function main() {
       if (hotkeys) {
         // Pen shortcuts
         hotkeys(
-          `ctrl+p, command+p, ctrl+z, command+z, ctrl+shift+z, command+shift+z,d,f,s,r,e,o,a,c,
+          `ctrl+p, command+p, ctrl+z, command+z, ctrl+shift+z, command+shift+z,d,f,s,r,e,t,a,c,
           ctrl+1,command+1,ctrl+2,command+2,ctrl+3,command+3,ctrl+4,command+4,ctrl+5,command+5,ctrl+6,command+6,ctrl+7,command+7,ctrl+8,command+8,ctrl+9,command+9,ctrl+0,command+0,
           ctrl+alt+1,command+alt+1, ctrl+alt+2,command+alt+2, ctrl+alt+3,command+alt+3,
           alt+=,alt+-`,
@@ -967,7 +967,7 @@ async function main() {
                   return false
                 }
 
-                case 'o': {
+                case 't': {
                   penStore.drauu.mode = 'ellipse'
                   penStore.modes.forEach(({ el }) =>
                     el.classList.remove('active')
@@ -978,6 +978,7 @@ async function main() {
 
                 case 'a': {
                   penStore.drauu.mode = 'line'
+                  penStore.drauu.brush.arrowEnd = true
                   penStore.modes.forEach(({ el }) =>
                     el.classList.remove('active')
                   )
@@ -987,6 +988,7 @@ async function main() {
 
                 case 'f': {
                   penStore.drauu.mode = 'line'
+                  penStore.drauu.brush.arrowEnd = false
                   penStore.modes.forEach(({ el }) =>
                     el.classList.remove('active')
                   )
