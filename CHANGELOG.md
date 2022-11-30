@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.9
+
+- feat: add pen mode for presentation.
+
 ## 0.3.8
 
 - fix: color freeze level default value.

@@ -255,7 +255,7 @@ const markmapShortcuts = [
           <div class="mb-2 text-gray-900">
             Using shortcuts, you can fine-grained control the mindmap.
           </div>
-          <div class="p-3">
+          <div class="p-3 h-[600px] overflow-y-auto">
             <div class="grid grid-cols-2 gap-4">
               <table class="table-auto">
                 <thead
