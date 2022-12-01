@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.10
+
+- feat: add pen mode icon.
+
 ## 0.3.9
 
 - feat: add pen mode for presentation.
