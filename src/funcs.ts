@@ -5,7 +5,7 @@ import org from 'org'
 import replaceAsync from 'string-replace-async'
 import ellipsis from 'text-ellipsis'
 import TurndownService from 'turndown'
-
+import { usePen } from '@/stores/pen'
 import { useHelp } from '@/stores/help'
 
 const settingsVersion = 'v3'
@@ -91,8 +91,27 @@ const getSVGContent = (svg: SVGElement): string => {
 // Customize toolbar
 export function addToolbar(mm) {
   const toolbar = new Toolbar()
-  toolbar.setItems(['zoomIn', 'zoomOut', 'fit', 'save-png', 'save-svg', 'help'])
+  toolbar.setItems([
+    'zoomIn',
+    'zoomOut',
+    'fit',
+    'pen',
+    'save-png',
+    'save-svg',
+    'help',
+  ])
   toolbar.setBrand(false)
+  toolbar.register({
+    id: 'pen',
+    title: 'Open pen mode',
+    content: Toolbar.icon(
+      'M12.9 6.858l4.242 4.243L7.242 21H3v-4.243l9.9-9.9zm1.414-1.414l2.121-2.122a1 1 0 0 1 1.414 0l2.829 2.829a1 1 0 0 1 0 1.414l-2.122 2.121-4.242-4.242z'
+    ),
+    onClick: async () => {
+      const penStore = usePen()
+      penStore.toggle()
+    },
+  })
   toolbar.register({
     id: 'save-png',
     title: 'Save as png',
@@ -179,6 +198,9 @@ export function addToolbar(mm) {
   el.style.position = 'absolute'
   el.style.bottom = '0.5rem'
   el.style.right = '0.5rem'
+  el.style.display = 'flex'
+  el.style.flexDirection = 'column'
+  el.style.rowGap = '2px'
   document.getElementById('markmap-toolbar')?.append(el)
 }
 

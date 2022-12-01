@@ -56,6 +56,7 @@ Most of features come from `Markmap` project.
 - Support open next markmap in markmap.
 - Support node anchor to pick sub tree as the next markmap.
 - Support export as PNG and SVG.
+- Support pen mode, so you can draw on markmap.
 
 ## Notes
 
@@ -67,6 +68,10 @@ Most of features come from `Markmap` project.
 - Tested on Logseq `v0.6.5`.
 
 ## Shortcuts
+
+There are so many shortcuts for each action.
+
+### Markmap related
 
 - `space`: fit window in center in case you move or zoom it.
 - `0`: hide all except the central one.
@@ -87,8 +92,8 @@ Most of features come from `Markmap` project.
 - `,`: reset to original tree.
 - `n`: focus to next sibling.
 - `p`: focus to previous sibling.
-- `r`: random change theme.
-- `z`: reset theme according to Logseq theme.
+- <code>`</code>: random change theme.
+- `mod+b`: reset theme according to Logseq theme.
 - `ESC` & `q`: close the mindmap.
 - `UP`: move mindmap up.
 - `DOWN`: move mindmap down.
