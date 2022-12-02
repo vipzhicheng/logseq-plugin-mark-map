@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.11
+
+- fix: footnote messed up markmap
+- feat: node anchor changable
+
 ## 0.3.10
 
 - feat: add pen mode icon.

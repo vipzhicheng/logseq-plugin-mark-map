@@ -72,6 +72,13 @@ const defineSettings: SettingSchemaDesc[] = [
     default: false,
   },
   {
+    title: 'Node Anchor Icon',
+    key: 'nodeAnchorIcon',
+    description: 'Use your favorate anchor icon',
+    type: 'string',
+    default: '🟢',
+  },
+  {
     title: 'Enable Autofit',
     key: 'autofitEnabled',
     description: 'With autofit, markmap always fit to the window.',
@@ -519,7 +526,9 @@ async function main() {
         let ret = addPrefixToMultipleLinesBlock(
           `${' '.repeat((depth + 1) * 2)}`,
           (logseq.settings?.nodeAnchorEnabled && page
-            ? `- <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">🟢</a> `
+            ? `- <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">${
+                logseq.settings?.nodeAnchorIcon || '🟢'
+              }</a> `
             : '- ') + topic
         )
 

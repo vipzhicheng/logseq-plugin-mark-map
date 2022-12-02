@@ -470,12 +470,14 @@ export const parseBlockContent = async (
   topic = topic.replace(regexUrl, '<$1>') // add <> to all links that followed by blank, means not markdown link
   topic = topic.replace(regexUrlMatchStartEnd, '<$1>') // add <> to all pure link block
 
+  // Cut block content
   if (properties?.markMapCut) {
     const orgTopic = topic
     topic = ellipsis(topic, parseInt(properties?.markMapCut))
     topic = `<span style="cursor:pointer" title="${orgTopic}">${topic}</span>`
   }
 
+  // Sync Logseq block groundcolor
   if (properties?.backgroundColor) {
     topic = `<span style="padding: 2px 6px; color: ${pickTextColorBasedOnBgColorSimple(
       hexToRgb(properties.backgroundColor),
@@ -484,6 +486,7 @@ export const parseBlockContent = async (
     )}; background-color:${properties.backgroundColor};">${topic}</span>`
   }
 
+  // Add prefix to code block
   if (topic.indexOf('```') > -1) {
     topic =
       '\n\n' +
@@ -498,6 +501,11 @@ export const parseBlockContent = async (
           }
         })
         .join('\n')
+  }
+
+  // Support markdown footnote
+  if (/\[\^(.*?)\]/.test(topic)) {
+    topic = topic.replace(/\[\^(.*?)\]/g, '［^$1］')
   }
 
   return topic
