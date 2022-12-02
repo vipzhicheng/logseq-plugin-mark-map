@@ -3,7 +3,7 @@
 ## 0.3.11
 
 - fix: footnote messed up markmap
-- feat: node anchor changable
+- feat: node anchor icon changable
 
 ## 0.3.10
 
