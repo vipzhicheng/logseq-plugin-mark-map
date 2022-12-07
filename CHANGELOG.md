@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.12
+
+- feat: add favoriates and recent to default markmap
+
 ## 0.3.11
 
 - fix: footnote messed up markmap

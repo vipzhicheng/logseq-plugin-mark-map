@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@logseq/libs': ^0.0.10
+  '@logseq/libs': ^0.0.12
   '@types/node': ^18.11.9
   '@typescript-eslint/eslint-plugin': ^5.44.0
   '@typescript-eslint/parser': ^5.44.0
@@ -41,7 +41,7 @@ specifiers:
   vue: ^3.2.45
 
 dependencies:
-  '@logseq/libs': 0.0.10
+  '@logseq/libs': 0.0.12
   alpinejs: 3.10.5
   cheerio: 1.0.0-rc.12
   d3: 7.6.1
@@ -219,8 +219,8 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
-  /@logseq/libs/0.0.10:
-    resolution: {integrity: sha512-Ah5wAhLcgrlOtk/9nEe11UsqOzvpcEaEWDV+oFD3TIGTeP4mfv2HjDiPYPBGXuMZRgvsW6klQLzzaxMieksXXg==}
+  /@logseq/libs/0.0.12:
+    resolution: {integrity: sha512-Efcb0pUrQUehCMS3qviyd5+g7kBptLM3geXvT07FOdzKsp9nbYT4ge7pMGZnnmzE9CPUTN3KLr6rhkQL2RM92A==}
     dependencies:
       csstype: 3.1.0
       debug: 4.3.4

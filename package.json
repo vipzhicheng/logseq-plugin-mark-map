@@ -19,7 +19,7 @@
     "build": "vite build && cp LICENSE icon.png package.json dist/"
   },
   "dependencies": {
-    "@logseq/libs": "^0.0.10",
+    "@logseq/libs": "^0.0.12",
     "alpinejs": "^3.10.5",
     "cheerio": "^1.0.0-rc.12",
     "d3": "^7.6.1",

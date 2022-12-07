@@ -420,18 +420,44 @@ async function main() {
           },
         ] as BlockEntity[]
 
-        const recentJournals = []
-
-        for (let i = 0; i < 10; i++) {
-          recentJournals.push({
-            content: `[[${format(
-              // new Date(`${year}-${month + 1}-${digit}`),
-              subDays(new Date(), i),
-              config.preferredDateFormat
-            )}]]`,
+        const favorites = []
+        const currentGraphFav = await logseq.App.getCurrentGraphFavorites()
+        for (let i = 0; i < currentGraphFav.length; i++) {
+          favorites.push({
+            content: `[[${currentGraphFav[i]}]]`,
           })
         }
+
+        blocks.push({
+          content: 'Favorites',
+          children: favorites,
+        } as BlockEntity)
+
+        const recents = []
+        const currentGraphRecent = await logseq.App.getCurrentGraphRecent()
+        for (let i = 0; i < currentGraphRecent.length; i++) {
+          recents.push({
+            content: `[[${currentGraphRecent[i]}]]`,
+          })
+        }
+
+        blocks.push({
+          content: 'Recent',
+          children: recents,
+        } as BlockEntity)
+
         if (config.enabledJournals) {
+          const recentJournals = []
+
+          for (let i = 0; i < 10; i++) {
+            recentJournals.push({
+              content: `[[${format(
+                // new Date(`${year}-${month + 1}-${digit}`),
+                subDays(new Date(), i),
+                config.preferredDateFormat
+              )}]]`,
+            })
+          }
           blocks.push({
             content: 'Recent Journals',
             children: recentJournals,

@@ -34,6 +34,10 @@ Load unpack plugin from `dist` directory
 - Vue
 - Markmap related packages
 
+## Version at least
+
+Logseq v0.8.12+
+
 ## Features
 
 Most of features come from `Markmap` project.
