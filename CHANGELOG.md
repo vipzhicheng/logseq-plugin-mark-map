@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.13
+
+- infra: upgrade deps
+
 ## 0.3.12
 
 - feat: add favoriates and recent to default markmap
