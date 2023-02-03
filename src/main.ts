@@ -1120,7 +1120,7 @@ async function main() {
           return false
         })
         hotkeys(
-          'up,down,left,right,esc,space,`,r,h,j,k,l,n,p,ctrl+b,command+b,q,-,=,0,9,1,2,3,4,5,/',
+          'up,down,left,right,esc,space,`,r,h,j,k,l,n,p,b,ctrl+b,command+b,q,-,=,0,9,1,2,3,4,5,/',
           // @ts-ignore
           async function (event, handler) {
             const helpStore = useHelp()

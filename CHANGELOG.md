@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.14
+
+- fix: shortcut `b` not work
+- fix: reset theme not correct
+
 ## 0.3.13
 
 - infra: upgrade deps

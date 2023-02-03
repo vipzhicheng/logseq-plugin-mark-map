@@ -49,8 +49,12 @@ export const useMarkmap = defineStore('markmap', {
     resetTheme() {
       this.manual = false
       this.theme = JSON.parse(localStorage.getItem('theme'))
-      this.front = 'text-gray-900'
-      this.bg = 'bg-gray-100'
+
+      if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
+        if (this.themeMapping[logseq.settings.theme]) {
+          this.setTheme(this.themeMapping[logseq.settings.theme])
+        }
+      }
     },
 
     setTheme(bg) {
