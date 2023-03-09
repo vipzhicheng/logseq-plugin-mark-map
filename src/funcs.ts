@@ -205,30 +205,41 @@ export function addToolbar(mm) {
 }
 
 export const themeWorkflowTag = (str) => {
-  return str.replace(/^(TODO|DOING|DONE|LATER|NOW) /, (match, p1) => {
-    switch (p1) {
-      case 'TODO':
-        return (
-          '<code style="background: #845EC2; color: #eee">' + p1 + '</code> '
-        )
-      case 'DOING':
-        return (
-          '<code style="background: #FF8066; color: #eee">' + p1 + '</code> '
-        )
-      case 'DONE':
-        return (
-          '<code style="background: #008B74; color: #eee">' + p1 + '</code> '
-        )
-      case 'NOW':
-        return (
-          '<code style="background: #006C9A; color: #eee">' + p1 + '</code> '
-        )
-      case 'LATER':
-        return (
-          '<code style="background: #911F27; color: #eee">' + p1 + '</code> '
-        )
+  return str.replace(
+    /^(TODO|DOING|DONE|LATER|NOW|WAITING|CANCELLED) /,
+    (match, p1) => {
+      switch (p1) {
+        case 'TODO':
+          return (
+            '<code style="background: #845EC2; color: #eee">' + p1 + '</code> '
+          )
+        case 'DOING':
+          return (
+            '<code style="background: #FF8066; color: #eee">' + p1 + '</code> '
+          )
+        case 'DONE':
+          return (
+            '<code style="background: #008B74; color: #eee">' + p1 + '</code> '
+          )
+        case 'NOW':
+          return (
+            '<code style="background: #006C9A; color: #eee">' + p1 + '</code> '
+          )
+        case 'LATER':
+          return (
+            '<code style="background: #911F27; color: #eee">' + p1 + '</code> '
+          )
+        case 'WAITING':
+          return (
+            '<code style="background: #3180FF; color: #eee">' + p1 + '</code> '
+          )
+        case 'CANCELLED':
+          return (
+            '<code style="background: #C7C7C7; color: #222">' + p1 + '</code> '
+          )
+      }
     }
-  })
+  )
 }
 
 const blockFilter = (it: any) => {
@@ -278,6 +289,16 @@ export const parseBlockContent = async (
   const regexHashImportant = /#\+BEGIN_IMPORTANT([\s\S]*?)#\+END_IMPORTANT/im
   const regexHashQuote = /#\+BEGIN_QUOTE([\s\S]*?)#\+END_QUOTE/im
   const regexHashCenter = /#\+BEGIN_CENTER([\s\S]*?)#\+END_CENTER/im
+  const regexLogBook = /:LOGBOOK:[\s\S]*?:END:/m
+
+  // remove logbook syntax
+  if (regexLogBook.test(topic)) {
+    topic = topic.replace(regexLogBook, (match, p1) => {
+      console.log('match', match)
+      return ''
+    })
+  }
+
   if (regexHashWarning.test(topic)) {
     topic = topic.replace(regexHashWarning, (match, p1) => {
       return `⚠️ ${p1.trim()}`

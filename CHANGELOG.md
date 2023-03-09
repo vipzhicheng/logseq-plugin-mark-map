@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.15
+
+- fix: style for `WAITING` task and `CANCELLED` task
+- fix: clean logbook syntax
+
 ## 0.3.14
 
 - fix: shortcut `b` not work
