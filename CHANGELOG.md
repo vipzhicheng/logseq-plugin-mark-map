@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.16
+
+- fix: allow empty block with children blocks exists.
 ## 0.3.15
 
 - fix: style for `WAITING` task and `CANCELLED` task

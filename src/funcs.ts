@@ -249,9 +249,10 @@ const blockFilter = (it: any) => {
   if (properties?.markMapDisplay === 'hidden') {
     return false
   }
-  if (!content || content.startsWith('---\n')) {
+  if (content.startsWith('---\n')) {
     return false
   }
+
   if (/---+/.test(content.trim())) {
     return false
   }
