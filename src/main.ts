@@ -110,6 +110,14 @@ const defineSettings: SettingSchemaDesc[] = [
     enumPicker: 'select',
     default: '0',
   },
+  {
+    title: 'Disable shortcuts',
+    key: 'disableShortcuts',
+    description:
+      'If you think markmap shortcuts conflict with others, you can check this option to disable it or change bindings in settings file then reload the application.',
+    type: 'boolean',
+    default: false,
+  },
 ]
 logseq.useSettingsSchema(defineSettings)
 
@@ -121,6 +129,13 @@ let editingBlockUUID = ''
 const triggerMarkmap = async ({ uuid }) => {
   const blocks = await logseq.Editor.getSelectedBlocks()
   const editing = await logseq.Editor.checkEditing()
+
+  if (!uuid) {
+    const block = await logseq.Editor.getCurrentBlock()
+    if (block && block.uuid) {
+      uuid = block.uuid
+    }
+  }
 
   if (uuid && (editing || (blocks && blocks.length > 0))) {
     editingBlockUUID = uuid
@@ -199,7 +214,9 @@ async function main() {
       label: 'Open Markmap',
       keybinding: {
         mode: 'global',
-        binding: keyBindings.openMarkmap,
+        binding: logseq.settings?.disableShortcuts
+          ? null
+          : keyBindings.openMarkmap,
       },
     },
     triggerMarkmap
@@ -210,7 +227,9 @@ async function main() {
       label: 'Open Full Markmap',
       keybinding: {
         mode: 'global',
-        binding: keyBindings.openMarkmapFull,
+        binding: logseq.settings?.disableShortcuts
+          ? null
+          : keyBindings.openMarkmapFull,
       },
     },
     triggerMarkmapForceFull

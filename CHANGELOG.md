@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.17
+
+- feat: support disable shortcuts
+
 ## 0.3.16
 
 - fix: allow empty block with children blocks exists.
