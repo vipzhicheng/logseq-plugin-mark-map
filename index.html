@@ -7,7 +7,6 @@
     <title>Markmap Integration For Logseq</title>
     <script type="application/javascript">
       async function rollTaskStatus(el, event) {
-        console.log('event', event)
         event.stopPropagation()
         const config = await logseq.App.getUserConfigs()
         const uuid = el.getAttribute('data-uuid')
