@@ -204,38 +204,52 @@ export function addToolbar(mm) {
   document.getElementById('markmap-toolbar')?.append(el)
 }
 
-export const themeWorkflowTag = (str) => {
+export const themeWorkflowTag = (str, uuid: string) => {
   return str.replace(
     /^(TODO|DOING|DONE|LATER|NOW|WAITING|CANCELLED) /,
     (match, p1) => {
       switch (p1) {
         case 'TODO':
           return (
-            '<code style="background: #845EC2; color: #eee">' + p1 + '</code> '
+            `<a style="cursor:pointer;" data-task="TODO" data-uuid="${uuid}" onclick="rollTaskStatus(this, event);"><code style="background: #845EC2; color: #eee">` +
+            p1 +
+            '</code></a> '
           )
         case 'DOING':
           return (
-            '<code style="background: #FF8066; color: #eee">' + p1 + '</code> '
+            `<a style="cursor:pointer;" data-task="DOING" data-uuid="${uuid}" onclick="rollTaskStatus(this, event);"><code style="background: #FF8066; color: #eee">` +
+            p1 +
+            '</code></a> '
           )
         case 'DONE':
           return (
-            '<code style="background: #008B74; color: #eee">' + p1 + '</code> '
+            `<a style="cursor:pointer;" data-task="DONE" data-uuid="${uuid}" onclick="rollTaskStatus(this, event);"><code style="background: #008B74; color: #eee">` +
+            p1 +
+            '</code></a> '
           )
         case 'NOW':
           return (
-            '<code style="background: #006C9A; color: #eee">' + p1 + '</code> '
+            `<a style="cursor:pointer;" data-task="NOW" data-uuid="${uuid}" onclick="rollTaskStatus(this, event);"><code style="background: #006C9A; color: #eee">` +
+            p1 +
+            '</code></a> '
           )
         case 'LATER':
           return (
-            '<code style="background: #911F27; color: #eee">' + p1 + '</code> '
+            `<a style="cursor:pointer;" data-task="LATER" data-uuid="${uuid}" onclick="rollTaskStatus(this, event);"><code style="background: #911F27; color: #eee">` +
+            p1 +
+            '</code></a> '
           )
         case 'WAITING':
           return (
-            '<code style="background: #3180FF; color: #eee">' + p1 + '</code> '
+            `<a style="cursor:pointer;" data-task="WAITING" data-uuid="${uuid}" onclick="rollTaskStatus(this, event);"><code style="background: #3180FF; color: #eee">` +
+            p1 +
+            '</code></a> '
           )
         case 'CANCELLED':
           return (
-            '<code style="background: #C7C7C7; color: #222">' + p1 + '</code> '
+            `<a style="cursor:pointer;" data-task="CANCELLED" data-uuid="${uuid}" onclick="rollTaskStatus(this, event);"><code style="background: #C7C7C7; color: #222">` +
+            p1 +
+            '</code></a> '
           )
       }
     }
@@ -272,6 +286,7 @@ const blockFilter = (it: any) => {
 export const parseBlockContent = async (
   content: string,
   properties: any = {},
+  uuid: string,
   config: any = {}
 ) => {
   const contentFiltered = content
@@ -359,7 +374,7 @@ export const parseBlockContent = async (
 
   if (topic) {
     // Theme workflow tag
-    topic = themeWorkflowTag(topic)
+    topic = themeWorkflowTag(topic, uuid)
   }
 
   // process link block reference
@@ -405,7 +420,10 @@ export const parseBlockContent = async (
 
         return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${
           block.uuid
-        }' });">${themeWorkflowTag(contentFiltered || '[MISSING BLOCK]')}</a>`
+        }' });">${themeWorkflowTag(
+          contentFiltered || '[MISSING BLOCK]',
+          block.uuid
+        )}</a>`
       }
       return '[MISSING BLOCK]'
     })
@@ -422,7 +440,10 @@ export const parseBlockContent = async (
           .join('\n')
         return `<a style="cursor: pointer" target="_blank" onclick="logseq.App.pushState('page', { name: '${
           block.uuid
-        }' });">${themeWorkflowTag(contentFiltered || '[MISSING BLOCK]')}</a>`
+        }' });">${themeWorkflowTag(
+          contentFiltered || '[MISSING BLOCK]',
+          block.uuid
+        )}</a>`
       }
       return '[MISSING BLOCK]'
     })

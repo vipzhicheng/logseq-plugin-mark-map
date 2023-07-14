@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.3.18
+
+- feat: make task tag clickable
 ## 0.3.17
 
 - feat: support disable shortcuts

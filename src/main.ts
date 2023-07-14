@@ -417,6 +417,7 @@ async function main() {
         content = await parseBlockContent(
           content,
           currentBlock?.properties,
+          currentBlock.uuid,
           config
         )
         title = content
@@ -565,7 +566,7 @@ async function main() {
         // uuid, title,
         const { children, content, properties, uuid } = it
 
-        const topic = await parseBlockContent(content, properties, config)
+        const topic = await parseBlockContent(content, properties, uuid, config)
 
         // Add leading syntax according to depth.
         let ret = addPrefixToMultipleLinesBlock(
@@ -1398,6 +1399,9 @@ async function main() {
         ),
         root
       )
+
+      // @ts-ignore
+      window.mm = mm
 
       // Only bind once
       bindKeys()
