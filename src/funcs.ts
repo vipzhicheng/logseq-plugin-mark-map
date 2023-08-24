@@ -7,6 +7,7 @@ import ellipsis from 'text-ellipsis'
 import TurndownService from 'turndown'
 import { usePen } from '@/stores/pen'
 import { useHelp } from '@/stores/help'
+import { BlockEntity, BlockUUIDTuple } from '@logseq/libs/dist/LSPlugin.user'
 
 const settingsVersion = 'v3'
 export const defaultSettings = {
@@ -595,4 +596,32 @@ export const addPrefixToMultipleLinesBlock = (
       return prefix + line
     })
     .join('\n')
+}
+
+export const convertFlatBlocksToTree = async (
+  blocks: (BlockUUIDTuple | BlockEntity)[]
+): Promise<BlockEntity[]> => {
+  const children = []
+  if (blocks && blocks.length > 0) {
+    for (const item of blocks) {
+      if (Array.isArray(item)) {
+        if (!item[1]) {
+          continue
+        }
+        const block = await logseq.Editor.getBlock(item[1], {
+          includeChildren: true,
+        })
+        if (block && block.children && block.children.length > 0) {
+          block.children = await convertFlatBlocksToTree(
+            block.children as BlockUUIDTuple[]
+          )
+        }
+        children.push(block)
+      } else {
+        children.push(item)
+      }
+    }
+  }
+
+  return children
 }

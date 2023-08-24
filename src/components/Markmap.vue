@@ -138,6 +138,22 @@ const markmapStore = useMarkmap()
   ></div>
 
   <div
+    class="absolute w-full top-4 cursor-pointer dark:text-gray-50 text-center text-sm opacity-0 hover:opacity-100"
+    :class="
+      markmapStore.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'
+    "
+  >
+    <span title="Page" class="font-bold" id="page-button">Page(!)</span> -
+    <span title="Hierarchy" class="font-bold" id="namespace-button"
+      >Hierarchy(@)</span
+    >
+    -
+    <span title="Linked References" class="font-bold" id="reference-button"
+      >Linked References(#)</span
+    >
+  </div>
+
+  <div
     title="Close"
     class="absolute right-4 top-4 cursor-pointer dark:text-gray-50"
     :class="

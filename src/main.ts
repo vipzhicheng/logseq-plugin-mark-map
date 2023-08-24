@@ -25,6 +25,7 @@ import {
   addPrefixToMultipleLinesBlock,
   addToolbar,
   closeButtonHandler,
+  convertFlatBlocksToTree,
   eventFire,
   getSettings,
   goBackButtonHandler,
@@ -123,77 +124,127 @@ logseq.useSettingsSchema(defineSettings)
 
 const transformer = new Transformer()
 
-let renderAsBlock = false
-let editingBlockUUID = ''
+async function main() {
+  let renderAsBlock = false
+  let editingBlockUUID = ''
 
-const triggerMarkmap = async ({ uuid }) => {
-  const blocks = await logseq.Editor.getSelectedBlocks()
-  const editing = await logseq.Editor.checkEditing()
+  const triggerMarkmap = async ({ uuid }) => {
+    const blocks = await logseq.Editor.getSelectedBlocks()
+    const editing = await logseq.Editor.checkEditing()
 
-  if (!uuid) {
-    const block = await logseq.Editor.getCurrentBlock()
-    if (block && block.uuid) {
-      uuid = block.uuid
+    if (!uuid) {
+      const block = await logseq.Editor.getCurrentBlock()
+      if (block && block.uuid) {
+        uuid = block.uuid
+      }
+    }
+
+    if (uuid && (editing || (blocks && blocks.length > 0))) {
+      editingBlockUUID = uuid
+      createModel().openMindMap(true)
+    } else {
+      createModel().openMindMap(false)
     }
   }
 
-  if (uuid && (editing || (blocks && blocks.length > 0))) {
+  const triggerMarkmapForceBlock = async ({ uuid }) => {
     editingBlockUUID = uuid
     createModel().openMindMap(true)
-  } else {
+  }
+  const triggerMarkmapForceFull = async () => {
     createModel().openMindMap(false)
   }
-}
 
-const triggerMarkmapForceBlock = async ({ uuid }) => {
-  editingBlockUUID = uuid
-  createModel().openMindMap(true)
-}
-const triggerMarkmapForceFull = async () => {
-  createModel().openMindMap(false)
-}
-
-/**
- * User model
- */
-function createModel() {
-  return {
-    openMindMap(blockMode = false) {
-      const helpStore = useHelp()
-      helpStore.closeHelp()
-
-      const penStore = usePen()
-      penStore.close()
-
-      const closeButton = document.getElementById('close-button')
-      closeButton.removeEventListener('click', closeButtonHandler, false)
-      closeButton.addEventListener('click', closeButtonHandler, false)
-
-      const goBackButton = document.getElementById('go-back-button')
-      goBackButton.removeEventListener('click', goBackButtonHandler, false)
-      goBackButton.addEventListener('click', goBackButtonHandler, false)
-
-      const goForwardButton = document.getElementById('go-forward-button')
-      goForwardButton.removeEventListener(
-        'click',
-        goForwardButtonHandler,
-        false
-      )
-      goForwardButton.addEventListener('click', goForwardButtonHandler, false)
-
-      if (blockMode === true || blockMode === false) {
-        renderAsBlock = blockMode
-      } else {
-        renderAsBlock = false
-      }
-      logseq.showMainUI({
-        autoFocus: true,
-      })
-    },
+  const namespaceButtonHandler = async () => {
+    let page = await logseq.Editor.getCurrentPage()
+    if (page && page.page) {
+      page = await logseq.Editor.getPage(page.page.id)
+    }
+    if (page) {
+      await renderMarkmap(`/namespace/${page.originalName}`)
+    }
   }
-}
+  const pageButtonHandler = async () => {
+    let page = await logseq.Editor.getCurrentPage()
+    if (page && page.page) {
+      page = await logseq.Editor.getPage(page.page.id)
+    }
+    if (page) {
+      await renderMarkmap()
+    }
+  }
+  const referenceButtonHandler = async () => {
+    let page = await logseq.Editor.getCurrentPage()
+    if (page && page.page) {
+      page = await logseq.Editor.getPage(page.page.id)
+    }
+    if (page) {
+      await renderMarkmap(`/reference/${page.originalName}`)
+    }
+  }
 
-async function main() {
+  /**
+   * User model
+   */
+  function createModel() {
+    return {
+      openMindMap(blockMode = false) {
+        const helpStore = useHelp()
+        helpStore.closeHelp()
+
+        const penStore = usePen()
+        penStore.close()
+
+        const pageButton = document.getElementById('page-button')
+        pageButton.removeEventListener('click', pageButtonHandler, false)
+        pageButton.addEventListener('click', pageButtonHandler, false)
+
+        const namespaceButton = document.getElementById('namespace-button')
+        namespaceButton.removeEventListener(
+          'click',
+          namespaceButtonHandler,
+          false
+        )
+        namespaceButton.addEventListener('click', namespaceButtonHandler, false)
+
+        const referenceButton = document.getElementById('reference-button')
+        referenceButton.removeEventListener(
+          'click',
+          referenceButtonHandler,
+          false
+        )
+        referenceButton.addEventListener('click', referenceButtonHandler, false)
+
+        const closeButton = document.getElementById('close-button')
+        closeButton.removeEventListener('click', closeButtonHandler, false)
+        closeButton.addEventListener('click', closeButtonHandler, false)
+
+        const goBackButton = document.getElementById('go-back-button')
+        goBackButton.removeEventListener('click', goBackButtonHandler, false)
+        goBackButton.addEventListener('click', goBackButtonHandler, false)
+
+        const goForwardButton = document.getElementById('go-forward-button')
+        goForwardButton.removeEventListener(
+          'click',
+          goForwardButtonHandler,
+          false
+        )
+        goForwardButton.addEventListener('click', goForwardButtonHandler, false)
+
+        if (blockMode === true || blockMode === false) {
+          renderAsBlock = blockMode
+        } else {
+          renderAsBlock = false
+        }
+        logseq.showMainUI({
+          autoFocus: true,
+        })
+      },
+    }
+  }
+
+  logseq.provideModel(createModel())
+
   lightbox.option({
     disableScrolling: true,
     wrapAround: true,
@@ -249,34 +300,6 @@ async function main() {
      </a>
     `,
   })
-
-  const convertFlatBlocksToTree = async (
-    blocks: (BlockUUIDTuple | BlockEntity)[]
-  ): Promise<BlockEntity[]> => {
-    const children = []
-    if (blocks && blocks.length > 0) {
-      for (const item of blocks) {
-        if (Array.isArray(item)) {
-          if (!item[1]) {
-            continue
-          }
-          const block = await logseq.Editor.getBlock(item[1], {
-            includeChildren: true,
-          })
-          if (block && block.children && block.children.length > 0) {
-            block.children = await convertFlatBlocksToTree(
-              block.children as BlockUUIDTuple[]
-            )
-          }
-          children.push(block)
-        } else {
-          children.push(item)
-        }
-      }
-    }
-
-    return children
-  }
 
   let mm: Markmap
   let currentLevel: number
@@ -371,21 +394,79 @@ async function main() {
     let blocks = await logseq.Editor.getCurrentPageBlocksTree()
     let page = (await logseq.Editor.getCurrentPage()) as any
 
+    let nodeAnchorEnabled = logseq.settings?.nodeAnchorEnabled || false
     // Make it compatible with block page trigger from markmap
     // When traverse on markmap, hook will pass the route to this function
-    if (route && route.startsWith('/page/')) {
-      const pageName = decodeURIComponent(route.substring(6))
-      if (isUUID.anyNonNil(pageName)) {
-        renderAsBlock = true
-        editingBlockUUID = pageName
-        if (page && page.page) {
-          page = await logseq.Editor.getPage(page.page.id)
-        }
-      } else {
-        renderAsBlock = false
+    if (route) {
+      if (route.startsWith('/page/')) {
+        const pageName = decodeURIComponent(route.substring(6))
+        if (isUUID.anyNonNil(pageName)) {
+          renderAsBlock = true
+          editingBlockUUID = pageName
+          if (page && page.page) {
+            page = await logseq.Editor.getPage(page.page.id)
+          }
+        } else {
+          renderAsBlock = false
 
+          page = await logseq.Editor.getPage(pageName)
+          blocks = await logseq.Editor.getPageBlocksTree(pageName)
+        }
+      } else if (route.startsWith('/namespace/')) {
+        nodeAnchorEnabled = false
+        const pageName = decodeURIComponent(route.substring(11))
+        renderAsBlock = false
         page = await logseq.Editor.getPage(pageName)
-        blocks = await logseq.Editor.getPageBlocksTree(pageName)
+
+        const namespaces = await logseq.Editor.getPagesFromNamespace(pageName)
+        const parse = function (items, pageName) {
+          const stack = []
+
+          items.forEach((item) => {
+            const cutName = item.originalName.substring(pageName.length + 1)
+
+            const names = cutName.split('/')
+            let current = stack
+            names.forEach((name) => {
+              const search = current.find((item) => item.key === name)
+
+              if (!search) {
+                current.push({
+                  key: name,
+                  content: `<a style="cursor: pointer" onclick="logseq.App.pushState('page', { name: '${item.originalName}' });">${name}</a>`,
+                  children: [],
+                })
+              } else {
+                current = search.children
+              }
+            })
+          })
+
+          return stack
+        }
+        blocks = parse(namespaces, pageName) as BlockEntity[]
+      } else if (route.startsWith('/reference/')) {
+        nodeAnchorEnabled = false
+        const pageName = decodeURIComponent(route.substring(11))
+        renderAsBlock = false
+        page = await logseq.Editor.getPage(pageName)
+
+        const references = await logseq.Editor.getPageLinkedReferences(pageName)
+        console.log('references', references)
+        const stack = [] as BlockEntity[]
+
+        references.forEach((item) => {
+          stack.push({
+            content: `<a style="cursor: pointer" onclick="logseq.App.pushState('page', { name: '${item[0].originalName}' });">${item[0].originalName}</a>`,
+            children: [
+              {
+                content: `<a style="cursor: pointer" onclick="logseq.App.pushState('page', { name: '${item[1][0].uuid}' });">#</a>`,
+              },
+            ],
+          } as BlockEntity)
+        })
+
+        blocks = stack
       }
     } else if (
       // trigger from shortcuts and slash command will not trigger route change
@@ -492,6 +573,8 @@ async function main() {
     currentLevel = -1 // reset level;
 
     let filteredBlocks = await walkTransformBlocksFilter(blocks)
+
+    // Process blocks limit
     if (
       page?.properties?.markMapLimitAll &&
       filteredBlocks.length > page?.properties?.markMapLimitAll
@@ -546,6 +629,7 @@ async function main() {
       return blocks
     }
 
+    // The final blocks to render
     filteredBlocks = walkTransformBlocksLimit(filteredBlocks)
 
     // iterate blocks
@@ -571,7 +655,7 @@ async function main() {
         // Add leading syntax according to depth.
         let ret = addPrefixToMultipleLinesBlock(
           `${' '.repeat((depth + 1) * 2)}`,
-          (logseq.settings?.nodeAnchorEnabled && page
+          (nodeAnchorEnabled && page
             ? `- <a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${uuid}' }); ">${
                 logseq.settings?.nodeAnchorIcon || '🟢'
               }</a> `
@@ -592,18 +676,20 @@ async function main() {
 
     let md =
       '- ' +
-      (renderAsBlock && logseq.settings.nodeAnchorEnabled
+      (renderAsBlock && nodeAnchorEnabled
         ? `<a style="cursor: pointer; font-size: 60%; vertical-align:middle;" target="_blank" onclick="logseq.App.pushState('page', { name: '${page.originalName}' }); ">🏠</a> `
         : '') +
       title +
       '\n\n' +
       (await walkTransformBlocks(filteredBlocks, 0, config)).join('\n')
+
+    // remove image size
     md = md.replace(
       /(!\[.*?\]\(.*?\))\{(:[a-z0-9 ]+(, )?)+\}/gi,
       (match, p1) => {
         return p1
       }
-    ) // remove image size
+    )
 
     // eslint-disable-next-line prefer-const
     let { root, features } = transformer.transform(md.trim())
@@ -1116,6 +1202,19 @@ async function main() {
           }
         )
 
+        // @ts-ignore
+        hotkeys('shift+1', async function () {
+          await pageButtonHandler()
+        })
+        // @ts-ignore
+        hotkeys('shift+2', async function () {
+          await namespaceButtonHandler()
+        })
+        // @ts-ignore
+        hotkeys('shift+3', async function () {
+          await referenceButtonHandler()
+        })
+
         // markmap shortcuts
         hotkeys('.', function () {
           // @ts-ignore
@@ -1409,6 +1508,8 @@ async function main() {
       addToolbar(mm)
     }
   }
+  // @ts-ignore
+  window.renderMarkmap = renderMarkmap
 
   logseq.on('ui:visible:changed', async ({ visible }) => {
     uiVisible = visible
@@ -1433,4 +1534,4 @@ async function main() {
   app.use(createPinia())
   app.mount('#app')
 }
-logseq.ready(createModel(), main).catch(() => console.error)
+logseq.ready(main).catch(() => console.error)
