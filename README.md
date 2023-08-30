@@ -77,6 +77,9 @@ There are so many shortcuts for each action.
 
 ### Markmap related
 
+- `shift+1`: Switch back to page view.
+- `shift+2`: Switch to hierarchy view.
+- `shift+3`: Switch to linked references view.
 - `space`: fit window in center in case you move or zoom it.
 - `0`: hide all except the central one.
 - `9`: show all.

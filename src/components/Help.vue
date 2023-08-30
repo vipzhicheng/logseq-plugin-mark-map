@@ -116,6 +116,18 @@ const penShortcuts = [
 
 const markmapShortcuts = [
   {
+    key: 'shift+1',
+    description: 'Switch back to page view.',
+  },
+  {
+    key: 'shift+2',
+    description: 'Switch to hierarchy view.',
+  },
+  {
+    key: 'shift+3',
+    description: 'Switch to linked references view.',
+  },
+  {
     key: 'SPACE',
     description: 'Fit window in center in case you move or zoom it.',
   },

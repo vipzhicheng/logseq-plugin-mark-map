@@ -3,6 +3,10 @@
 ## 0.3.18
 
 - feat: make task tag clickable
+- feat: support hierarchy and linked references
+- fix: replace query syntax to indicator
+- fix: replace table syntax to indicator
+
 ## 0.3.17
 
 - feat: support disable shortcuts

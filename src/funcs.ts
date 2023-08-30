@@ -299,6 +299,7 @@ export const parseBlockContent = async (
   // Process #+BEGIN_WARNING, #+BEGIN_NOTE, #+BEGIN_TIP, #+BEGIN_CAUTION, #+BEGIN_PINNED, #+BEGIN_IMPORTANT, #+BEGIN_QUOTE, #+BEGIN_CENTER
 
   const regexHashWarning = /#\+BEGIN_WARNING([\s\S]*?)#\+END_WARNING/im
+  const regexQuery = /#\+BEGIN_QUERY([\s\S]*?)#\+END_QUERY/im
   const regexHashNote = /#\+BEGIN_NOTE([\s\S]*?)#\+END_NOTE/im
   const regexHashTip = /#\+BEGIN_TIP([\s\S]*?)#\+END_TIP/im
   const regexHashCaution = /#\+BEGIN_CAUTION([\s\S]*?)#\+END_CAUTION/im
@@ -307,6 +308,7 @@ export const parseBlockContent = async (
   const regexHashQuote = /#\+BEGIN_QUOTE([\s\S]*?)#\+END_QUOTE/im
   const regexHashCenter = /#\+BEGIN_CENTER([\s\S]*?)#\+END_CENTER/im
   const regexLogBook = /:LOGBOOK:[\s\S]*?:END:/m
+  const regexMarkdownTable = /\|[\s-|]*?\|/m
 
   // remove logbook syntax
   if (regexLogBook.test(topic)) {
@@ -316,7 +318,9 @@ export const parseBlockContent = async (
     })
   }
 
-  if (regexHashWarning.test(topic)) {
+  if (regexMarkdownTable.test(topic)) {
+    topic = `🗓️ <a style="cursor: pointer" onclick="logseq.App.pushState('page', { name: '${uuid}' });">Markdown Table</a>`
+  } else if (regexHashWarning.test(topic)) {
     topic = topic.replace(regexHashWarning, (match, p1) => {
       return `⚠️ ${p1.trim()}`
     })
@@ -347,6 +351,10 @@ export const parseBlockContent = async (
   } else if (regexHashCenter.test(topic)) {
     topic = topic.replace(regexHashCenter, (match, p1) => {
       return `${p1.trim()}`
+    })
+  } else if (regexQuery.test(topic)) {
+    topic = topic.replace(regexQuery, (match, p1) => {
+      return `🔍 <a style="cursor: pointer" onclick="logseq.App.pushState('page', { name: '${uuid}' });">LOGSEQ QUERY</a>`
     })
   }
 
