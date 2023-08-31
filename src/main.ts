@@ -452,7 +452,6 @@ async function main() {
         page = await logseq.Editor.getPage(pageName)
 
         const references = await logseq.Editor.getPageLinkedReferences(pageName)
-        console.log('references', references)
         const stack = [] as BlockEntity[]
 
         references.forEach((item) => {

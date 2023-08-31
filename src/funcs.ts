@@ -313,7 +313,6 @@ export const parseBlockContent = async (
   // remove logbook syntax
   if (regexLogBook.test(topic)) {
     topic = topic.replace(regexLogBook, (match, p1) => {
-      console.log('match', match)
       return ''
     })
   }

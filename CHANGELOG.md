@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.3.18
+## 0.4
 
 - feat: make task tag clickable
 - feat: support hierarchy and linked references
