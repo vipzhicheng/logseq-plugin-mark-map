@@ -119,6 +119,23 @@ const defineSettings: SettingSchemaDesc[] = [
     type: 'boolean',
     default: false,
   },
+  {
+    title: '(Experimental) Enable rendering images on markmap',
+    key: 'enableRenderImage',
+    description:
+      'By default render images as icon and image alt text. If you want to render images as image, check this option.',
+    type: 'boolean',
+    default: false,
+  },
+  {
+    title: '(Experimental) Max images size for rendering',
+    key: 'maxRenderImageSize',
+    description:
+      'The longest image side length will be less than this setting.',
+    type: 'enum',
+    enumChoices: ['200', '150', '100', '50'],
+    default: '100',
+  },
 ]
 logseq.useSettingsSchema(defineSettings)
 
@@ -361,6 +378,21 @@ async function main() {
 
     if (['pdf'].includes(src.substring(src.lastIndexOf('.') + 1))) {
       result = `📄 ${alt}`
+    } else if (
+      logseq.settings?.enableRenderImage &&
+      ['png', 'jpg', 'jpeg', 'webp'].includes(
+        src.substring(src.lastIndexOf('.') + 1).toLowerCase()
+      )
+    ) {
+      const maxSize = logseq.settings?.maxRenderImageSize
+        ? logseq.settings.maxRenderImageSize
+        : '100'
+      const minSize = 20
+      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${
+        src.indexOf('http') !== 0 ? 'assets://' : ''
+      }${src}"><img alt="${alt}"  src="${
+        src.indexOf('http') !== 0 ? 'assets://' : ''
+      }${src}" style="max-width: ${maxSize}px; max-height: ${maxSize}px; min-height: ${minSize}px; min-width: ${minSize}px;"/></a>`
     } else {
       result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${
         src.indexOf('http') !== 0 ? 'assets://' : ''

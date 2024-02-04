@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.1
+
+- feat: enable rendering images on markmap, and adjust render size.
+
 ## 0.4
 
 - feat: make task tag clickable
@@ -14,6 +18,7 @@
 ## 0.3.16
 
 - fix: allow empty block with children blocks exists.
+
 ## 0.3.15
 
 - fix: style for `WAITING` task and `CANCELLED` task
