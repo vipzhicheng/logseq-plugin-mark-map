@@ -6,8 +6,15 @@ import replaceAsync from 'string-replace-async'
 import ellipsis from 'text-ellipsis'
 import TurndownService from 'turndown'
 import { usePen } from '@/stores/pen'
+import { useMarkmap } from '@/stores/markmap'
 import { useHelp } from '@/stores/help'
-import { BlockEntity, BlockUUIDTuple } from '@logseq/libs/dist/LSPlugin.user'
+import {
+  BlockEntity,
+  BlockUUIDTuple,
+  SettingSchemaDesc,
+} from '@logseq/libs/dist/LSPlugin.user'
+import { Transformer } from 'markmap-lib'
+const transformer = new Transformer()
 
 const settingsVersion = 'v3'
 export const defaultSettings = {
@@ -42,22 +49,6 @@ export const getSettings = (
   return key ? (merged[key] ? merged[key] : defaultValue) : merged
 }
 
-export const goForwardButtonHandler = async () => {
-  // @ts-ignore
-  await logseq.App.invokeExternalCommand('logseq.go/forward')
-}
-
-export const closeButtonHandler = () => {
-  logseq.hideMainUI({
-    restoreEditingCursor: true,
-  })
-}
-
-export const goBackButtonHandler = async () => {
-  // @ts-ignore
-  await logseq.App.invokeExternalCommand('logseq.go/backward')
-}
-
 export function eventFire(el: any, etype: string) {
   if (el.fireEvent) {
     el.fireEvent('on' + etype)
@@ -68,7 +59,7 @@ export function eventFire(el: any, etype: string) {
   }
 }
 
-const getSVGContent = (svg: SVGElement): string => {
+export const getSVGContent = (svg: SVGElement): string => {
   const xmlVersion = '1.1'
   const svgVersion = '1.1'
   const svgBaseProfile = 'full'
@@ -76,13 +67,20 @@ const getSVGContent = (svg: SVGElement): string => {
   const svgXmlnsXlink = 'http://www.w3.org/1999/xlink'
   const svgXmlnsEv = 'http://www.w3.org/2001/xml-events'
 
+  let svgInner = svg.innerHTML
+  svgInner = svgInner
+    .replace(/onclick=".*?"/g, '')
+    .replace(/<a class="anchor".*?>.*?<\/a>/g, '')
+
   let svgContent = `<?xml version="${xmlVersion}"?>
   <svg version="${svgVersion}"
   baseProfile="${svgBaseProfile}"
+  width="1920"
+  height="1080"
   xmlns="${svgXmlns}"
   xmlns:xlink="${svgXmlnsXlink}"
   xmlns:ev="${svgXmlnsEv}">
-  ${svg.innerHTML}
+  ${svgInner}
   </svg>`
 
   svgContent = svgContent.replace(/<br>/g, '<br/>')
@@ -90,120 +88,6 @@ const getSVGContent = (svg: SVGElement): string => {
 }
 
 // Customize toolbar
-export function addToolbar(mm) {
-  const toolbar = new Toolbar()
-  toolbar.setItems([
-    'zoomIn',
-    'zoomOut',
-    'fit',
-    'pen',
-    'save-png',
-    'save-svg',
-    'help',
-  ])
-  toolbar.setBrand(false)
-  toolbar.register({
-    id: 'pen',
-    title: 'Open pen mode',
-    content: Toolbar.icon(
-      'M12.9 6.858l4.242 4.243L7.242 21H3v-4.243l9.9-9.9zm1.414-1.414l2.121-2.122a1 1 0 0 1 1.414 0l2.829 2.829a1 1 0 0 1 0 1.414l-2.122 2.121-4.242-4.242z'
-    ),
-    onClick: async () => {
-      const penStore = usePen()
-      penStore.toggle()
-    },
-  })
-  toolbar.register({
-    id: 'save-png',
-    title: 'Save as png',
-    content: Toolbar.icon(
-      'M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z'
-    ),
-    onClick: async () => {
-      const g = document.querySelector('#markmap g').getBoundingClientRect()
-      const el = document.querySelector('#markmap-container') as HTMLElement
-      const rect = el.getBoundingClientRect()
-      const oldHeight = el.style.height
-      const oldWidth = el.style.width
-      if (g.height > g.width) {
-        el.style.height = `${Math.ceil((g.height * rect.width) / g.width)}px`
-      } else {
-        el.style.width = `${Math.ceil((g.width * rect.height) / g.height)}px`
-      }
-
-      // after container resize, fit once manually
-      await mm.fit()
-      const page = await logseq.Editor.getCurrentPage()
-      if (el) {
-        html2canvas(el, {}).then(async function (canvas: HTMLCanvasElement) {
-          const title = page?.originalName
-          const url = canvas.toDataURL('image/png')
-          const oA = document.createElement('a')
-          oA.download = title || ''
-          oA.href = url
-          document.body.appendChild(oA)
-
-          oA.click()
-          el.style.height = oldHeight
-          el.style.width = oldWidth
-          await mm.fit()
-
-          oA.remove()
-        })
-      }
-    },
-  })
-  toolbar.register({
-    id: 'save-svg',
-    title: 'Save as svg',
-    content: Toolbar.icon(
-      'M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z'
-    ),
-    onClick: async () => {
-      const svg = document.querySelector('#markmap') as SVGElement
-      const content = getSVGContent(svg)
-
-      const mime_type = 'image/svg+xml'
-
-      const blob = new Blob([content], { type: mime_type })
-
-      const page = await logseq.Editor.getCurrentPage()
-      const title = page?.originalName || 'markmap'
-      const dlink = document.createElement('a')
-      dlink.download = `${title}.svg`
-      dlink.href = window.URL.createObjectURL(blob)
-      dlink.onclick = function (e) {
-        // revokeObjectURL needs a delay to work properly
-        setTimeout(function () {
-          window.URL.revokeObjectURL(dlink.href)
-        }, 1500)
-      }
-
-      dlink.click()
-      dlink.remove()
-    },
-  })
-  toolbar.register({
-    id: 'help',
-    title: 'Show shortcuts description',
-    content: Toolbar.icon(
-      'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
-    ),
-    onClick: async () => {
-      const helpStore = useHelp()
-      helpStore.toggleHelp()
-    },
-  })
-  toolbar.attach(mm)
-  const el = toolbar.render() as HTMLElement
-  el.style.position = 'absolute'
-  el.style.bottom = '0.5rem'
-  el.style.right = '0.5rem'
-  el.style.display = 'flex'
-  el.style.flexDirection = 'column'
-  el.style.rowGap = '2px'
-  document.getElementById('markmap-toolbar')?.append(el)
-}
 
 export const themeWorkflowTag = (str, uuid: string) => {
   return str.replace(
@@ -631,4 +515,430 @@ export const convertFlatBlocksToTree = async (
   }
 
   return children
+}
+
+export const getSettingsDefinition = (): SettingSchemaDesc[] => {
+  return [
+    {
+      title: 'Theme',
+      key: 'theme',
+      description: 'Set theme',
+      type: 'enum',
+      enumPicker: 'select',
+      enumChoices: [
+        'auto',
+        'light-gray',
+        'light-red',
+        'light-blue',
+        'light-green',
+        'light-yellow',
+        'light-purple',
+        'light-pink',
+        'light-indigo',
+        'dark-indigo',
+        'dark-pink',
+        'dark-purple',
+        'dark-yellow',
+        'dark-green',
+        'dark-blue',
+        'dark-red',
+        'dark-gray',
+      ],
+      default: 'auto',
+    },
+    {
+      title: 'Enable Blur Background',
+      key: 'enableBlurBackground',
+      description: 'If you like blur background, you can enable this option',
+      type: 'boolean',
+      default: false,
+    },
+    {
+      title: 'Enable Node Anchor',
+      key: 'nodeAnchorEnabled',
+      description:
+        'Node anchor can give you the ability to pick any sub tree as a new markmap',
+      type: 'boolean',
+      default: false,
+    },
+    {
+      title: 'Node Anchor Icon',
+      key: 'nodeAnchorIcon',
+      description: 'Use your favorate anchor icon',
+      type: 'string',
+      default: '🟢',
+    },
+    {
+      title: 'Enable Autofit',
+      key: 'autofitEnabled',
+      description: 'With autofit, markmap always fit to the window.',
+      type: 'boolean',
+      default: true,
+    },
+    {
+      title: 'Enable replace Latex math expression',
+      key: 'replaceLatexMathExpressionEnabled',
+      description:
+        'Enable replace Latex math expression to make more math expression work on markmap.',
+      type: 'boolean',
+      default: false,
+    },
+    {
+      title: 'Sync Collapsed State',
+      key: 'syncCollapsedState',
+      description: 'Sync Logseq blocks collapsed state to markmap.',
+      type: 'boolean',
+      default: false,
+    },
+    {
+      title: 'Color Freeze Level',
+      key: 'colorFreezeLevel',
+      description:
+        'From the level you can freeze branches color, 0 means disabled and each branch has random color.',
+      type: 'enum',
+      enumChoices: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+      enumPicker: 'select',
+      default: '0',
+    },
+    {
+      title: 'Disable shortcuts',
+      key: 'disableShortcuts',
+      description:
+        'If you think markmap shortcuts conflict with others, you can check this option to disable it or change bindings in settings file then reload the application.',
+      type: 'boolean',
+      default: false,
+    },
+    {
+      title: '(Experimental) Enable rendering images on markmap',
+      key: 'enableRenderImage',
+      description:
+        'By default render images as icon and image alt text. If you want to render images as image, check this option.',
+      type: 'boolean',
+      default: false,
+    },
+    {
+      title: '(Experimental) Max images size for rendering',
+      key: 'maxRenderImageSize',
+      description:
+        'The longest image side length will be less than this setting.',
+      type: 'enum',
+      enumChoices: ['200', '150', '100', '50'],
+      default: '100',
+    },
+  ]
+}
+
+export const addToolbar = (mm) => {
+  const toolbar = new Toolbar()
+  toolbar.setItems([
+    'forward',
+    'back',
+    'line',
+    'page',
+    'namespace',
+    'reference',
+    'line',
+    'zoomIn',
+    'zoomOut',
+    'fit',
+    'line',
+    'pen',
+    'save-png',
+    'save-svg',
+    'line',
+    'help',
+    'close',
+  ])
+  toolbar.setBrand(false)
+
+  toolbar.register({
+    id: 'forward',
+    title: 'Go forward',
+    content: Toolbar.icon(
+      'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z'
+    ),
+    onClick: async () => {
+      // @ts-ignore
+      await logseq.App.invokeExternalCommand('logseq.go/forward')
+    },
+  })
+  toolbar.register({
+    id: 'back',
+    title: 'Go back',
+    content: Toolbar.icon(
+      'M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z'
+    ),
+    onClick: async () => {
+      // @ts-ignore
+      await logseq.App.invokeExternalCommand('logseq.go/backward')
+    },
+  })
+  toolbar.register({
+    id: 'page',
+    title: 'Switch to page mode',
+    content: Toolbar.icon(
+      'M13 1v1h1v1h1v1h1v1h1v1h1v1h1v13h-1v1H4v-1H3V2h1V1zm0 3h-1v4h4V7h-1V6h-1V5h-1zM5 3v16h12v-9h-6V9h-1V3z'
+    ),
+    onClick: async () => {
+      await pageButtonHandler()
+    },
+  })
+  toolbar.register({
+    id: 'namespace',
+    title: 'Switch to namespace mode',
+    content: Toolbar.icon(
+      'M3 3h6v4H3zm12 7h6v4h-6zm0 7h6v4h-6zm-2-4H7v5h6v2H5V9h2v2h6z'
+    ),
+    onClick: async () => {
+      await namespaceButtonHandler()
+    },
+  })
+  toolbar.register({
+    id: 'reference',
+    title: 'Switch to reference mode',
+    content: Toolbar.icon(
+      'M10.615 16.077H7.077q-1.692 0-2.884-1.192Q3 13.693 3 12q0-1.691 1.193-2.885q1.192-1.193 2.884-1.193h3.538v1H7.077q-1.27 0-2.173.904T4 12q0 1.27.904 2.173t2.173.904h3.538zM8.5 12.5v-1h7v1zm4.885 3.577v-1h3.538q1.27 0 2.173-.904T20 12q0-1.27-.904-2.173t-2.173-.904h-3.538v-1h3.538q1.692 0 2.885 1.192Q21 10.307 21 12q0 1.691-1.193 2.885q-1.192 1.193-2.884 1.193z'
+    ),
+    onClick: async () => {
+      await referenceButtonHandler()
+    },
+  })
+  toolbar.register({
+    id: 'line',
+    title: '',
+    content: Toolbar.icon(
+      'M2 14a1 1 0 0 1 1-1h22a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1',
+      {
+        class: 'line',
+      }
+    ),
+    onClick: async () => {
+      // do nothing
+    },
+  })
+
+  toolbar.register({
+    id: 'pen',
+    title: 'Open pen mode',
+    content: Toolbar.icon(
+      'M12.9 6.858l4.242 4.243L7.242 21H3v-4.243l9.9-9.9zm1.414-1.414l2.121-2.122a1 1 0 0 1 1.414 0l2.829 2.829a1 1 0 0 1 0 1.414l-2.122 2.121-4.242-4.242z'
+    ),
+    onClick: async () => {
+      const penStore = usePen()
+      penStore.toggle()
+    },
+  })
+  toolbar.register({
+    id: 'save-png',
+    title: 'Save as png',
+    content: Toolbar.icon(
+      'M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z'
+    ),
+    onClick: async () => {
+      const g = document.querySelector('#markmap g').getBoundingClientRect()
+      const el = document.querySelector('#markmap-container') as HTMLElement
+      const rect = el.getBoundingClientRect()
+      const oldHeight = el.style.height
+      const oldWidth = el.style.width
+      if (g.height > g.width) {
+        el.style.height = `${Math.ceil((g.height * rect.width) / g.width)}px`
+      } else {
+        el.style.width = `${Math.ceil((g.width * rect.height) / g.height)}px`
+      }
+
+      // after container resize, fit once manually
+      await mm.fit()
+      const page = await logseq.Editor.getCurrentPage()
+      if (el) {
+        html2canvas(el, {}).then(async function (canvas: HTMLCanvasElement) {
+          const title = page?.originalName
+          const url = canvas.toDataURL('image/png')
+          const oA = document.createElement('a')
+          oA.download = title || ''
+          oA.href = url
+          document.body.appendChild(oA)
+
+          oA.click()
+          el.style.height = oldHeight
+          el.style.width = oldWidth
+          await mm.fit()
+
+          oA.remove()
+        })
+      }
+    },
+  })
+  toolbar.register({
+    id: 'save-svg',
+    title: 'Save as svg',
+    content: Toolbar.icon(
+      'M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z'
+    ),
+    onClick: async () => {
+      const svg = document.querySelector('#markmap') as SVGElement
+      const content = getSVGContent(svg)
+
+      const mime_type = 'image/svg+xml'
+
+      const blob = new Blob([content], { type: mime_type })
+
+      const page = await logseq.Editor.getCurrentPage()
+      const title = page?.originalName || 'markmap'
+      const dlink = document.createElement('a')
+      dlink.download = `${title}.svg`
+      dlink.href = window.URL.createObjectURL(blob)
+      dlink.onclick = function (e) {
+        // revokeObjectURL needs a delay to work properly
+        setTimeout(function () {
+          window.URL.revokeObjectURL(dlink.href)
+        }, 1500)
+      }
+
+      dlink.click()
+      dlink.remove()
+    },
+  })
+  toolbar.register({
+    id: 'help',
+    title: 'Show shortcuts description',
+    content: Toolbar.icon(
+      'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
+    ),
+    onClick: async () => {
+      const helpStore = useHelp()
+      helpStore.toggleHelp()
+    },
+  })
+  toolbar.register({
+    id: 'close',
+    title: 'Close Markmap',
+    content: Toolbar.icon(
+      'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+    ),
+    onClick: async () => {
+      logseq.hideMainUI({
+        restoreEditingCursor: true,
+      })
+    },
+  })
+  toolbar.attach(mm)
+  const el = toolbar.render() as HTMLElement
+  el.style.position = 'absolute'
+  el.style.bottom = '1rem'
+  el.style.right = '1rem'
+  el.style.display = 'flex'
+  el.style.flexDirection = 'column'
+  el.style.rowGap = '2px'
+  document.getElementById('markmap-toolbar')?.append(el)
+}
+
+export const hookMarkmapTransformer = async () => {
+  let config = await logseq.App.getUserConfigs()
+
+  // reload config if graph change
+  logseq.App.onCurrentGraphChanged(async () => {
+    config = await logseq.App.getUserConfigs()
+  })
+
+  const defaultLinkRender = transformer.md.renderer.rules.link_open
+  transformer.md.inline.ruler.enable(['mark'])
+  transformer.md.renderer.rules.link_open = function (
+    tokens,
+    idx: number,
+    ...args: []
+  ) {
+    let result = defaultLinkRender(tokens, idx, ...args)
+
+    if (tokens[idx] && tokens[idx].href) {
+      result = result.replace('>', ' target="_blank">')
+    }
+
+    return result
+  }
+
+  const matchAttr = (s: string) => {
+    const r = /\b(\w+)\s*=\s*"(.*?)"/g
+    const d: any = {}
+
+    // ...  this loop will run indefinitely!
+    let m = r.exec(s)
+    while (m) {
+      d[m[1]] = m[2]
+      m = r.exec(s)
+    }
+
+    return d
+  }
+
+  const defaultImageRender = transformer.md.renderer.rules.image
+  transformer.md.renderer.rules.image = function (
+    tokens,
+    idx: number,
+    ...args: []
+  ) {
+    let result = defaultImageRender(tokens, idx, ...args)
+    const attr = matchAttr(result)
+    let src = attr.src || attr.href
+    const alt = attr.alt || attr.title || ''
+
+    if (src.indexOf('http') !== 0 && src.indexOf('..') === 0) {
+      src = config.currentGraph.substring(13) + '/' + src.replace(/\.\.\//g, '')
+    }
+
+    if (['pdf'].includes(src.substring(src.lastIndexOf('.') + 1))) {
+      result = `📄 ${alt}`
+    } else if (
+      logseq.settings?.enableRenderImage &&
+      ['png', 'jpg', 'jpeg', 'webp'].includes(
+        src.substring(src.lastIndexOf('.') + 1).toLowerCase()
+      )
+    ) {
+      const maxSize = logseq.settings?.maxRenderImageSize
+        ? logseq.settings.maxRenderImageSize
+        : '100'
+      const minSize = 20
+      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${
+        src.indexOf('http') !== 0 ? 'assets://' : ''
+      }${src}"><img alt="${alt}"  src="${
+        src.indexOf('http') !== 0 ? 'assets://' : ''
+      }${src}" style="max-width: ${maxSize}px; max-height: ${maxSize}px; min-height: ${minSize}px; min-width: ${minSize}px;"/></a>`
+    } else {
+      result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${
+        src.indexOf('http') !== 0 ? 'assets://' : ''
+      }${src}">🖼 ${alt}</a>`
+    }
+
+    return result
+  }
+}
+
+export const namespaceButtonHandler = async () => {
+  const { renderMarkmap } = useMarkmap()
+  let page = await logseq.Editor.getCurrentPage()
+  if (page && page.page) {
+    page = await logseq.Editor.getPage(page.page.id)
+  }
+  if (page) {
+    await renderMarkmap(`/namespace/${page.originalName}`)
+  }
+}
+export const pageButtonHandler = async () => {
+  const { renderMarkmap } = useMarkmap()
+  let page = await logseq.Editor.getCurrentPage()
+  if (page && page.page) {
+    page = await logseq.Editor.getPage(page.page.id)
+  }
+  if (page) {
+    await renderMarkmap()
+  }
+}
+export const referenceButtonHandler = async () => {
+  const { renderMarkmap } = useMarkmap()
+  let page = await logseq.Editor.getCurrentPage()
+  if (page && page.page) {
+    page = await logseq.Editor.getPage(page.page.id)
+  }
+  if (page) {
+    await renderMarkmap(`/reference/${page.originalName}`)
+  }
 }

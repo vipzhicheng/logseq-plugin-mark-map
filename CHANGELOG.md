@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.4.2
+
+- fix: add 3 toolbar buttons
+- fix: adjust save to svg
+- fix: adjust save to png
+- chore: refactor code
+- feat: add blur switch setting
+
 ## 0.4.1
 
 - feat: enable rendering images on markmap, and adjust render size.

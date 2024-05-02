@@ -1,19 +1,27 @@
 <script lang="ts" setup>
 import { useMarkmap } from '@/stores/markmap'
+import { useSettings } from '@/composables/useSettings'
 const markmapStore = useMarkmap()
+const { settings } = useSettings()
 </script>
 <template>
   <div
-    class="h-screen dark:bg-gray-900 dark:text-gray-50 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-sm items-center justify-center flex w-full"
-    :class="{ [markmapStore.front]: true, [markmapStore.bg]: true }"
+    class="pointer-events-auto h-screen dark:bg-gray-900 dark:text-gray-50 items-center justify-center flex w-full"
+    :class="{
+      [markmapStore.front]: true,
+      [markmapStore.bg]: true,
+      'bg-opacity-90 dark:bg-opacity-90 backdrop-blur-sm': Boolean(
+        settings?.enableBlurBackground
+      ),
+    }"
     id="markmap-container"
   >
     <svg class="w-11/12 h-5/6" id="markmap"></svg>
 
     <div
-      class="absolute bottom-4 w-full flex items-center justify-center opacity-0 hover:opacity-100"
+      class="absolute left-4 flex items-center justify-center opacity-0 hover:opacity-100"
     >
-      <div class="flex flex-row gap-2 w-auto">
+      <div class="flex flex-col gap-2 w-auto">
         <div x-data title="Random">
           <svg
             id="random-button"
@@ -136,84 +144,9 @@ const markmapStore = useMarkmap()
       markmapStore.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'
     "
   ></div>
-
-  <div
-    class="absolute w-full top-4 cursor-pointer dark:text-gray-50 text-center text-sm opacity-0 hover:opacity-100"
-    :class="
-      markmapStore.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'
-    "
-  >
-    <span title="Page" class="font-bold" id="page-button">Page(!)</span> -
-    <span title="Hierarchy" class="font-bold" id="namespace-button"
-      >Hierarchy(@)</span
-    >
-    -
-    <span title="Linked References" class="font-bold" id="reference-button"
-      >Linked References(#)</span
-    >
-  </div>
-
-  <div
-    title="Close"
-    class="absolute right-4 top-4 cursor-pointer dark:text-gray-50"
-    :class="
-      markmapStore.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'
-    "
-  >
-    <svg
-      id="close-button"
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-5 w-5 cursor-pointer"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fill-rule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-        clip-rule="evenodd"
-      />
-    </svg>
-  </div>
-  <div
-    title="Go Forward"
-    class="absolute right-10 top-4 cursor-pointer dark:text-gray-50"
-    :class="
-      markmapStore.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'
-    "
-  >
-    <svg
-      id="go-forward-button"
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-5 w-5"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fill-rule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
-        clip-rule="evenodd"
-      />
-    </svg>
-  </div>
-  <div
-    title="Go Back"
-    class="absolute right-16 top-4 cursor-pointer dark:text-gray-50"
-    :class="
-      markmapStore.bg.indexOf('900') > -1 ? 'text-gray-50' : 'text-gray-900'
-    "
-  >
-    <svg
-      id="go-back-button"
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-5 w-5"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fill-rule="evenodd"
-        d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z"
-        clip-rule="evenodd"
-      />
-    </svg>
-  </div>
 </template>
+<style>
+.mm-toolbar-item .line {
+  opacity: 0.2;
+}
+</style>

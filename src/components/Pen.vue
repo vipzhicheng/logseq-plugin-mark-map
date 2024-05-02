@@ -1,14 +1,23 @@
 <script lang="ts" setup>
 import { usePen } from '@/stores/pen'
+import { useMarkmap } from '@/stores/markmap'
 const penStore = usePen()
+const markmapStore = useMarkmap()
 </script>
 <template>
   <div
     id="pen-mode-layer"
     class="fixed top-0 left-0 w-screen h-screen flex flex-col select-none"
-    :class="penStore.visible ? '' : 'opacity-0 hidden'"
+    :class="{
+      'opacity-0 hidden': !penStore.visible,
+      'text-gray-50': markmapStore.bg.indexOf('900') > -1,
+      'text-gray-900': !(markmapStore.bg.indexOf('900') > -1),
+    }"
   >
-    <div id="toolbar" class="flex justify-center bg-gray-200">
+    <div
+      id="toolbar"
+      class="absolute bottom-0 flex justify-center bg-gray-900/20 w-full z-50"
+    >
       <div class="px-6 p-2 flex justify-wrap flex-wrap gap-0.5">
         <button class="pen-button" id="undo" aria-label="Undo" title="Undo">
           ↩️
@@ -212,5 +221,8 @@ const penStore = usePen()
 
 #toolbar {
   cursor: pointer;
+}
+
+.text-gray-50 #toolbar .active {
 }
 </style>
