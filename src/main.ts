@@ -15,7 +15,7 @@ import {
   hookMarkmapTransformer,
   initSettings,
 } from './funcs'
-import './style.css'
+import './assets/index.css'
 
 const app = createApp(App)
 app.use(createPinia())

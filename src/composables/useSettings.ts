@@ -1,5 +1,4 @@
 import '@logseq/libs'
-import { LSPluginBaseInfo } from '@logseq/libs/dist/LSPlugin.user'
 import { ref } from 'vue'
 const settings = ref(logseq.settings)
 

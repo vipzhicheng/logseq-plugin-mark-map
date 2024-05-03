@@ -66,6 +66,14 @@ export const getSVGContent = (svg: SVGElement): string => {
   const svgXmlns = 'http://www.w3.org/2000/svg'
   const svgXmlnsXlink = 'http://www.w3.org/1999/xlink'
   const svgXmlnsEv = 'http://www.w3.org/2001/xml-events'
+  const viewportWidth =
+    window.innerWidth ||
+    document.documentElement.clientWidth ||
+    document.body.clientWidth
+  const viewportHeight =
+    window.innerHeight ||
+    document.documentElement.clientHeight ||
+    document.body.clientHeight
 
   let svgInner = svg.innerHTML
   svgInner = svgInner
@@ -75,8 +83,8 @@ export const getSVGContent = (svg: SVGElement): string => {
   let svgContent = `<?xml version="${xmlVersion}"?>
   <svg version="${svgVersion}"
   baseProfile="${svgBaseProfile}"
-  width="1920"
-  height="1080"
+  width="${viewportWidth}"
+  height="${viewportHeight}"
   xmlns="${svgXmlns}"
   xmlns:xlink="${svgXmlnsXlink}"
   xmlns:ev="${svgXmlnsEv}">
@@ -630,202 +638,14 @@ export const getSettingsDefinition = (): SettingSchemaDesc[] => {
 
 export const addToolbar = (mm) => {
   const toolbar = new Toolbar()
-  toolbar.setItems([
-    'forward',
-    'back',
-    'line',
-    'page',
-    'namespace',
-    'reference',
-    'line',
-    'zoomIn',
-    'zoomOut',
-    'fit',
-    'line',
-    'pen',
-    'save-png',
-    'save-svg',
-    'line',
-    'help',
-    'close',
-  ])
+  toolbar.setItems(['zoomIn', 'zoomOut', 'fit'])
   toolbar.setBrand(false)
 
-  toolbar.register({
-    id: 'forward',
-    title: 'Go forward',
-    content: Toolbar.icon(
-      'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z'
-    ),
-    onClick: async () => {
-      // @ts-ignore
-      await logseq.App.invokeExternalCommand('logseq.go/forward')
-    },
-  })
-  toolbar.register({
-    id: 'back',
-    title: 'Go back',
-    content: Toolbar.icon(
-      'M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z'
-    ),
-    onClick: async () => {
-      // @ts-ignore
-      await logseq.App.invokeExternalCommand('logseq.go/backward')
-    },
-  })
-  toolbar.register({
-    id: 'page',
-    title: 'Switch to page mode',
-    content: Toolbar.icon(
-      'M13 1v1h1v1h1v1h1v1h1v1h1v1h1v13h-1v1H4v-1H3V2h1V1zm0 3h-1v4h4V7h-1V6h-1V5h-1zM5 3v16h12v-9h-6V9h-1V3z'
-    ),
-    onClick: async () => {
-      await pageButtonHandler()
-    },
-  })
-  toolbar.register({
-    id: 'namespace',
-    title: 'Switch to namespace mode',
-    content: Toolbar.icon(
-      'M3 3h6v4H3zm12 7h6v4h-6zm0 7h6v4h-6zm-2-4H7v5h6v2H5V9h2v2h6z'
-    ),
-    onClick: async () => {
-      await namespaceButtonHandler()
-    },
-  })
-  toolbar.register({
-    id: 'reference',
-    title: 'Switch to reference mode',
-    content: Toolbar.icon(
-      'M10.615 16.077H7.077q-1.692 0-2.884-1.192Q3 13.693 3 12q0-1.691 1.193-2.885q1.192-1.193 2.884-1.193h3.538v1H7.077q-1.27 0-2.173.904T4 12q0 1.27.904 2.173t2.173.904h3.538zM8.5 12.5v-1h7v1zm4.885 3.577v-1h3.538q1.27 0 2.173-.904T20 12q0-1.27-.904-2.173t-2.173-.904h-3.538v-1h3.538q1.692 0 2.885 1.192Q21 10.307 21 12q0 1.691-1.193 2.885q-1.192 1.193-2.884 1.193z'
-    ),
-    onClick: async () => {
-      await referenceButtonHandler()
-    },
-  })
-  toolbar.register({
-    id: 'line',
-    title: '',
-    content: Toolbar.icon(
-      'M2 14a1 1 0 0 1 1-1h22a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1',
-      {
-        class: 'line',
-      }
-    ),
-    onClick: async () => {
-      // do nothing
-    },
-  })
-
-  toolbar.register({
-    id: 'pen',
-    title: 'Open pen mode',
-    content: Toolbar.icon(
-      'M12.9 6.858l4.242 4.243L7.242 21H3v-4.243l9.9-9.9zm1.414-1.414l2.121-2.122a1 1 0 0 1 1.414 0l2.829 2.829a1 1 0 0 1 0 1.414l-2.122 2.121-4.242-4.242z'
-    ),
-    onClick: async () => {
-      const penStore = usePen()
-      penStore.toggle()
-    },
-  })
-  toolbar.register({
-    id: 'save-png',
-    title: 'Save as png',
-    content: Toolbar.icon(
-      'M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z'
-    ),
-    onClick: async () => {
-      const g = document.querySelector('#markmap g').getBoundingClientRect()
-      const el = document.querySelector('#markmap-container') as HTMLElement
-      const rect = el.getBoundingClientRect()
-      const oldHeight = el.style.height
-      const oldWidth = el.style.width
-      if (g.height > g.width) {
-        el.style.height = `${Math.ceil((g.height * rect.width) / g.width)}px`
-      } else {
-        el.style.width = `${Math.ceil((g.width * rect.height) / g.height)}px`
-      }
-
-      // after container resize, fit once manually
-      await mm.fit()
-      const page = await logseq.Editor.getCurrentPage()
-      if (el) {
-        html2canvas(el, {}).then(async function (canvas: HTMLCanvasElement) {
-          const title = page?.originalName
-          const url = canvas.toDataURL('image/png')
-          const oA = document.createElement('a')
-          oA.download = title || ''
-          oA.href = url
-          document.body.appendChild(oA)
-
-          oA.click()
-          el.style.height = oldHeight
-          el.style.width = oldWidth
-          await mm.fit()
-
-          oA.remove()
-        })
-      }
-    },
-  })
-  toolbar.register({
-    id: 'save-svg',
-    title: 'Save as svg',
-    content: Toolbar.icon(
-      'M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z'
-    ),
-    onClick: async () => {
-      const svg = document.querySelector('#markmap') as SVGElement
-      const content = getSVGContent(svg)
-
-      const mime_type = 'image/svg+xml'
-
-      const blob = new Blob([content], { type: mime_type })
-
-      const page = await logseq.Editor.getCurrentPage()
-      const title = page?.originalName || 'markmap'
-      const dlink = document.createElement('a')
-      dlink.download = `${title}.svg`
-      dlink.href = window.URL.createObjectURL(blob)
-      dlink.onclick = function (e) {
-        // revokeObjectURL needs a delay to work properly
-        setTimeout(function () {
-          window.URL.revokeObjectURL(dlink.href)
-        }, 1500)
-      }
-
-      dlink.click()
-      dlink.remove()
-    },
-  })
-  toolbar.register({
-    id: 'help',
-    title: 'Show shortcuts description',
-    content: Toolbar.icon(
-      'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
-    ),
-    onClick: async () => {
-      const helpStore = useHelp()
-      helpStore.toggleHelp()
-    },
-  })
-  toolbar.register({
-    id: 'close',
-    title: 'Close Markmap',
-    content: Toolbar.icon(
-      'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
-    ),
-    onClick: async () => {
-      logseq.hideMainUI({
-        restoreEditingCursor: true,
-      })
-    },
-  })
   toolbar.attach(mm)
   const el = toolbar.render() as HTMLElement
   el.style.position = 'absolute'
-  el.style.bottom = '1rem'
-  el.style.right = '1rem'
+  el.style.bottom = '0.5rem'
+  el.style.right = '0.5rem'
   el.style.display = 'flex'
   el.style.flexDirection = 'column'
   el.style.rowGap = '2px'
@@ -919,7 +739,7 @@ export const namespaceButtonHandler = async () => {
     page = await logseq.Editor.getPage(page.page.id)
   }
   if (page) {
-    await renderMarkmap(`/namespace/${page.originalName}`)
+    await renderMarkmap(`/namespace/${page.originalName}`, true)
   }
 }
 export const pageButtonHandler = async () => {
@@ -929,7 +749,7 @@ export const pageButtonHandler = async () => {
     page = await logseq.Editor.getPage(page.page.id)
   }
   if (page) {
-    await renderMarkmap()
+    await renderMarkmap(`/page/${page.originalName}`, true)
   }
 }
 export const referenceButtonHandler = async () => {
@@ -939,6 +759,6 @@ export const referenceButtonHandler = async () => {
     page = await logseq.Editor.getPage(page.page.id)
   }
   if (page) {
-    await renderMarkmap(`/reference/${page.originalName}`)
+    await renderMarkmap(`/reference/${page.originalName}`, true)
   }
 }

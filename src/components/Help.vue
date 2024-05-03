@@ -1,11 +1,16 @@
 <script lang="ts" setup>
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+
 import { useHelp } from '@/stores/help'
 const helpStore = useHelp()
-let dialogVisible = true
-
-const handleClose = () => {
-  helpStore.visible = false
-}
 
 const penShortcuts = [
   {
@@ -246,27 +251,19 @@ const markmapShortcuts = [
 ]
 </script>
 <template>
-  <div
-    id="help-modal"
-    class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center z-50"
-    :class="helpStore.visible ? '' : 'opacity-0 hidden'"
-  >
-    <div
-      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-95"
-    ></div>
-
-    <el-dialog
-      v-model="helpStore.visible"
-      title="Key bindings"
-      width="70%"
-      :before-close="handleClose"
+  <Dialog :open="helpStore.visible" @update:open="helpStore.setHelp">
+    <DialogContent
+      class="sm:max-w-[70%] grid-rows-[auto_minmax(0,1fr)_auto] p-0 max-h-[90dvh]"
     >
+      <DialogHeader class="p-6 pb-0">
+        <DialogTitle>Key bindings</DialogTitle>
+        <DialogDescription>
+          Using shortcuts, you can fine-grained control the mindmap.
+        </DialogDescription>
+      </DialogHeader>
       <div class="flex flex-col justify-center h-full">
         <!-- Table -->
         <div class="w-full mx-auto bg-white shadow-lg rounded-sm">
-          <div class="mb-2 text-gray-900">
-            Using shortcuts, you can fine-grained control the mindmap.
-          </div>
           <div class="p-3 h-[600px] overflow-y-auto">
             <div class="grid grid-cols-2 gap-4">
               <table class="table-auto">
@@ -337,6 +334,6 @@ const markmapShortcuts = [
           </div>
         </div>
       </div>
-    </el-dialog>
-  </div>
+    </DialogContent>
+  </Dialog>
 </template>

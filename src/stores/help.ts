@@ -9,6 +9,9 @@ export const useHelp = defineStore('help', {
     toggleHelp() {
       this.visible = !this.visible
     },
+    setHelp(visible: boolean) {
+      this.visible = visible
+    },
 
     closeHelp() {
       this.visible = false

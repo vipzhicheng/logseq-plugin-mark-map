@@ -30,6 +30,14 @@ const markmapStore = useMarkmap()
         </button>
         <div class="mt-1 mx-2 opacity-25">/</div>
         <button
+          class="pen-button"
+          id="m-arrow"
+          aria-label="Arrow"
+          title="Arrow"
+        >
+          ↗
+        </button>
+        <button
           class="pen-button active"
           id="m-stylus"
           aria-label="Stylus"
@@ -43,14 +51,7 @@ const markmapStore = useMarkmap()
         <button class="pen-button" id="m-line" aria-label="Line" title="Line">
           ⁄
         </button>
-        <button
-          class="pen-button"
-          id="m-arrow"
-          aria-label="Arrow"
-          title="Arrow"
-        >
-          ↗
-        </button>
+
         <button
           class="pen-button"
           id="m-rectangle"

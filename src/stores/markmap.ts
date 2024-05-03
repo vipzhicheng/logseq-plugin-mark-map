@@ -36,7 +36,7 @@ lightbox.option({
 
 // let renderAsBlock = ref(false)
 // let editingBlockUUID = ref('')
-let mm: Markmap
+// let mm: Markmap
 let currentLevel: number
 let totalLevel: number
 let originalRoot: INode
@@ -44,6 +44,7 @@ let originalTotalLevel: number
 
 export const useMarkmap = defineStore('markmap', {
   state: () => ({
+    mm: null,
     themeMapping: {
       'light-gray': 'bg-gray-100',
       'light-red': 'bg-red-100',
@@ -120,7 +121,7 @@ export const useMarkmap = defineStore('markmap', {
       this.front = this.themeList[this.bg]
     },
 
-    async renderMarkmap(route = null) {
+    async renderMarkmap(route = null, showMessage = false) {
       let config = await logseq.App.getUserConfigs()
       // reload config if graph change
       logseq.App.onCurrentGraphChanged(async () => {
@@ -161,10 +162,14 @@ export const useMarkmap = defineStore('markmap', {
             page = await logseq.Editor.getPage(pageName)
             blocks = await logseq.Editor.getPageBlocksTree(pageName)
           }
+          showMessage && logseq.UI.showMsg('Page view')
         } else if (route.startsWith('/namespace/')) {
           nodeAnchorEnabled = false
-          const pageName = decodeURIComponent(route.substring(11))
+          let pageName = decodeURIComponent(route.substring(11))
           this.renderAsBlock = false
+          if (pageName.indexOf('/') > -1) {
+            pageName = pageName.split('/')[0]
+          }
           page = await logseq.Editor.getPage(pageName)
 
           const namespaces = await logseq.Editor.getPagesFromNamespace(pageName)
@@ -194,6 +199,7 @@ export const useMarkmap = defineStore('markmap', {
             return stack
           }
           blocks = parse(namespaces, pageName) as BlockEntity[]
+          showMessage && logseq.UI.showMsg('Namespace view')
         } else if (route.startsWith('/reference/')) {
           nodeAnchorEnabled = false
           const pageName = decodeURIComponent(route.substring(11))
@@ -203,16 +209,25 @@ export const useMarkmap = defineStore('markmap', {
           const references = await logseq.Editor.getPageLinkedReferences(
             pageName
           )
-          console.log('references', references)
           const stack = [] as BlockEntity[]
 
-          references.forEach((item) => {
-            stack.push({
-              content: `<a style="cursor: pointer" onclick="logseq.App.pushState('page', { name: '${item[0].originalName}' });">${item[0].originalName}</a>`,
-            } as BlockEntity)
-          })
+          if (references) {
+            references.forEach((item) => {
+              stack.push({
+                content: `<a style="cursor: pointer" onclick="logseq.App.pushState('page', { name: '${item[0].originalName}' });">${item[0].originalName}</a>`,
+              } as BlockEntity)
+            })
 
-          blocks = stack
+            blocks = stack
+            showMessage && logseq.UI.showMsg('Reference view')
+          } else {
+            showMessage &&
+              logseq.UI.showMsg(
+                'There is no linked reference for current page.',
+                'warning'
+              )
+            return
+          }
         }
       } else if (
         // trigger from shortcuts and slash command will not trigger route change
@@ -612,7 +627,7 @@ export const useMarkmap = defineStore('markmap', {
           // @ts-ignore
           window.root = root
           showAll(root)
-          mm.setData(root)
+          this.mm.setData(root)
           totalLevel--
           currentLevel = totalLevel
         }
@@ -626,7 +641,7 @@ export const useMarkmap = defineStore('markmap', {
           // @ts-ignore
           window.root = root
           showAll(root)
-          mm.setData(root)
+          this.mm.setData(root)
 
           totalLevel++
           currentLevel = totalLevel
@@ -639,7 +654,7 @@ export const useMarkmap = defineStore('markmap', {
           root = top.children[++pointer]
           // @ts-ignore
           window.root = root
-          mm.setData(root)
+          this.mm.setData(root)
         }
       }
 
@@ -649,7 +664,7 @@ export const useMarkmap = defineStore('markmap', {
           root = top.children[--pointer]
           // @ts-ignore
           window.root = root
-          mm.setData(root)
+          this.mm.setData(root)
         }
       }
 
@@ -659,14 +674,14 @@ export const useMarkmap = defineStore('markmap', {
         window.root = root
         stack = []
         showAll(root)
-        mm.setData(root)
+        this.mm.setData(root)
         totalLevel = originalTotalLevel
         currentLevel = totalLevel
       }
 
       let svgNode
 
-      const bindKeys = async function () {
+      const bindKeys = async () => {
         if (hotkeys) {
           // Pen shortcuts
           hotkeys(
@@ -674,7 +689,7 @@ export const useMarkmap = defineStore('markmap', {
             ctrl+1,command+1,ctrl+2,command+2,ctrl+3,command+3,ctrl+4,command+4,ctrl+5,command+5,ctrl+6,command+6,ctrl+7,command+7,ctrl+8,command+8,ctrl+9,command+9,ctrl+0,command+0,
             ctrl+alt+1,command+alt+1, ctrl+alt+2,command+alt+2, ctrl+alt+3,command+alt+3,
             alt+=,alt+-`,
-            function (event, handler) {
+            (event, handler) => {
               const penStore = usePen()
 
               switch (handler.key) {
@@ -1021,13 +1036,13 @@ export const useMarkmap = defineStore('markmap', {
             return false
           })
           hotkeys(
-            'up,down,left,right,esc,space,`,r,h,j,k,l,n,p,b,ctrl+b,command+b,q,-,=,0,9,1,2,3,4,5,/',
+            'up,down,left,right,esc,space,`,r,h,j,k,l,n,p,b,ctrl+b,command+b,q,-,=,0,9,1,2,3,4,5,shift+/',
             // @ts-ignore
-            async function (event, handler) {
+            async (event, handler) => {
               const helpStore = useHelp()
               if (
                 helpStore.visible &&
-                !['/', 'q', 'esc'].includes(handler.key)
+                !['shift+/', 'q', 'esc'].includes(handler.key)
               ) {
                 return
               }
@@ -1080,59 +1095,59 @@ export const useMarkmap = defineStore('markmap', {
                   })
                   break
                 case 'space': // space
-                  await mm?.fit()
+                  await this.mm?.fit()
                   break
                 case '0': // 0
                   currentLevel = 0
                   hideAll(root)
-                  mm.setData(root)
+                  this.mm.setData(root)
 
                   break
                 case '9': // 9
                   currentLevel = totalLevel
                   showAll(root)
-                  mm.setData(root)
+                  this.mm.setData(root)
 
                   break
                 case '1': // 1
                   hideAll(root)
                   expandLevel(root, 1)
                   currentLevel = 1
-                  mm.setData(root)
+                  this.mm.setData(root)
 
                   break
                 case '2': // 2
                   hideAll(root)
                   expandLevel(root, 2)
                   currentLevel = 2
-                  mm.setData(root)
+                  this.mm.setData(root)
 
                   break
                 case '3': // 3
                   hideAll(root)
                   expandLevel(root, 3)
                   currentLevel = 3
-                  mm.setData(root)
+                  this.mm.setData(root)
 
                   break
                 case '4': // 4
                   hideAll(root)
                   expandLevel(root, 4)
                   currentLevel = 4
-                  mm.setData(root)
+                  this.mm.setData(root)
 
                   break
                 case '5': // 5
                   hideAll(root)
                   expandLevel(root, 5)
                   currentLevel = 5
-                  mm.setData(root)
+                  this.mm.setData(root)
 
                   break
                 case 'h': // h
                   hideAll(root)
                   expandLevel(root, currentLevel > 0 ? --currentLevel : 0)
-                  mm.setData(root)
+                  this.mm.setData(root)
                   break
                 case 'l': // l
                   hideAll(root)
@@ -1140,23 +1155,23 @@ export const useMarkmap = defineStore('markmap', {
                     root,
                     currentLevel < totalLevel ? ++currentLevel : totalLevel
                   )
-                  mm.setData(root)
+                  this.mm.setData(root)
                   break
 
                 case 'j': // j
                   expandStepByStep(root)
-                  mm.setData(root)
+                  this.mm.setData(root)
                   break
                 case 'k': // k
                   collapseStepByStep(root)
-                  mm.setData(root)
+                  this.mm.setData(root)
                   break
 
                 case '=': // +
-                  await mm.rescale(1.25)
+                  await this.mm.rescale(1.25)
                   break
                 case '-': // -
-                  await mm.rescale(0.8)
+                  await this.mm.rescale(0.8)
                   break
                 case 'ctrl+b':
                 case 'command+b':
@@ -1171,72 +1186,80 @@ export const useMarkmap = defineStore('markmap', {
                   eventFire(elRandomButton, 'click')
                   break
                 case 'up':
-                  svgNode = mm.svg.node()
+                  svgNode = this.mm.svg.node()
                   if (svgNode) {
                     // @ts-ignore
-                    const transform = d3.zoomTransform(mm.svg.node())
+                    const transform = d3.zoomTransform(this.mm.svg.node())
                     if (transform.x && transform.y && transform.k) {
                       // @ts-ignore
                       transform.y = transform.y - 100
                       // @ts-ignore
-                      mm.transition(mm.g).attr(
-                        'transform',
-                        `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
-                      )
+                      this.mm
+                        .transition(this.mm.g)
+                        .attr(
+                          'transform',
+                          `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
+                        )
                     }
                   }
                   break
                 case 'down':
-                  svgNode = mm.svg.node()
+                  svgNode = this.mm.svg.node()
                   if (svgNode) {
                     // @ts-ignore
-                    const transform = d3.zoomTransform(mm.svg.node())
+                    const transform = d3.zoomTransform(this.mm.svg.node())
                     if (transform.x && transform.y && transform.k) {
                       // @ts-ignore
                       transform.y = transform.y + 100
                       // @ts-ignore
-                      mm.transition(mm.g).attr(
-                        'transform',
-                        `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
-                      )
+                      this.mm
+                        .transition(this.mm.g)
+                        .attr(
+                          'transform',
+                          `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
+                        )
                     }
                   }
                   break
 
                 case 'left':
-                  svgNode = mm.svg.node()
+                  svgNode = this.mm.svg.node()
                   if (svgNode) {
                     // @ts-ignore
-                    const transform = d3.zoomTransform(mm.svg.node())
+                    const transform = d3.zoomTransform(this.mm.svg.node())
                     if (transform.x && transform.y && transform.k) {
                       // @ts-ignore
                       transform.x = transform.x - 100
                       // @ts-ignore
-                      mm.transition(mm.g).attr(
-                        'transform',
-                        `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
-                      )
+                      this.mm
+                        .transition(this.mm.g)
+                        .attr(
+                          'transform',
+                          `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
+                        )
                     }
                   }
                   break
                 case 'right':
-                  svgNode = mm.svg.node()
+                  svgNode = this.mm.svg.node()
                   if (svgNode) {
                     // @ts-ignore
-                    const transform = d3.zoomTransform(mm.svg.node())
+                    const transform = d3.zoomTransform(this.mm.svg.node())
                     if (transform.x && transform.y && transform.k) {
                       // @ts-ignore
                       transform.x = transform.x + 100
                       // @ts-ignore
-                      mm.transition(mm.g).attr(
-                        'transform',
-                        `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
-                      )
+                      this.mm
+                        .transition(this.mm.g)
+                        .attr(
+                          'transform',
+                          `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
+                        )
                     }
                   }
                   break
 
-                case '/': {
+                case 'shift+/': {
                   const helpStore = useHelp()
                   helpStore.toggleHelp()
                   break
@@ -1251,10 +1274,10 @@ export const useMarkmap = defineStore('markmap', {
         }
       }
 
-      if (mm) {
+      if (this.mm) {
         // reuse instance, update data
         showAllWithCollapsed(root)
-        mm.setData(
+        this.mm.setData(
           root,
           Object.assign(
             deriveOptions({
@@ -1270,7 +1293,7 @@ export const useMarkmap = defineStore('markmap', {
       } else {
         // initialize instance
         showAllWithCollapsed(root)
-        mm = Markmap.create(
+        this.mm = Markmap.create(
           '#markmap',
           Object.assign(
             deriveOptions({
@@ -1286,12 +1309,12 @@ export const useMarkmap = defineStore('markmap', {
         )
 
         // @ts-ignore
-        window.mm = mm
+        window.mm = this.mm
 
         // Only bind once
         bindKeys()
 
-        addToolbar(mm)
+        addToolbar(this.mm)
       }
     },
   },

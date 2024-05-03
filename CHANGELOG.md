@@ -2,11 +2,11 @@
 
 ## 0.4.2
 
-- fix: add 3 toolbar buttons
 - fix: adjust save to svg
-- fix: adjust save to png
 - chore: refactor code
+- chore: change ui to shadcn-vue
 - feat: add blur switch setting
+- feat: add left bottom button and control panel menu, and move most actions to it.
 
 ## 0.4.1
 
