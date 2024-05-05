@@ -133,8 +133,16 @@ const markmapShortcuts = [
     description: 'Switch to linked references view.',
   },
   {
-    key: 'SPACE',
+    key: 'space',
     description: 'Fit window in center in case you move or zoom it.',
+  },
+  {
+    key: 'shift+space',
+    description: 'Fit window in top or left to fit the window.',
+  },
+  {
+    key: 'shift+g',
+    description: 'Fit window in right or bottom to fit the window.',
   },
   {
     key: '0',
@@ -189,19 +197,19 @@ const markmapShortcuts = [
     description: 'Collapse step by step.',
   },
   {
-    key: '⬆️',
+    key: '⬆️ or shift+k',
     description: 'Move mindmap up.',
   },
   {
-    key: '⬇️',
+    key: '⬇️ or shift+j',
     description: 'Move mindmap down.',
   },
   {
-    key: '⬅️',
+    key: '⬅️ or shift+h',
     description: 'Move mindmap left.',
   },
   {
-    key: '➡️',
+    key: '➡️ or shift+l',
     description: 'Move mindmap right.',
   },
   {
@@ -245,7 +253,7 @@ const markmapShortcuts = [
     description: 'Go forward',
   },
   {
-    key: '/',
+    key: '?',
     description: 'Toggle this modal.',
   },
 ]

@@ -1036,7 +1036,7 @@ export const useMarkmap = defineStore('markmap', {
             return false
           })
           hotkeys(
-            'up,down,left,right,esc,space,`,r,h,j,k,l,n,p,b,ctrl+b,command+b,q,-,=,0,9,1,2,3,4,5,shift+/',
+            'up,down,left,right,esc,space, shift+space, shift+g, `,r,h,j,k,shift+j,shift+k,l,n,shift+l,shift+h,p,b,ctrl+b,command+b,q,-,=,0,9,1,2,3,4,5,shift+/',
             // @ts-ignore
             async (event, handler) => {
               const helpStore = useHelp()
@@ -1097,6 +1097,120 @@ export const useMarkmap = defineStore('markmap', {
                 case 'space': // space
                   await this.mm?.fit()
                   break
+                case 'shift+space': {
+                  // await this.mm?.fit()
+                  svgNode = this.mm.svg.node()
+
+                  // undefined
+                  const { width: offsetWidth, height: offsetHeight } =
+                    svgNode.getBoundingClientRect()
+                  const { fitRatio } = this.mm.options
+                  const { minX, maxX, minY, maxY } = this.mm.state
+                  const naturalWidth = maxY - minY
+                  const naturalHeight = maxX - minX
+                  const aspectRatio = naturalWidth / naturalHeight
+
+                  // 确定基于短边缩放
+                  let scale
+                  if (aspectRatio > 1) {
+                    // 宽度大于高度，基于宽度缩放
+                    scale = Math.min(
+                      (offsetHeight / naturalHeight) * fitRatio,
+                      4
+                    )
+                  } else {
+                    // 高度大于或等于宽度，基于高度缩放
+                    scale = Math.min((offsetWidth / naturalWidth) * fitRatio, 4)
+                  }
+
+                  if (svgNode) {
+                    // @ts-ignore
+                    const transform = d3.zoomTransform(this.mm.svg.node())
+                    // @ts-ignore
+                    let translateX, translateY
+                    if (aspectRatio > 1) {
+                      // 宽度大于高度，定位到左边
+                      translateX = 0 - minY * scale
+                      translateY =
+                        (offsetHeight - naturalHeight * scale) / 2 -
+                        minX * scale
+                    } else {
+                      // 高度大于或等于宽度，定位到最顶部
+                      translateX = 0 - minY * scale
+                      translateY = 0 - minX * scale
+                    }
+                    transform.x = translateX
+                    transform.y = translateY
+                    transform.k = scale
+                    // @ts-ignore
+                    this.mm
+                      .transition(this.mm.g)
+                      .attr(
+                        'transform',
+                        `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
+                      )
+                  }
+                  break
+                }
+                case 'shift+g': {
+                  // await this.mm?.fit()
+                  svgNode = this.mm.svg.node()
+
+                  // undefined
+                  const { width: offsetWidth, height: offsetHeight } =
+                    svgNode.getBoundingClientRect()
+                  const { fitRatio } = this.mm.options
+                  const { minX, maxX, minY, maxY } = this.mm.state
+                  const naturalWidth = maxY - minY
+                  const naturalHeight = maxX - minX
+                  const aspectRatio = naturalWidth / naturalHeight
+
+                  // 确定基于短边缩放
+                  let scale
+                  if (aspectRatio > 1) {
+                    // 宽度大于高度，基于宽度缩放
+                    scale = Math.min(
+                      (offsetHeight / naturalHeight) * fitRatio,
+                      4
+                    )
+                  } else {
+                    // 高度大于或等于宽度，基于高度缩放
+                    scale = Math.min((offsetWidth / naturalWidth) * fitRatio, 4)
+                  }
+
+                  if (svgNode) {
+                    // @ts-ignore
+                    const transform = d3.zoomTransform(this.mm.svg.node())
+                    // @ts-ignore
+                    let translateX, translateY
+                    if (aspectRatio > 1) {
+                      // 宽度大于高度，定位到左边
+                      translateX =
+                        0 - minY * scale - (naturalWidth * scale - offsetWidth)
+                      translateY =
+                        (offsetHeight - naturalHeight * scale) / 2 -
+                        minX * scale
+                    } else {
+                      // 高度大于或等于宽度，定位到最顶部
+                      translateX = 0 - minY * scale
+                      translateY =
+                        0 -
+                        minX * scale -
+                        (naturalHeight * scale - offsetHeight)
+                    }
+                    transform.x = translateX
+                    transform.y = translateY
+                    transform.k = scale
+                    // @ts-ignore
+                    this.mm
+                      .transition(this.mm.g)
+                      .attr(
+                        'transform',
+                        `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
+                      )
+                  }
+                  break
+                }
                 case '0': // 0
                   currentLevel = 0
                   hideAll(root)
@@ -1186,24 +1300,7 @@ export const useMarkmap = defineStore('markmap', {
                   eventFire(elRandomButton, 'click')
                   break
                 case 'up':
-                  svgNode = this.mm.svg.node()
-                  if (svgNode) {
-                    // @ts-ignore
-                    const transform = d3.zoomTransform(this.mm.svg.node())
-                    if (transform.x && transform.y && transform.k) {
-                      // @ts-ignore
-                      transform.y = transform.y - 100
-                      // @ts-ignore
-                      this.mm
-                        .transition(this.mm.g)
-                        .attr(
-                          'transform',
-                          `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
-                        )
-                    }
-                  }
-                  break
-                case 'down':
+                case 'shift+k':
                   svgNode = this.mm.svg.node()
                   if (svgNode) {
                     // @ts-ignore
@@ -1221,15 +1318,35 @@ export const useMarkmap = defineStore('markmap', {
                     }
                   }
                   break
-
-                case 'left':
+                case 'down':
+                case 'shift+j':
                   svgNode = this.mm.svg.node()
                   if (svgNode) {
                     // @ts-ignore
                     const transform = d3.zoomTransform(this.mm.svg.node())
                     if (transform.x && transform.y && transform.k) {
                       // @ts-ignore
-                      transform.x = transform.x - 100
+                      transform.y = transform.y - 100
+                      // @ts-ignore
+                      this.mm
+                        .transition(this.mm.g)
+                        .attr(
+                          'transform',
+                          `translate(${transform.x}, ${transform.y} ) scale(${transform.k})`
+                        )
+                    }
+                  }
+                  break
+
+                case 'left':
+                case 'shift+h':
+                  svgNode = this.mm.svg.node()
+                  if (svgNode) {
+                    // @ts-ignore
+                    const transform = d3.zoomTransform(this.mm.svg.node())
+                    if (transform.x && transform.y && transform.k) {
+                      // @ts-ignore
+                      transform.x = transform.x + 100
                       // @ts-ignore
                       this.mm
                         .transition(this.mm.g)
@@ -1241,13 +1358,14 @@ export const useMarkmap = defineStore('markmap', {
                   }
                   break
                 case 'right':
+                case 'shift+l':
                   svgNode = this.mm.svg.node()
                   if (svgNode) {
                     // @ts-ignore
                     const transform = d3.zoomTransform(this.mm.svg.node())
                     if (transform.x && transform.y && transform.k) {
                       // @ts-ignore
-                      transform.x = transform.x + 100
+                      transform.x = transform.x - 100
                       // @ts-ignore
                       this.mm
                         .transition(this.mm.g)

@@ -7,6 +7,7 @@
 - chore: change ui to shadcn-vue
 - feat: add blur switch setting
 - feat: add left bottom button and control panel menu, and move most actions to it.
+- feat: optimize and add some shortcuts
 
 ## 0.4.1
 
