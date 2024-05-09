@@ -1,31 +1,31 @@
-import { defineStore } from 'pinia'
-import '@logseq/libs'
-import jQuery from 'jquery'
-import lightbox from 'lightbox2'
-import 'lightbox2/dist/css/lightbox.min.css'
-import { useHelp } from '@/stores/help'
-import { usePen } from '@/stores/pen'
-import isUUID from 'is-uuid'
-import { BlockEntity } from '@logseq/libs/dist/LSPlugin.user'
 import {
   addPrefixToMultipleLinesBlock,
   addToolbar,
   convertFlatBlocksToTree,
   eventFire,
+  hookMarkmapTransformer,
   namespaceButtonHandler,
   pageButtonHandler,
   parseBlockContent,
   referenceButtonHandler,
   walkTransformBlocksFilter,
 } from '@/funcs'
-import { format, subDays } from 'date-fns'
+import { useHelp } from '@/stores/help'
+import { usePen } from '@/stores/pen'
+import '@logseq/libs'
+import { BlockEntity } from '@logseq/libs/dist/LSPlugin.user'
 import * as d3 from 'd3'
+import { format, subDays } from 'date-fns'
+import hotkeys from 'hotkeys-js'
+import isUUID from 'is-uuid'
+import jQuery from 'jquery'
+import lightbox from 'lightbox2'
+import 'lightbox2/dist/css/lightbox.min.css'
 import { INode } from 'markmap-common'
-import { Markmap, deriveOptions } from 'markmap-view'
 import { Transformer } from 'markmap-lib'
 import * as markmap from 'markmap-view'
-import hotkeys from 'hotkeys-js'
-import { ref } from 'vue'
+import { deriveOptions } from 'markmap-view'
+import { defineStore } from 'pinia'
 
 const transformer = new Transformer()
 
@@ -122,6 +122,7 @@ export const useMarkmap = defineStore('markmap', {
     },
 
     async renderMarkmap(route = null, showMessage = false) {
+      await hookMarkmapTransformer(transformer)
       let config = await logseq.App.getUserConfigs()
       // reload config if graph change
       logseq.App.onCurrentGraphChanged(async () => {

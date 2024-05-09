@@ -1,20 +1,16 @@
-import '@logseq/libs'
-import { Toolbar } from 'markmap-toolbar'
-import html2canvas from 'html2canvas'
-import org from 'org'
-import replaceAsync from 'string-replace-async'
-import ellipsis from 'text-ellipsis'
-import TurndownService from 'turndown'
-import { usePen } from '@/stores/pen'
 import { useMarkmap } from '@/stores/markmap'
-import { useHelp } from '@/stores/help'
+import '@logseq/libs'
 import {
   BlockEntity,
   BlockUUIDTuple,
   SettingSchemaDesc,
 } from '@logseq/libs/dist/LSPlugin.user'
 import { Transformer } from 'markmap-lib'
-const transformer = new Transformer()
+import { Toolbar } from 'markmap-toolbar'
+import org from 'org'
+import replaceAsync from 'string-replace-async'
+import ellipsis from 'text-ellipsis'
+import TurndownService from 'turndown'
 
 const settingsVersion = 'v3'
 export const defaultSettings = {
@@ -652,7 +648,7 @@ export const addToolbar = (mm) => {
   document.getElementById('markmap-toolbar')?.append(el)
 }
 
-export const hookMarkmapTransformer = async () => {
+export const hookMarkmapTransformer = async (transformer: Transformer) => {
   let config = await logseq.App.getUserConfigs()
 
   // reload config if graph change

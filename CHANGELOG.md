@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.3
+
+- fix: image render issue.
+
 ## 0.4.2
 
 - fix: adjust save to svg

@@ -44,9 +44,6 @@ async function main() {
   initSettings()
   const keyBindings = getSettings('keyBindings')
 
-  // Hook Markmap transformer
-  await hookMarkmapTransformer()
-
   // Define Logseq Models
   function createModel() {
     return {
