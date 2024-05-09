@@ -19,7 +19,7 @@
     "build": "VITE_CJS_IGNORE_WARNING=true vite build && cp LICENSE icon.png package.json dist/"
   },
   "dependencies": {
-    "@logseq/libs": "^0.0.14",
+    "@logseq/libs": "^0.0.17",
     "cheerio": "^1.0.0-rc.12",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

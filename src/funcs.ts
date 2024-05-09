@@ -11,6 +11,7 @@ import org from 'org'
 import replaceAsync from 'string-replace-async'
 import ellipsis from 'text-ellipsis'
 import TurndownService from 'turndown'
+import { l } from 'vite/dist/node/types.d-aGj9QkWt'
 
 const settingsVersion = 'v3'
 export const defaultSettings = {
@@ -328,7 +329,66 @@ export const parseBlockContent = async (
   if (regexBlockRef.test(topic)) {
     topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
       const block = await logseq.Editor.getBlock(p1)
-      if (block && block.content) {
+      console.log('block', block)
+      if (
+        block &&
+        block.properties &&
+        block.properties.lsType === 'annotation' &&
+        block.properties.hlType === 'area'
+      ) {
+        const page = await logseq.Editor.getPage(block.page.id)
+        console.log('xxx')
+        console.log('page', page)
+
+        let config = await logseq.App.getUserConfigs()
+        // reload config if graph change
+        logseq.App.onCurrentGraphChanged(async () => {
+          config = await logseq.App.getUserConfigs()
+        })
+        if (page.properties.filePath) {
+          let filePath = page.properties.filePath
+          if (filePath.indexOf('http') !== 0 && filePath.indexOf('..') === 0) {
+            filePath =
+              config.currentGraph.substring(13) +
+              '/' +
+              filePath.replace(/\.\.\//g, '')
+
+            filePath =
+              filePath.slice(0, -4) +
+              `/${block.properties.hlPage}_${block.properties.id}_${block.properties.hlStamp}.png`
+            let result
+            if (
+              logseq.settings?.enableRenderImage &&
+              ['png', 'jpg', 'jpeg', 'webp'].includes(
+                filePath.substring(filePath.lastIndexOf('.') + 1).toLowerCase()
+              )
+            ) {
+              const maxSize = logseq.settings?.maxRenderImageSize
+                ? logseq.settings.maxRenderImageSize
+                : '100'
+              const minSize = 20
+              result = `<a target="_blank" title="PDF Annotation P${
+                block.properties.hlPage
+              }"  data-lightbox="gallery" href="${
+                filePath.indexOf('http') !== 0 ? 'assets://' : ''
+              }${filePath}"><img alt="PDF Annotation P${
+                block.properties.hlPage
+              }"  src="${
+                filePath.indexOf('http') !== 0 ? 'assets://' : ''
+              }${filePath}" style="max-width: ${maxSize}px; max-height: ${maxSize}px; min-height: ${minSize}px; min-width: ${minSize}px;"/></a>`
+            } else {
+              result = `<a target="_blank" title="PDF Annotation P${
+                block.properties.hlPage
+              }"  data-lightbox="gallery" href="${
+                filePath.indexOf('http') !== 0 ? 'assets://' : ''
+              }${filePath}">🖼 PDF Annotation P${block.properties.hlPage}</a>`
+            }
+            if (result) {
+              return result
+            }
+          }
+        }
+      } else if (block && block.content) {
         const content = block.content
         const contentFiltered = content
           .split('\n')
@@ -732,7 +792,7 @@ export const namespaceButtonHandler = async () => {
   const { renderMarkmap } = useMarkmap()
   let page = await logseq.Editor.getCurrentPage()
   if (page && page.page) {
-    page = await logseq.Editor.getPage(page.page.id)
+    page = await logseq.Editor.getPage((page as BlockEntity).page.id)
   }
   if (page) {
     await renderMarkmap(`/namespace/${page.originalName}`, true)
@@ -742,7 +802,7 @@ export const pageButtonHandler = async () => {
   const { renderMarkmap } = useMarkmap()
   let page = await logseq.Editor.getCurrentPage()
   if (page && page.page) {
-    page = await logseq.Editor.getPage(page.page.id)
+    page = await logseq.Editor.getPage((page as BlockEntity).page.id)
   }
   if (page) {
     await renderMarkmap(`/page/${page.originalName}`, true)
@@ -752,7 +812,7 @@ export const referenceButtonHandler = async () => {
   const { renderMarkmap } = useMarkmap()
   let page = await logseq.Editor.getCurrentPage()
   if (page && page.page) {
-    page = await logseq.Editor.getPage(page.page.id)
+    page = await logseq.Editor.getPage((page as BlockEntity).page.id)
   }
   if (page) {
     await renderMarkmap(`/reference/${page.originalName}`, true)

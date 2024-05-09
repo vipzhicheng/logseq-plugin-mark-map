@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.4
+
+- fix: pdf area annotation render issue.
+
 ## 0.4.3
 
 - fix: image render issue.

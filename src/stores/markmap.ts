@@ -102,8 +102,8 @@ export const useMarkmap = defineStore('markmap', {
       this.theme = JSON.parse(localStorage.getItem('theme'))
 
       if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
-        if (this.themeMapping[logseq.settings.theme]) {
-          this.setTheme(this.themeMapping[logseq.settings.theme])
+        if (this.themeMapping[logseq.settings.theme as string]) {
+          this.setTheme(this.themeMapping[logseq.settings.theme as string])
         }
       }
     },
@@ -135,9 +135,9 @@ export const useMarkmap = defineStore('markmap', {
       markmapStore.resetTheme()
 
       if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
-        if (markmapStore.themeMapping[logseq.settings.theme]) {
+        if (markmapStore.themeMapping[logseq.settings.theme as string]) {
           markmapStore.setTheme(
-            markmapStore.themeMapping[logseq.settings.theme]
+            markmapStore.themeMapping[logseq.settings.theme as string]
           )
         }
       }
@@ -1384,7 +1384,6 @@ export const useMarkmap = defineStore('markmap', {
                   break
                 }
                 default:
-                  // console.log(handler.key);
                   break
               }
               return false
@@ -1402,7 +1401,9 @@ export const useMarkmap = defineStore('markmap', {
             deriveOptions({
               pan: true,
               maxWidth: 400,
-              colorFreezeLevel: parseInt(logseq.settings?.colorFreezeLevel),
+              colorFreezeLevel: parseInt(
+                logseq.settings.colorFreezeLevel as string
+              ),
             }),
             {
               autoFit: logseq.settings?.autofitEnabled,
@@ -1418,7 +1419,9 @@ export const useMarkmap = defineStore('markmap', {
             deriveOptions({
               pan: true,
               maxWidth: 400,
-              colorFreezeLevel: parseInt(logseq.settings?.colorFreezeLevel),
+              colorFreezeLevel: parseInt(
+                logseq.settings.colorFreezeLevel as string
+              ),
             }),
             {
               autoFit: logseq.settings?.autofitEnabled,
