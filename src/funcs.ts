@@ -329,7 +329,6 @@ export const parseBlockContent = async (
   if (regexBlockRef.test(topic)) {
     topic = await replaceAsync(topic, regexBlockRef, async (match, p1) => {
       const block = await logseq.Editor.getBlock(p1)
-      console.log('block', block)
       if (
         block &&
         block.properties &&
@@ -337,8 +336,6 @@ export const parseBlockContent = async (
         block.properties.hlType === 'area'
       ) {
         const page = await logseq.Editor.getPage(block.page.id)
-        console.log('xxx')
-        console.log('page', page)
 
         let config = await logseq.App.getUserConfigs()
         // reload config if graph change

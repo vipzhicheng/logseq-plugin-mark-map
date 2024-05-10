@@ -3,6 +3,7 @@
 ## 0.4.4
 
 - fix: pdf area annotation render issue.
+- chore: upgrade deps
 
 ## 0.4.3
 

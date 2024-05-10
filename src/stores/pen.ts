@@ -1,8 +1,7 @@
-import { defineStore } from 'pinia'
 import '@logseq/libs'
-import type { Brush, DrawingMode } from 'drauu'
+import type { DrawingMode } from 'drauu'
 import { createDrauu } from 'drauu'
-import hotkeys from 'hotkeys-js'
+import { defineStore } from 'pinia'
 
 export const usePen = defineStore('pen', {
   state: () => ({
@@ -29,7 +28,7 @@ export const usePen = defineStore('pen', {
         el: '#svg',
         brush: {
           color: '#ede215',
-          size: 1,
+          size: 5,
         },
       })
 
