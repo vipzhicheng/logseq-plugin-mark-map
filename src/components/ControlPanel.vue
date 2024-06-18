@@ -73,7 +73,7 @@ const handleSavePNG = async () => {
   const page = await logseq.Editor.getCurrentPage()
   if (el) {
     html2canvas(el, {}).then(async function (canvas: HTMLCanvasElement) {
-      const title = page?.originalName
+      const title = page?.originalName as string
       const url = canvas.toDataURL('image/png')
       const oA = document.createElement('a')
       oA.download = title || ''

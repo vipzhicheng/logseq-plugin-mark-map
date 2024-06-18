@@ -9,13 +9,8 @@ import { useSettings } from '@/composables/useSettings'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
-import {
-  getSettings,
-  getSettingsDefinition,
-  hookMarkmapTransformer,
-  initSettings,
-} from './funcs'
 import './assets/index.css'
+import { getSettings, getSettingsDefinition, initSettings } from './funcs'
 
 const app = createApp(App)
 app.use(createPinia())
@@ -162,8 +157,8 @@ async function main() {
     updateSettings(newSettings)
     resetTheme()
     if (logseq.settings?.theme && logseq.settings.theme !== 'auto') {
-      if (themeMapping[logseq.settings.theme]) {
-        setTheme(themeMapping[logseq.settings.theme])
+      if (themeMapping[logseq.settings.theme as string]) {
+        setTheme(themeMapping[logseq.settings.theme as string])
       }
     }
   })

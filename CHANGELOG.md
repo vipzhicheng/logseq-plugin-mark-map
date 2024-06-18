@@ -3,6 +3,7 @@
 ## 0.4.4
 
 - fix: pdf area annotation render issue.
+- fix: export as svg do not support image.
 - chore: upgrade deps
 
 ## 0.4.3

@@ -11,7 +11,6 @@ import org from 'org'
 import replaceAsync from 'string-replace-async'
 import ellipsis from 'text-ellipsis'
 import TurndownService from 'turndown'
-import { l } from 'vite/dist/node/types.d-aGj9QkWt'
 
 const settingsVersion = 'v3'
 export const defaultSettings = {
@@ -76,6 +75,8 @@ export const getSVGContent = (svg: SVGElement): string => {
   svgInner = svgInner
     .replace(/onclick=".*?"/g, '')
     .replace(/<a class="anchor".*?>.*?<\/a>/g, '')
+    .replace(/assets:\/\//g, '')
+    .replace(/<img([^<]*?)>/g, '<img$1/>')
 
   let svgContent = `<?xml version="${xmlVersion}"?>
   <svg version="${svgVersion}"
@@ -363,7 +364,9 @@ export const parseBlockContent = async (
               const maxSize = logseq.settings?.maxRenderImageSize
                 ? logseq.settings.maxRenderImageSize
                 : '100'
-              const minSize = 20
+              const minSize = logseq.settings?.minRenderImageSize
+                ? logseq.settings.minRenderImageSize
+                : '50'
               result = `<a target="_blank" title="PDF Annotation P${
                 block.properties.hlPage
               }"  data-lightbox="gallery" href="${
@@ -372,7 +375,7 @@ export const parseBlockContent = async (
                 block.properties.hlPage
               }"  src="${
                 filePath.indexOf('http') !== 0 ? 'assets://' : ''
-              }${filePath}" style="max-width: ${maxSize}px; max-height: ${maxSize}px; min-height: ${minSize}px; min-width: ${minSize}px;"/></a>`
+              }${filePath}" style="max-height: ${maxSize}px; min-width: ${minSize}px;"/></a>`
             } else {
               result = `<a target="_blank" title="PDF Annotation P${
                 block.properties.hlPage
@@ -685,6 +688,15 @@ export const getSettingsDefinition = (): SettingSchemaDesc[] => {
       type: 'enum',
       enumChoices: ['200', '150', '100', '50'],
       default: '100',
+    },
+    {
+      title: '(Experimental) Min images size for rendering',
+      key: 'minRenderImageSize',
+      description:
+        'The minimum image side length will be more than this setting.',
+      type: 'enum',
+      enumChoices: ['200', '150', '100', '50'],
+      default: '50',
     },
   ]
 }
