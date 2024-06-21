@@ -56,7 +56,7 @@ export function eventFire(el: any, etype: string) {
 }
 
 export const getSVGContent = (svg: SVGElement): string => {
-  const xmlVersion = '1.1'
+  const xmlVersion = '1.0'
   const svgVersion = '1.1'
   const svgBaseProfile = 'full'
   const svgXmlns = 'http://www.w3.org/2000/svg'
@@ -78,7 +78,7 @@ export const getSVGContent = (svg: SVGElement): string => {
     .replace(/assets:\/\//g, '')
     .replace(/<img([^<]*?)>/g, '<img$1/>')
 
-  let svgContent = `<?xml version="${xmlVersion}"?>
+  let svgContent = `<?xml version="${xmlVersion}" encoding="UTF-8" standalone="no"?>
   <svg version="${svgVersion}"
   baseProfile="${svgBaseProfile}"
   width="${viewportWidth}"
@@ -781,7 +781,9 @@ export const hookMarkmapTransformer = async (transformer: Transformer) => {
       const maxSize = logseq.settings?.maxRenderImageSize
         ? logseq.settings.maxRenderImageSize
         : '100'
-      const minSize = 20
+      const minSize = logseq.settings?.minRenderImageSize
+        ? logseq.settings.minRenderImageSize
+        : '50'
       result = `<a target="_blank" title="${alt}"  data-lightbox="gallery" href="${
         src.indexOf('http') !== 0 ? 'assets://' : ''
       }${src}"><img alt="${alt}"  src="${

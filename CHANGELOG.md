@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.5
+
+- fix: export as svg on Firefox
+
 ## 0.4.4
 
 - fix: pdf area annotation render issue.
