@@ -75,8 +75,16 @@ export const getSVGContent = (svg: SVGElement): string => {
   svgInner = svgInner
     .replace(/onclick=".*?"/g, '')
     .replace(/<a class="anchor".*?>.*?<\/a>/g, '')
-    .replace(/assets:\/\//g, '')
-    .replace(/<img([^<]*?)>/g, '<img$1/>')
+    .replace(/(assets:\/\/)+/g, 'assets://')
+  if (navigator.userAgent.indexOf('Windows') > -1) {
+    svgInner = svgInner.replace(/assets:\/\//g, 'file:///')
+  } else if (navigator.userAgent.indexOf('Macintosh') > -1) {
+    svgInner = svgInner.replace(/assets:\/\//g, 'file://')
+  } else {
+    // Other platform use the same rules as Mac for now.
+    svgInner = svgInner.replace(/assets:\/\//g, 'file://')
+  }
+  svgInner = svgInner.replace(/<img([^<]*?)>/g, '<img$1/>')
 
   let svgContent = `<?xml version="${xmlVersion}" encoding="UTF-8" standalone="no"?>
   <svg version="${svgVersion}"

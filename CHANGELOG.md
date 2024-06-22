@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.6
+
+- fix: compatibility when export as svg on Win/Mac
+
 ## 0.4.5
 
 - fix: export as svg on Firefox
